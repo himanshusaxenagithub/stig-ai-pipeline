@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  SAMPLE FILE — for testing stig-prep only.
+
+  This is a 6-rule excerpt modeled on the structure of the DISA
+  Apple macOS 15 (Sequoia) STIG (XCCDF 1.1 as DISA publishes it).
+  Rule IDs and titles correspond to real STIG rules; discussion,
+  check, and fix text are abbreviated illustrations, and severities
+  are illustrative. Do NOT use this file to harden a system — download
+  the official package from https://public.cyber.mil/stigs/downloads/
+-->
+<Benchmark xmlns="http://checklists.nist.gov/xccdf/1.1" id="Apple_macOS_15_STIG_SAMPLE">
+  <title>Apple macOS 15 (Sequoia) Security Technical Implementation Guide (SAMPLE EXCERPT)</title>
+  <description>Sample excerpt for parser testing.</description>
+  <plain-text id="release-info">Release: 7 Benchmark Date: 07 Apr 2026 (sample)</plain-text>
+  <version>1</version>
+
+  <Group id="V-268421">
+    <title>SRG-OS-000028-GPOS-00009</title>
+    <description>&lt;GroupDescription&gt;&lt;/GroupDescription&gt;</description>
+    <Rule id="SV-268421r1_rule" severity="medium" weight="10.0">
+      <version>APPL-15-000002</version>
+      <title>The macOS system must enforce screen saver password.</title>
+      <description>&lt;VulnDiscussion&gt;Users must authenticate when unlocking the screen saver. The screen saver acts as a session lock and prevents unauthorized users from accessing the current user's account.&lt;/VulnDiscussion&gt;&lt;FalsePositives&gt;&lt;/FalsePositives&gt;&lt;Mitigations&gt;&lt;/Mitigations&gt;</description>
+      <ident system="http://cyber.mil/cci">CCI-000056</ident>
+      <fixtext fixref="F-268421r1_fix">Install the "com.apple.screensaver" configuration profile to enable a password prompt when unlocking the screen saver. (Sample text — see official STIG.)</fixtext>
+      <check system="C-268421r1_chk">
+        <check-content>Verify the macOS system requires a password to unlock the screen saver:
+
+/usr/bin/osascript -l JavaScript &lt;&lt; EOS
+$.NSUserDefaults.alloc.initWithSuiteName('com.apple.screensaver')\
+.objectForKey('askForPassword').js
+EOS
+
+If the result is not "true", this is a finding. (Sample text — see official STIG.)</check-content>
+      </check>
+    </Rule>
+  </Group>
+
+  <Group id="V-268428">
+    <title>SRG-OS-000021-GPOS-00005</title>
+    <description>&lt;GroupDescription&gt;&lt;/GroupDescription&gt;</description>
+    <Rule id="SV-268428r1_rule" severity="medium" weight="10.0">
+      <version>APPL-15-000022</version>
+      <title>The macOS system must limit consecutive failed login attempts to three.</title>
+      <description>&lt;VulnDiscussion&gt;The macOS system must be configured to limit the number of failed login attempts to a maximum of three. When the maximum number of failed attempts is reached, the account must be locked for a period of time. This protects against brute-force attacks that attempt to gain unauthorized access.&lt;/VulnDiscussion&gt;&lt;FalsePositives&gt;&lt;/FalsePositives&gt;</description>
+      <ident system="http://cyber.mil/cci">CCI-000044</ident>
+      <ident system="http://cyber.mil/cci">CCI-002238</ident>
+      <fixtext fixref="F-268428r1_fix">Install the "com.apple.mobiledevice.passwordpolicy" configuration profile to enforce a maximum of three consecutive failed login attempts. (Sample text — see official STIG.)</fixtext>
+      <check system="C-268428r1_chk">
+        <check-content>Verify the macOS system limits consecutive failed login attempts:
+
+/usr/bin/pwpolicy getaccountpolicies | tail -n +2 | /usr/bin/xmllint --xpath '//dict/key[text()="policyAttributeMaximumFailedAuthentications"]/following-sibling::integer[1]/text()' -
+
+If the result is not 3 or lower, this is a finding. (Sample text — see official STIG.)</check-content>
+      </check>
+    </Rule>
+  </Group>
+
+  <Group id="V-268420">
+    <title>SRG-OS-000028-GPOS-00008</title>
+    <description>&lt;GroupDescription&gt;&lt;/GroupDescription&gt;</description>
+    <Rule id="SV-268420r1_rule" severity="medium" weight="10.0">
+      <version>APPL-15-000001</version>
+      <title>The macOS system must prevent Apple Watch from terminating a session lock.</title>
+      <description>&lt;VulnDiscussion&gt;Session locks must only be terminated by re-authentication with an authorized credential. Allowing an Apple Watch to unlock the system weakens the session lock. (Sample text.)&lt;/VulnDiscussion&gt;</description>
+      <ident system="http://cyber.mil/cci">CCI-000056</ident>
+      <fixtext fixref="F-268420r1_fix">Install a configuration profile that disables Apple Watch auto-unlock. (Sample text — see official STIG.)</fixtext>
+      <check system="C-268420r1_chk">
+        <check-content>Verify auto-unlock with Apple Watch is disabled. If enabled, this is a finding. (Sample text — see official STIG.)</check-content>
+      </check>
+    </Rule>
+  </Group>
+
+  <Group id="V-268426">
+    <title>SRG-OS-000002-GPOS-00002</title>
+    <description>&lt;GroupDescription&gt;&lt;/GroupDescription&gt;</description>
+    <Rule id="SV-268426r1_rule" severity="medium" weight="10.0">
+      <version>APPL-15-000012</version>
+      <title>The macOS system must automatically remove or disable temporary user accounts after 72 hours.</title>
+      <description>&lt;VulnDiscussion&gt;Temporary accounts left active beyond their intended lifetime provide an avenue for unauthorized access. They must be removed or disabled within 72 hours. (Sample text.)&lt;/VulnDiscussion&gt;</description>
+      <ident system="http://cyber.mil/cci">CCI-000016</ident>
+      <fixtext fixref="F-268426r1_fix">Remove or disable temporary accounts within 72 hours of creation. (Sample text — see official STIG.)</fixtext>
+      <check system="C-268426r1_chk">
+        <check-content>Ask the administrator if temporary accounts are used. If they persist beyond 72 hours, this is a finding. (Sample text — see official STIG.)</check-content>
+      </check>
+    </Rule>
+  </Group>
+
+  <Group id="V-268427">
+    <title>SRG-OS-000355-GPOS-00143</title>
+    <description>&lt;GroupDescription&gt;&lt;/GroupDescription&gt;</description>
+    <Rule id="SV-268427r1_rule" severity="medium" weight="10.0">
+      <version>APPL-15-000014</version>
+      <title>The macOS system must enforce time synchronization.</title>
+      <description>&lt;VulnDiscussion&gt;Accurate time is required for audit record correlation and authentication protocols. The system must synchronize with an authoritative time source. (Sample text.)&lt;/VulnDiscussion&gt;</description>
+      <ident system="http://cyber.mil/cci">CCI-001891</ident>
+      <fixtext fixref="F-268427r1_fix">Enable time synchronization: /usr/bin/sudo /usr/sbin/systemsetup -setusingnetworktime on (Sample text — see official STIG.)</fixtext>
+      <check system="C-268427r1_chk">
+        <check-content>Verify network time is enabled: /usr/sbin/systemsetup -getusingnetworktime
+If "Network Time: On" is not returned, this is a finding. (Sample text — see official STIG.)</check-content>
+      </check>
+    </Rule>
+  </Group>
+
+  <Group id="V-268423">
+    <title>SRG-OS-000031-GPOS-00012</title>
+    <description>&lt;GroupDescription&gt;&lt;/GroupDescription&gt;</description>
+    <Rule id="SV-268423r1_rule" severity="low" weight="10.0">
+      <version>APPL-15-000007</version>
+      <title>The macOS system must disable hot corners.</title>
+      <description>&lt;VulnDiscussion&gt;A hot corner can be configured to disable the screen saver, bypassing the session lock. Hot corners must be disabled. (Sample text; severity illustrative.)&lt;/VulnDiscussion&gt;</description>
+      <ident system="http://cyber.mil/cci">CCI-000060</ident>
+      <fixtext fixref="F-268423r1_fix">Install a configuration profile that disables hot corners. (Sample text — see official STIG.)</fixtext>
+      <check system="C-268423r1_chk">
+        <check-content>Verify hot corners are disabled via profiles output. If any wvous-*-corner returns a disabling value, this is a finding. (Sample text — see official STIG.)</check-content>
+      </check>
+    </Rule>
+  </Group>
+</Benchmark>

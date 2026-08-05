@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+out/
+*.ai-cache.json
+U_*_STIG.zip
+.DS_Store
+.Rhistory
+stig-ai-pipeline-backup.zip
+PROJECT_NOTES.md
+publish_to_github.sh
