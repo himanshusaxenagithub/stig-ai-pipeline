@@ -78,6 +78,27 @@ downgraded to `needs-judgment`, and every annotation is labeled with the
 model that produced it. **AI output is an aid, not an authority — the
 official DISA STIG text is always the source of truth.**
 
+## AI skill: one-command tracker
+
+`skills/stig-to-tracker/` packages this workflow as a reusable AI skill.
+Installed into an AI assistant that supports skills (such as Claude), it
+turns a single instruction like *"parse the STIG file"* into the full
+chain: locate the STIG, run stig-prep, validate the rule count, build a
+formatted Excel tracker, and flag anomalies for human review.
+
+The tracker builder also works standalone:
+
+```bash
+pip install openpyxl   # the only extra dependency, used just for this step
+python3 -m stigprep parse U_Apple_macOS_15_V1R7_STIG.zip --format json
+python3 skills/stig-to-tracker/scripts/make_tracker.py \
+    out/*_checklist.json macos_stig_tracker.xlsx
+```
+
+The workbook has three sheets: **Summary** (counts by severity), **Tracker**
+(one row per rule, CAT I first, status dropdowns, owner/date/notes columns),
+and **Details** (full check and fix text per rule).
+
 ## Options
 
 ```
