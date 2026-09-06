@@ -1,6 +1,6 @@
 ---
 name: stig-explain
-description: Explain DISA STIG rules in plain English, ten at a time, and file the explanations so anyone gets them for free. Use this skill whenever the user asks to explain a STIG, annotate a checklist, add plain-English summaries or triage ratings to STIG rules, or says anything like "explain these rules", "what do these STIG findings mean", "annotate the tracker", "add explanations to the checklist" — even if they do not name the tool. It works on the *_checklist.json that stig-prep produces, needs no API key, and writes results into both the checklist and a shared annotations cache that stig-prep's --explain also reads.
+description: Explain DISA STIG rules in plain English, ten at a time, and file the explanations so anyone gets them for free. Use this skill whenever the user asks to explain a STIG, annotate a checklist, add plain-English summaries or triage ratings to STIG rules, or says anything like "explain these rules", "what do these STIG findings mean", "annotate the tracker", "add explanations to the checklist" — even if they do not name the tool. It works on the *_checklist.json that stig-prep produces, needs no account or external service, and writes results into both the checklist and a shared annotations file that stig-prep's --explain attaches.
 ---
 
 # STIG → plain-English explanations
@@ -82,9 +82,8 @@ listed items and merge again. On success it prints
 
 1. the `ai` field of each rule inside the checklist JSON, and
 2. `annotations/<stig-source>.ai-cache.json` at the repository root, in the
-   same format stig-prep's `--explain` uses, so the script path and the skill
-   path share one artifact. Commit that file: anyone who clones the repository
-   then gets the explanations with no API key and no assistant.
+   format stig-prep's `--explain` attaches. Commit that file: anyone who clones the repository
+   then gets the explanations with no assistant at all.
 
 ## Step 5 — Repeat until done
 

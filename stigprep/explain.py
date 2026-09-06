@@ -1,202 +1,100 @@
-"""AI explanation layer.
+"""Plain-English explanations for STIG rules.
 
-Sends STIG rules to the Anthropic API in small batches and attaches a
-plain-English summary, a triage bucket, and an automation flag to each
-rule. Results are cached on disk (keyed by rule id + model) so re-runs
-cost nothing.
+Explanations are produced by the ``stig-explain`` skill: an AI assistant the
+user already has writes, for each rule, a summary, a triage bucket, an
+automation flag and a caution, and a helper script validates and files
+them. The results live in two places, both in the same format:
 
-Requires the ANTHROPIC_API_KEY environment variable.
-No third-party dependencies — uses urllib from the standard library.
+* ``annotations/<stig-source>.ai-cache.json`` in this repository — the
+  published sets, available to anyone who clones it;
+* ``<stig-source>.ai-cache.json`` next to the STIG file — a local set the
+  user produced themselves.
+
+This module only *attaches* those explanations to a parsed benchmark. It
+makes no network calls and needs no account or key. Nothing here invents
+content: a rule with no filed explanation is left unannotated and reported.
+
+No third-party dependencies.
 """
 
 from __future__ import annotations
 
 import json
-import os
 import sys
-import time
-import urllib.error
-import urllib.request
 from pathlib import Path
 
-API_URL = "https://api.anthropic.com/v1/messages"
-API_VERSION = "2023-06-01"
-DEFAULT_MODEL = "claude-sonnet-4-5"
-BATCH_SIZE = 8
-
 TRIAGE_VALUES = ["quick-win", "config-profile", "needs-judgment", "risky-change"]
-
-SYSTEM_PROMPT = """\
-You are a senior security engineer helping a colleague work through a DISA
-STIG checklist. For each rule provided, respond with practical, accurate
-guidance. You must respond with ONLY a JSON array, one object per rule,
-each with these keys:
-- "stig_id": copied verbatim from the input
-- "summary": 1-2 plain-English sentences: what this rule actually makes
-  you do and why it matters, written for an engineer, no jargon
-- "triage": exactly one of "quick-win" (fast, low-risk to apply),
-  "config-profile" (needs an MDM/configuration profile deployed),
-  "needs-judgment" (depends on environment or mission; a human must
-  decide), "risky-change" (can lock users out or break workflows if
-  applied blindly)
-- "automation": "automatable" if check and fix can both be scripted,
-  otherwise "manual"
-- "caution": one sentence on what could go wrong applying this, or ""
-
-Do not invent commands that are not in the check/fix text. Output only
-the JSON array, no markdown fences, no commentary."""
 
 
 class ExplainError(RuntimeError):
     pass
 
 
-def _http_post(payload: dict, api_key: str) -> dict:
-    req = urllib.request.Request(
-        API_URL,
-        data=json.dumps(payload).encode(),
-        headers={
-            "content-type": "application/json",
-            "x-api-key": api_key,
-            "anthropic-version": API_VERSION,
-        },
-        method="POST",
-    )
-    with urllib.request.urlopen(req, timeout=180) as resp:
-        return json.loads(resp.read())
-
-
-def _call_api(rules_payload: list, model: str, api_key: str) -> list:
-    payload = {
-        "model": model,
-        "max_tokens": 4096,
-        "system": SYSTEM_PROMPT,
-        "messages": [{
-            "role": "user",
-            "content": json.dumps(rules_payload, ensure_ascii=False),
-        }],
-    }
-    last_err = None
-    for attempt in range(4):
-        try:
-            data = _http_post(payload, api_key)
-            text = "".join(
-                block.get("text", "")
-                for block in data.get("content", [])
-                if block.get("type") == "text"
-            ).strip()
-            if text.startswith("```"):
-                text = text.strip("`")
-                text = text[text.find("["):text.rfind("]") + 1]
-            return json.loads(text)
-        except urllib.error.HTTPError as e:
-            body = e.read().decode(errors="replace")[:300]
-            if e.code in (429, 500, 502, 503, 529) and attempt < 3:
-                time.sleep(2 ** (attempt + 1))
-                last_err = f"HTTP {e.code}: {body}"
-                continue
-            raise ExplainError(f"Anthropic API error HTTP {e.code}: {body}")
-        except (json.JSONDecodeError, KeyError) as e:
-            last_err = f"unparseable model response: {e}"
-            if attempt < 3:
-                continue
-    raise ExplainError(f"giving up after retries: {last_err}")
-
-
 def _cache_path(source: Path) -> Path:
     return source.with_suffix(".ai-cache.json")
 
 
-def explain(benchmark, source_path, model: str = DEFAULT_MODEL,
-            limit: int | None = None, progress=True) -> int:
-    """Attach AI annotations to benchmark.rules in place.
+def _repo_annotations_path(source: Path) -> Path:
+    return Path(__file__).resolve().parents[1] / "annotations" / _cache_path(source).name
 
-    Returns the number of rules annotated via the API (cache hits not
-    counted). Raises ExplainError on unrecoverable API failures.
+
+def _load(path: Path) -> dict:
+    if not path.exists():
+        return {}
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+        return data if isinstance(data, dict) else {}
+    except json.JSONDecodeError:
+        return {}
+
+
+def load_annotations(source_path) -> dict[str, dict]:
+    """Return {stig_id: annotation} from the repository set and the local
+    cache. A local entry wins over a repository entry for the same rule."""
+    source = Path(source_path)
+    merged: dict[str, dict] = {}
+    for store in (_repo_annotations_path(source), _cache_path(source)):
+        for key, value in _load(store).items():
+            sid = key.split(":", 1)[1] if ":" in key else key
+            if isinstance(value, dict) and value.get("summary"):
+                merged[sid] = value
+    return merged
+
+
+def explain(benchmark, source_path, progress: bool = True, **_ignored) -> int:
+    """Attach filed explanations to ``benchmark.rules`` in place.
+
+    Returns the number of rules annotated. Rules with no filed explanation
+    are left as they are; when any remain, a note on stderr says how to
+    produce them with the stig-explain skill.
     """
-    api_key = os.environ.get("ANTHROPIC_API_KEY", "").strip()
-
-    cache_file = _cache_path(Path(source_path))
-    cache = {}
-    if cache_file.exists():
-        try:
-            cache = json.loads(cache_file.read_text())
-        except json.JSONDecodeError:
-            cache = {}
-
-    # Also honour annotations committed to the repository (written by the
-    # stig-explain skill or by an earlier --explain run), so that a user
-    # who never sets an API key still gets the explanations.
-    repo_ann = Path(__file__).resolve().parents[1] / "annotations" / cache_file.name
-    if repo_ann.exists():
-        try:
-            for k, v in json.loads(repo_ann.read_text()).items():
-                cache.setdefault(k, v)
-        except json.JSONDecodeError:
-            pass
-    by_sid = {k.split(":", 1)[1]: v for k, v in cache.items() if ":" in k}
-
-    todo = []
+    ann = load_annotations(source_path)
+    hit = 0
+    missing = []
     for rule in benchmark.rules:
-        key = f"{model}:{rule.stig_id}"
-        if key in cache:
-            rule.ai = cache[key]
-        elif rule.stig_id in by_sid:          # annotated by another model/skill
-            rule.ai = by_sid[rule.stig_id]
-        else:
-            todo.append(rule)
-
-    if limit is not None:
-        todo = todo[:limit]
-
-    if todo and not api_key:
-        covered = len(benchmark.rules) - len(todo)
-        raise ExplainError(
-            f"{covered} of {len(benchmark.rules)} rules are covered by committed "
-            f"annotations; the remaining {len(todo)} need an API call.\n"
-            "Either run the stig-explain skill (no key needed) or set a key:\n"
-            '  export ANTHROPIC_API_KEY="sk-ant-..."  (https://console.anthropic.com)'
-        )
-    if not todo:
-        if progress:
-            print(f"  AI: all {len(benchmark.rules)} rules annotated from cache, 0 API calls",
-                  file=sys.stderr)
-        return 0
-
-    api_calls = 0
-    for i in range(0, len(todo), BATCH_SIZE):
-        batch = todo[i:i + BATCH_SIZE]
-        payload = [{
-            "stig_id": r.stig_id,
-            "severity": r.severity,
-            "title": r.title,
-            "discussion": r.discussion[:1500],
-            "check_text": r.check_text[:1500],
-            "fix_text": r.fix_text[:1500],
-        } for r in batch]
-
-        if progress:
-            done = min(i + BATCH_SIZE, len(todo))
-            print(f"  AI: annotating {done}/{len(todo)} rules...",
-                  file=sys.stderr)
-
-        results = _call_api(payload, model, api_key)
-        by_id = {item.get("stig_id"): item for item in results
-                 if isinstance(item, dict)}
-        for r in batch:
-            item = by_id.get(r.stig_id)
-            if not item:
-                continue
-            triage = item.get("triage", "")
-            r.ai = {
-                "summary": str(item.get("summary", "")).strip(),
-                "triage": triage if triage in TRIAGE_VALUES else "needs-judgment",
-                "automation": item.get("automation", "manual"),
-                "caution": str(item.get("caution", "")).strip(),
-                "model": model,
+        entry = ann.get(rule.stig_id)
+        if entry:
+            rule.ai = {
+                "summary": entry.get("summary", ""),
+                "triage": entry.get("triage") if entry.get("triage") in TRIAGE_VALUES else "needs-judgment",
+                "automation": entry.get("automation", "manual"),
+                "caution": entry.get("caution", ""),
+                "model": entry.get("model", ""),
             }
-            cache[f"{model}:{r.stig_id}"] = r.ai
-            api_calls += 1
-        cache_file.write_text(json.dumps(cache, indent=1))
+            hit += 1
+        else:
+            missing.append(rule.stig_id)
 
-    return api_calls
+    if progress:
+        total = len(benchmark.rules)
+        if hit == total:
+            print(f"  explanations: all {total} rules annotated from filed sets", file=sys.stderr)
+        elif hit:
+            print(f"  explanations: {hit} of {total} rules annotated; {len(missing)} have none yet",
+                  file=sys.stderr)
+        else:
+            print(f"  explanations: none filed for this STIG yet", file=sys.stderr)
+        if missing:
+            print("  to produce them, run the stig-explain skill "
+                  "(skills/stig-explain/SKILL.md) on this checklist", file=sys.stderr)
+    return hit

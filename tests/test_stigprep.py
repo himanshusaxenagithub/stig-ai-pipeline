@@ -80,60 +80,57 @@ class TestRender(unittest.TestCase):
 
 
 class TestExplain(unittest.TestCase):
-    def test_missing_api_key_raises(self):
+    """explain() attaches filed explanations; it never calls out anywhere."""
+
+    def _write(self, path, entries, model="test-assistant"):
+        path.write_text(json.dumps({f"{model}:{sid}": e for sid, e in entries.items()}))
+
+    def test_no_filed_explanations_leaves_rules_unannotated(self):
         b = parse_stig(SAMPLE)
-        with mock.patch.dict("os.environ", {"ANTHROPIC_API_KEY": ""}):
-            with self.assertRaises(explain_mod.ExplainError):
-                explain_mod.explain(b, SAMPLE)
-
-    def test_annotation_and_cache(self):
-        b = parse_stig(SAMPLE)
-
-        def fake_api(rules_payload, model, api_key):
-            return [{
-                "stig_id": r["stig_id"],
-                "summary": f"Explains {r['stig_id']}.",
-                "triage": "quick-win",
-                "automation": "automatable",
-                "caution": "",
-            } for r in rules_payload]
-
         with tempfile.TemporaryDirectory() as td:
             src = Path(td) / "sample.xml"
             src.write_bytes(SAMPLE.read_bytes())
-            with mock.patch.dict("os.environ",
-                                 {"ANTHROPIC_API_KEY": "sk-test"}), \
-                 mock.patch.object(explain_mod, "_call_api",
-                                   side_effect=fake_api) as api:
+            n = explain_mod.explain(b, src, progress=False)
+        self.assertEqual(n, 0)
+        self.assertTrue(all(not r.ai for r in b.rules))
+
+    def test_local_cache_next_to_source_is_attached(self):
+        b = parse_stig(SAMPLE)
+        with tempfile.TemporaryDirectory() as td:
+            src = Path(td) / "sample.xml"
+            src.write_bytes(SAMPLE.read_bytes())
+            self._write(src.with_suffix(".ai-cache.json"), {
+                r.stig_id: {"summary": f"Explains {r.stig_id}.", "triage": "quick-win",
+                            "automation": "automatable", "caution": ""} for r in b.rules})
+            n = explain_mod.explain(b, src, progress=False)
+        self.assertEqual(n, 6)
+        self.assertTrue(all(r.ai["summary"].startswith("Explains") for r in b.rules))
+
+    def test_repository_annotations_are_attached(self):
+        b = parse_stig(SAMPLE)
+        with tempfile.TemporaryDirectory() as td:
+            src = Path(td) / "sample.xml"
+            src.write_bytes(SAMPLE.read_bytes())
+            repo = Path(td) / "annotations" / "sample.ai-cache.json"
+            repo.parent.mkdir()
+            self._write(repo, {b.rules[0].stig_id: {"summary": "From the repo.",
+                               "triage": "config-profile", "automation": "manual", "caution": ""}})
+            with mock.patch.object(explain_mod, "_repo_annotations_path", return_value=repo):
                 n = explain_mod.explain(b, src, progress=False)
-                self.assertEqual(n, 6)
-                self.assertTrue(all(r.ai for r in b.rules))
-                # Second run: everything served from cache, no API calls
-                b2 = parse_stig(src)
-                first_calls = api.call_count
-                n2 = explain_mod.explain(b2, src, progress=False)
-                self.assertEqual(n2, 0)
-                self.assertEqual(api.call_count, first_calls)
-                self.assertTrue(all(r.ai for r in b2.rules))
+        self.assertEqual(n, 1)
+        self.assertEqual(b.rules[0].ai["summary"], "From the repo.")
+        self.assertFalse(b.rules[1].ai)
 
     def test_invalid_triage_normalized(self):
         b = parse_stig(SAMPLE)
-
-        def fake_api(rules_payload, model, api_key):
-            return [{"stig_id": r["stig_id"], "summary": "x",
-                     "triage": "banana", "automation": "manual",
-                     "caution": ""} for r in rules_payload]
-
         with tempfile.TemporaryDirectory() as td:
             src = Path(td) / "sample.xml"
             src.write_bytes(SAMPLE.read_bytes())
-            with mock.patch.dict("os.environ",
-                                 {"ANTHROPIC_API_KEY": "sk-test"}), \
-                 mock.patch.object(explain_mod, "_call_api",
-                                   side_effect=fake_api):
-                explain_mod.explain(b, src, progress=False)
-        self.assertTrue(all(r.ai["triage"] == "needs-judgment"
-                            for r in b.rules))
+            self._write(src.with_suffix(".ai-cache.json"), {
+                r.stig_id: {"summary": "x", "triage": "banana", "automation": "manual",
+                            "caution": ""} for r in b.rules})
+            explain_mod.explain(b, src, progress=False)
+        self.assertTrue(all(r.ai["triage"] == "needs-judgment" for r in b.rules))
 
 
 if __name__ == "__main__":

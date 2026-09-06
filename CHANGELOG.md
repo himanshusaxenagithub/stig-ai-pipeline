@@ -28,7 +28,7 @@
 
 ### Added — skills
 
-- `skills/stig-explain/` — plain-English explanations without an API key:
+- `skills/stig-explain/` — plain-English explanations:
   the assistant writes summary / triage / automation / caution for ten
   rules at a time; a helper validates and files them into the checklist
   and `annotations/`, which `--explain` also reads.
@@ -41,12 +41,17 @@
   the complete Windows 11 V2R9 explanation set (257 rules), produced with
   the skill.
 
+### Removed
+
+- The direct API annotation path and `--model`. Explanations are produced
+  with the stig-explain skill and committed; the parser attaches them.
+
 ### Changed
 
 - `not_equals` with empty output is now ERROR ("no output to evaluate"),
   not PASS. "Anything but X" is only evidence if there was an answer.
 - `make_tracker.py` adds four explanation columns when annotations exist.
-- `--explain` reads `annotations/` before calling the API.
+- `--explain` now only attaches filed explanations (repository `annotations/` and a local cache). No network calls, no account, no key anywhere in the tool.
 - stig-to-tracker plausibility ceiling raised to 500 rules (RHEL 9 V2R9
   carries 445).
 

@@ -49,46 +49,29 @@ Don't have the STIG handy? Try it on the bundled 6-rule sample first:
 python3 -m stigprep parse samples/sample_macos15_stig.xml
 ```
 
-## AI triage & explanations
+## Plain-English explanations
 
 Every rule can carry a plain-English summary, a triage bucket (`quick-win`,
 `config-profile`, `needs-judgment`, `risky-change`), an automation flag and a
-one-line caution. There are three ways to get them; the first two need no
-API key and no account.
+one-line caution. No account, no key, no external service.
 
-**1. Already in the repository.** `annotations/` ships complete explanation
-sets. Parse the matching STIG and they are picked up automatically:
+**Already in the repository.** `annotations/` ships complete explanation
+sets. Parse the matching STIG with `--explain` and they are attached:
 
 ```
 python3 -m stigprep parse U_MS_Windows_11_V2R9_STIG.zip --explain
-#  -> 257 rules annotated from annotations/, 0 API calls
+#  explanations: all 257 rules annotated from filed sets
 ```
 
 Currently shipped: Microsoft Windows 11 V2R9 (257 rules). More follow.
 
-**2. With the AI assistant you already have.** The `stig-explain` skill
-(`skills/stig-explain/`) lets any assistant that supports skills write the
-same four fields, ten rules at a time. A helper script hands it the next
-batch, validates every answer — rejecting the batch if a rating is invalid,
-a field is missing, or a command appears that is not in the rule's own text
-— and files the results into the checklist and into `annotations/`. See the
-skill for the loop; it is how the Windows 11 set was produced.
-
-**3. Direct API call.** With an [Anthropic API key](https://console.anthropic.com/)
-stig-prep can annotate any rules not already covered:
-
-```
-export ANTHROPIC_API_KEY="sk-ant-..."
-
-# Cheap test drive: annotate just 5 rules first
-python3 -m stigprep parse U_Apple_macOS_15_V1R7_STIG.zip --explain --limit 5
-
-# Full run (results are cached next to the STIG file and in annotations/ — re-runs are free)
-python3 -m stigprep parse U_Apple_macOS_15_V1R7_STIG.zip --explain
-```
-
-Whichever path produced them, the annotations land in the same place and the
-same format, so a set generated once is available to every later user.
+**Produce them for any other STIG.** The `stig-explain` skill
+(`skills/stig-explain/`) lets the AI assistant you already have write the
+four fields, ten rules at a time. A helper script hands it the next batch,
+validates every answer — rejecting the batch if a rating is invalid, a field
+is missing, or a command appears that is not in the rule's own text — and
+files the results into the checklist and into `annotations/`. That is how the
+Windows 11 set was produced. Commit the file and every later user gets it.
 
 ## Module 2: stig-scan
 
@@ -204,13 +187,13 @@ The pack ships with **every entry unreviewed**. That is not an oversight;
 an approval is worthless if it was not made by the person accountable for
 the system.
 
-## AI skill: plain-English explanations without an API key
+## AI skill: plain-English explanations
 
 `skills/stig-explain/` lets any AI assistant that supports skills produce the
-same summary / triage / automation / caution fields as `--explain`, ten rules
-at a time, with no API key. A helper script hands the assistant the next batch
+summary / triage / automation / caution fields, ten rules
+at a time. A helper script hands the assistant the next batch
 and validates and files the answers. Results land in the checklist JSON and in
-`annotations/<stig>.ai-cache.json`, which `--explain` also reads — so
+`annotations/<stig>.ai-cache.json`, which `--explain` attaches — so
 annotations committed to this repository are available to every user, with or
 without an assistant. `annotations/` currently carries the complete Windows 11
 V2R9 set (257 rules).
@@ -251,9 +234,7 @@ and **Details** (full check and fix text per rule).
 python3 -m stigprep parse <stig.zip|xccdf.xml>
     -o, --out DIR     output directory (default: ./out)
     --format LIST     md,json,csv (default: all)
-    --explain         AI annotations (needs ANTHROPIC_API_KEY)
-    --model NAME      Anthropic model (default: claude-sonnet-4-5)
-    --limit N         annotate at most N un-cached rules
+    --explain         attach plain-English explanations filed in annotations/
 ```
 
 ## Tests

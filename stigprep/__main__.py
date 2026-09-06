@@ -6,14 +6,12 @@ Usage:
 Options:
   -o, --out DIR        output directory (default: ./out)
   --format LIST        comma-separated: md,json,csv (default: all three)
-  --explain            annotate rules with AI (needs ANTHROPIC_API_KEY)
-  --model NAME         Anthropic model for --explain (default: claude-sonnet-4-5)
-  --limit N            with --explain, only annotate the first N
+  --explain            attach plain-English explanations filed in annotations/
                        un-cached rules (useful for a cheap test run)
 
 Examples:
   python3 -m stigprep parse U_Apple_macOS_15_V1R7_STIG.zip
-  python3 -m stigprep parse samples/sample_macos15_stig.xml --explain --limit 5
+  python3 -m stigprep parse U_MS_Windows_11_V2R9_STIG.zip --explain
 """
 
 from __future__ import annotations
@@ -25,7 +23,7 @@ from pathlib import Path
 
 from .parser import parse_stig
 from .render import to_markdown, to_json, to_csv
-from .explain import explain, ExplainError, DEFAULT_MODEL
+from .explain import explain, ExplainError
 
 
 def _slug(text: str) -> str:
@@ -46,10 +44,8 @@ def main(argv=None) -> int:
     p.add_argument("--format", default="md,json,csv",
                    help="comma-separated output formats (md,json,csv)")
     p.add_argument("--explain", action="store_true",
-                   help="annotate rules with AI (needs ANTHROPIC_API_KEY)")
-    p.add_argument("--model", default=DEFAULT_MODEL)
-    p.add_argument("--limit", type=int, default=None,
-                   help="with --explain, annotate at most N un-cached rules")
+                   help="attach plain-English explanations filed in annotations/ "
+                        "(produced with the stig-explain skill)")
 
     args = ap.parse_args(argv)
 
@@ -73,14 +69,8 @@ def main(argv=None) -> int:
           f"{counts.get('low', 0)} CAT III")
 
     if args.explain:
-        try:
-            n = explain(benchmark, stig_path, model=args.model,
-                        limit=args.limit)
-            cached = sum(1 for r in benchmark.rules if r.ai) - n
-            print(f"  AI: {n} rules annotated ({cached} from cache)")
-        except ExplainError as e:
-            print(f"error (AI): {e}", file=sys.stderr)
-            print("  continuing without AI annotations...", file=sys.stderr)
+        n = explain(benchmark, stig_path)
+        print(f"  explanations attached: {n} of {len(benchmark.rules)} rules")
 
     out_dir = Path(args.out)
     out_dir.mkdir(parents=True, exist_ok=True)
