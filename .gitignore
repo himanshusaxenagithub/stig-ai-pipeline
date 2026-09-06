@@ -8,3 +8,13 @@ U_*_STIG.zip
 stig-ai-pipeline-backup.zip
 PROJECT_NOTES.md
 publish_to_github.sh
+
+# STIG source packages (large, publicly downloadable from public.cyber.mil)
+U_*_STIG/
+U_*_STIG.zip
+out/
+evidence/
+
+# committed annotation caches are the published artifact
+!annotations/*.ai-cache.json
+.stage/

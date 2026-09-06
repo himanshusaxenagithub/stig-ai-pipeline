@@ -109,6 +109,9 @@ def build(data, out_path):
     for cat in ("CAT I", "CAT II", "CAT III"):
         meta.append((f"{cat} rules", sum(1 for r in rules if r.get("cat") == cat)))
     meta.append(("Parser warnings", len(warns)))
+    n_ai = sum(1 for r in rules if (r.get("ai") or {}).get("summary"))
+    if n_ai:
+        meta.append(("Rules with plain-English explanation", f"{n_ai} of {len(rules)}"))
     for i, (k, v) in enumerate(meta, start=1):
         s.cell(row=i, column=1, value=k).font = Font(bold=True)
         s.cell(row=i, column=2, value=v)
@@ -121,6 +124,10 @@ def build(data, out_path):
     t = wb.create_sheet("Tracker")
     headers = ["#", "Rule ID", "CAT", "Severity", "Requirement", "Status", "Owner", "Target date", "Notes"]
     widths = [5, 18, 9, 10, 72, 15, 12, 13, 40]
+    has_ai = any((r.get("ai") or {}).get("summary") for r in rules)
+    if has_ai:
+        headers += ["What it means", "Triage", "Scriptable", "Caution"]
+        widths += [60, 15, 12, 45]
     for c, (h, w) in enumerate(zip(headers, widths), start=1):
         t.cell(row=1, column=c, value=h)
         t.column_dimensions[get_column_letter(c)].width = w
@@ -143,6 +150,11 @@ def build(data, out_path):
         tc.alignment = Alignment(wrap_text=True, vertical="top")
         sc = t.cell(row=i, column=6, value="Open")
         dv.add(sc)
+        if has_ai:
+            ai = r.get("ai") or {}
+            for col, key in zip((10, 11, 12, 13), ("summary", "triage", "automation", "caution")):
+                c = t.cell(row=i, column=col, value=ai.get(key, ""))
+                c.alignment = Alignment(wrap_text=True, vertical="top")
         for col in range(1, len(headers) + 1):
             t.cell(row=i, column=col).border = BORDER
 

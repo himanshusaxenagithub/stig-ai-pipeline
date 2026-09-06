@@ -1,0 +1,10 @@
+{
+  "stig_id": "APPL-26-002001",
+  "command": "/bin/launchctl print-disabled system | /usr/bin/grep -c '\"com.apple.smbd\" => disabled'",
+  "stdout": "PASS",
+  "stderr": "",
+  "returncode": 0,
+  "error": "",
+  "_synthetic": true,
+  "_note": "Hand-authored demo fixture modelling an unmanaged Mac. Not a real recording."
+}

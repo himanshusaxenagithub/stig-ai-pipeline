@@ -130,11 +130,25 @@ def explain(benchmark, source_path, model: str = DEFAULT_MODEL,
         except json.JSONDecodeError:
             cache = {}
 
+    # Also honour annotations committed to the repository (written by the
+    # stig-explain skill or by an earlier --explain run), so that a user
+    # who never sets an API key still gets the explanations.
+    repo_ann = Path(__file__).resolve().parents[1] / "annotations" / cache_file.name
+    if repo_ann.exists():
+        try:
+            for k, v in json.loads(repo_ann.read_text()).items():
+                cache.setdefault(k, v)
+        except json.JSONDecodeError:
+            pass
+    by_sid = {k.split(":", 1)[1]: v for k, v in cache.items() if ":" in k}
+
     todo = []
     for rule in benchmark.rules:
         key = f"{model}:{rule.stig_id}"
         if key in cache:
             rule.ai = cache[key]
+        elif rule.stig_id in by_sid:          # annotated by another model/skill
+            rule.ai = by_sid[rule.stig_id]
         else:
             todo.append(rule)
 

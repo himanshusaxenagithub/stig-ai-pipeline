@@ -1,0 +1,10 @@
+{
+  "stig_id": "APPL-26-002021",
+  "command": "/usr/bin/osascript -l JavaScript << EOS\nfunction run() {\nlet pref1 = $.NSUserDefaults.alloc.initWithSuiteName('com.apple.SubmitDiagInfo')\\\n.objectForKey('AutoSubmit').js\nlet pref2 = $.NSUserDefaults.alloc.initWithSuiteName('com.apple.applicationaccess')\\\n.objectForKey('allowDiagnosticSubmission').js\nif ( pref1 == false && pref2 == false ){\n    return(\"true\")\n} else {\n    return(\"false\")\n}\n}\nEOS",
+  "stdout": "",
+  "stderr": "",
+  "returncode": 0,
+  "error": "",
+  "_synthetic": true,
+  "_note": "Hand-authored demo fixture modelling an unmanaged Mac. Not a real recording."
+}

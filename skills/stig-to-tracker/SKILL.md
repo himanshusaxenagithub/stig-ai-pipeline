@@ -45,7 +45,7 @@ CSV forms, drop `--format json` and all three are produced.
 ## Step 3 — Validate before building
 
 Compare the parser's printed rule count against expectations: a real OS STIG
-has roughly 150–400 rules. A count of 0 or a handful means the wrong file was
+has roughly 150–500 rules (RHEL 9 V2R9 carries 445). A count of 0 or a handful means the wrong file was
 parsed (for example, a sample or a stylesheet) — stop and tell the user rather
 than shipping an empty tracker. Also confirm the parsed title matches the
 product the user asked about.

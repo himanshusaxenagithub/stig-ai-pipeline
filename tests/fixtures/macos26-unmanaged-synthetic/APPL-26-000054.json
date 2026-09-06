@@ -1,0 +1,10 @@
+{
+  "stig_id": "APPL-26-000054",
+  "command": "fips_sshd_config=(\"Ciphers aes128-gcm@openssh.com\" \"HostbasedAcceptedAlgorithms ecdsa-sha2-nistp256,ecdsa-sha2-nistp256-cert-v01@openssh.com\" \"HostKeyAlgorithms ecdsa-sha2-nistp256-cert-v01@openssh.com,sk-ecdsa-sha2-nistp256-cert-v01@openssh.com,ecdsa-sha2-nistp256,sk-ecdsa-sha2-nistp256@openssh.com\" \"KexAlgorithms ecdh-sha2-nistp256\" \"MACs hmac-sha2-256-etm@openssh.com,hmac-sha2-256\" \"PubkeyAcceptedAlgorithms ecdsa-sha2-nistp256,ecdsa-sha2-nistp256-cert-v01@openssh.com,sk-ecdsa-sha2-nistp256-cert-v01@openssh.com\" \"CASignatureAlgorithms ecdsa-sha2-nistp256,sk-ecdsa-sha2-nistp256@openssh.com\")\ntotal=0\nfor config in $fips_sshd_config; do\ntotal=$(expr $(/usr/sbin/sshd -G | /usr/bin/grep -i -c \"$config\") + $total)\ndone\n\necho $total",
+  "stdout": "0",
+  "stderr": "",
+  "returncode": 0,
+  "error": "",
+  "_synthetic": true,
+  "_note": "Hand-authored demo fixture modelling an unmanaged Mac. Not a real recording."
+}

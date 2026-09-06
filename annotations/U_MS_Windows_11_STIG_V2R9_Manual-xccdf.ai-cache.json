@@ -1,0 +1,2058 @@
+{
+ "claude-cowork-2026-09:WN11-00-000030": {
+  "summary": "Turn on full-disk encryption (BitLocker) for the Windows drive and every fixed data drive, so a lost or stolen machine cannot be read by pulling the disk out. Another full-disk encryption product is acceptable if it also meets the pre-boot rules.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "Back up the BitLocker recovery key somewhere safe before enabling it; without the key a locked drive is unrecoverable.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-00-000031": {
+  "summary": "Require the user to type a PIN before Windows starts, in addition to the TPM chip, so the encrypted drive cannot be unlocked just by powering on the machine. Set through Group Policy under BitLocker's operating system drive settings.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "Every reboot will prompt for the PIN, which breaks unattended restarts and remote reboots unless Network Unlock is set up.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-00-000040": {
+  "summary": "Keep Windows 11 on a version Microsoft still supports (22H2 build 22621.380 or newer), because older versions stop receiving security fixes. Check with winver.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "A feature update takes time and a reboot; schedule it, and check any line-of-business software supports the newer version first.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-00-000045": {
+  "summary": "Make sure an antivirus product is installed and running. Microsoft Defender, which ships with Windows, satisfies this; a third-party product is fine too.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "If a third-party antivirus is installed, confirm it actually started and is updating, not just present.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-00-000050": {
+  "summary": "Every local drive that has a drive letter must use the NTFS file system, because only NTFS supports the permissions and auditing the other rules rely on. Recovery and EFI partitions are exempt.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Reformatting a drive erases it; move the data off first and be sure the drive is not used by something that needs another format.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-00-000070": {
+  "summary": "Only the accounts that actually administer the machine may be in the local Administrators group. Ordinary user accounts must be removed, and on domain machines the Domain Admins group should be swapped for a workstation-admin group.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Removing the wrong account can lock out the person who supports the machine; confirm who needs admin rights before removing anyone.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-00-000100": {
+  "summary": "Internet Information Services (IIS), Microsoft's web server, must not be installed on a workstation. Check Windows Features and remove it if present.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "If some application genuinely needs IIS, document the exception with the security officer instead of removing it.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-00-000150": {
+  "summary": "Enable SEHOP, a built-in Windows protection that blocks a common memory-corruption attack technique. It is a single Group Policy setting, but it needs the SecGuide policy templates from the STIG package copied into the PolicyDefinitions folders first.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "Without the SecGuide templates the setting does not appear in the policy editor; copy them in before looking for it.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-00-000240": {
+  "summary": "Administrators must not browse the web or read email while logged in with their admin account. This is a written policy requirement backed, where possible, by technical controls such as application allowlisting. Exceptions for local admin tools are allowed if defined.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "This needs an organisational policy and user training, not just a setting; a purely technical block can interfere with legitimate admin web consoles unless exceptions are defined.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AC-000045": {
+  "summary": "Make sure the policy \"Store passwords using reversible encryption\" is Disabled. Reversible encryption is effectively storing passwords in clear text.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000075": {
+  "summary": "Credential Guard must actually be running, so that the credentials Windows keeps in memory are isolated by virtualization-based security and cannot be harvested by malware that compromises the OS. The Group Policy setting turns it on with a UEFI lock, but the hardware must support it, so verify it is running rather than just checking the registry.",
+  "triage": "risky-change",
+  "automation": "manual",
+  "caution": "Enabling with UEFI lock is hard to reverse, requires compatible hardware and firmware, and can break older software that relies on unsupported authentication methods.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000155": {
+  "summary": "Turn off Solicited Remote Assistance so users cannot invite someone else to view or take control of their session. This closes a path by which an outside party could gain access to the machine.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Help desks that rely on the built-in Remote Assistance feature will need another remote-support tool.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000180": {
+  "summary": "Disable Autoplay for non-volume devices such as phones and cameras connected over MTP, so nothing runs automatically when they are plugged in. This keeps malicious code on a connected device from launching on its own.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000185": {
+  "summary": "Set the default AutoRun behavior to never execute autorun commands, so inserting media or a device cannot silently launch a program. This blocks a classic way of introducing malicious code.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000190": {
+  "summary": "Turn off AutoPlay on every drive type, including CD/DVD and network drives, so media never starts playing or installing on its own. Use the policy setting rather than typing the registry value by hand to get the correct value.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Users will have to open removable media manually; if the registry value is typed by hand it is easy to enter the wrong number.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000315": {
+  "summary": "Make sure Windows Installer is not allowed to always install with elevated privileges. If it is, a standard user or malicious package could gain full control of the system simply by running an installer.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Some legacy software-deployment setups may have depended on this behavior to install for non-admin users.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000330": {
+  "summary": "Prevent the WinRM client from using Basic authentication, which sends passwords in plain text. Remote management should use stronger authentication methods instead.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Remote management scripts that connect to systems requiring Basic authentication will stop working until they are switched to another method.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000345": {
+  "summary": "Prevent the WinRM service from accepting Basic authentication, so remote management connections cannot send plain-text passwords to this machine. A temporary, documented exception is possible with Authorizing Official approval in specific administrative situations.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "Any tool that manages this machine over WinRM with Basic authentication will lose access; check remote management workflows before rolling out.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-SO-000140": {
+  "summary": "Disable anonymous SID/Name translation so an unauthenticated user cannot look up account names from security identifiers or vice versa. This removes an easy way to gather account information for an attack. The check is done by reviewing the effective setting in the Local Group Policy Editor.",
+  "triage": "quick-win",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-SO-000145": {
+  "summary": "Block anonymous (null session) users from listing the accounts in the local SAM database. Without this, anyone who can reach the machine can obtain a list of usernames to target.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-SO-000150": {
+  "summary": "Block anonymous (null session) users from listing both local accounts and shared folders. Without this, an unauthenticated visitor can build a map of usernames and shares to attack.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Very old applications or devices that browse shares anonymously may stop seeing them.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-SO-000165": {
+  "summary": "Restrict anonymous access to named pipes and shares so only the ones explicitly listed in the related policies (which must be blank) are reachable without logging in. This shuts a door that could otherwise allow unauthorized access to the system.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Legacy services that depend on anonymous named-pipe or share access will break; confirm none are in use.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-SO-000195": {
+  "summary": "Stop Windows from storing the weak LAN Manager hash of passwords the next time each password changes. LM hashes are trivially cracked, so removing them protects account passwords.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "The change only takes effect for a password after it is next changed; very old clients that require LM hashes will not be able to authenticate.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-SO-000205": {
+  "summary": "Set the LAN Manager authentication level so the machine sends only NTLMv2 responses and refuses the older LM and NTLM protocols, which are weaker and easier to attack.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "Any legacy device, server, or application that only speaks LM or NTLMv1 will no longer be able to authenticate with this system.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-UR-000015": {
+  "summary": "Make sure nobody, not even administrators, holds the Act as part of the operating system user right. Any account with it can impersonate any user and take complete control of the machine, so the policy should be defined with no entries.",
+  "triage": "quick-win",
+  "automation": "manual",
+  "caution": "A service that legitimately needs this right will fail; verify none is installed before blanking the setting.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-UR-000045": {
+  "summary": "Make sure no group or account holds the Create a token object user right, which lets a process mint access tokens and grant itself elevated rights. The policy should be defined but left blank.",
+  "triage": "quick-win",
+  "automation": "manual",
+  "caution": "Rare services that require this right will stop working; check for them first.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-UR-000065": {
+  "summary": "Limit the Debug programs user right to the Administrators group only. Anyone with this right can attach a debugger to any process or the kernel, giving full access to sensitive parts of the operating system.",
+  "triage": "quick-win",
+  "automation": "manual",
+  "caution": "Developers or monitoring tools granted this right outside Administrators will lose it.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-00-000005": {
+  "summary": "Domain-joined machines must run the 64-bit Windows 11 Enterprise edition, because features such as Credential Guard and virtualization-based security are only available there. Check Settings > System > About; standalone systems are exempt.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Meeting this may require re-licensing or reimaging machines that run Pro or another edition.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-00-000010": {
+  "summary": "Each machine must have a TPM 2.0 that is enabled in firmware and reported as ready for use, so Credential Guard keys are protected by hardware rather than software. Check with the TPM management console described in the rule.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Enabling or clearing a TPM in firmware can affect BitLocker and other keys tied to it; hardware without a TPM cannot be fixed by configuration.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-00-000015": {
+  "summary": "The firmware must be running in UEFI mode rather than Legacy BIOS, because Secure Boot, virtualization-based security, and Credential Guard depend on it. Check the BIOS Mode line in System Information.",
+  "triage": "risky-change",
+  "automation": "manual",
+  "caution": "Switching an existing installation from Legacy BIOS to UEFI usually requires converting the disk layout or reinstalling Windows, and can leave the system unbootable if done incorrectly.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-00-000020": {
+  "summary": "Secure Boot must be turned on in the firmware so the machine only boots a trusted operating system. Virtualization-based security and Credential Guard will not work without it. Check the Secure Boot State line in System Information.",
+  "triage": "risky-change",
+  "automation": "manual",
+  "caution": "Turning on Secure Boot can stop the system booting if the OS or drivers are unsigned, or if the disk is still set up for Legacy BIOS.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-00-000032": {
+  "summary": "Require a BitLocker startup PIN of at least six digits so an attacker who takes the drive cannot boot it without the PIN. Virtual desktop deployments with no data at rest are exempt.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "Users must know and enter their PIN at every boot; existing BitLocker setups may need the PIN added or changed to meet the new length.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-00-000035": {
+  "summary": "Run an application allowlisting tool, such as AppLocker, in deny-by-default mode so only approved programs, including built-in packaged apps, can execute. The organization has to decide what belongs on the approved list.",
+  "triage": "risky-change",
+  "automation": "manual",
+  "caution": "A poorly built allowlist blocks legitimate software and can bring work to a halt; pilot the rules in audit mode before enforcing.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-00-000055": {
+  "summary": "Windows 11 must be the only operating system installed on the machine. A second OS could be used to bypass Windows security controls. Check the Default operating system list under Startup and Recovery.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Removing another OS may involve deleting partitions and repairing the boot configuration; back up first.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-00-000060": {
+  "summary": "Workstations should not have file shares beyond the built-in administrative ones. If a share is truly needed, both the share permissions and the NTFS permissions must be tightened to only the groups that need access.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Removing or restricting a share that colleagues rely on will cut off their access; confirm who uses it first.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-00-000075": {
+  "summary": "The Backup Operators group must contain only dedicated backup accounts, because its members can read and write every file regardless of permissions. Normal user accounts must not be in it; give backup staff a separate account for that job.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Removing a member could break scheduled backups running under that account.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-00-000080": {
+  "summary": "If a hypervisor such as Hyper-V or VMware Workstation is installed, only authorized and documented users may create or run virtual machines. For Hyper-V this means reviewing the Hyper-V Administrators group; for other products, restrict access however that product allows.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Users removed from the group lose the ability to run their VMs; the ISSM/ISSO must have an up-to-date list of who is authorized.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-00-000090": {
+  "summary": "Every active local account must have an expiring password; the Password never expires box must be cleared on each one. Passwords that never change are more likely to be discovered or cracked.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Service or application accounts set to never expire will start failing when their password lapses unless a rotation process is in place.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-00-000095": {
+  "summary": "Keep the default Windows file-system permissions on system directories and make sure the option that lets Everyone permissions apply to anonymous users is disabled. Users and Authenticated Users should have no more than read and execute except where the defaults say otherwise.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Resetting permissions that an application changed on purpose can break that application.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-00-000105": {
+  "summary": "The SNMP feature must not be installed, because it does not support required security features such as encrypted passwords and traffic. Check the Windows\\System32 folder for the SNMP application and remove the feature if present.",
+  "triage": "quick-win",
+  "automation": "manual",
+  "caution": "Monitoring systems that poll this machine over SNMP will lose visibility.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-00-000110": {
+  "summary": "The Simple TCP/IP Services feature (echo, daytime, and similar) must not be installed, because these legacy services lack modern security protections. Check the Services console and remove the feature through Turn Windows features on or off.",
+  "triage": "quick-win",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-00-000115": {
+  "summary": "The Telnet Client must not be installed, since Telnet sends passwords and traffic unencrypted. Look for the telnet application in Windows\\System32 and remove the feature through Turn Windows features on or off.",
+  "triage": "quick-win",
+  "automation": "manual",
+  "caution": "Administrators who use the Telnet client to test network devices will need another tool.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-00-000120": {
+  "summary": "The TFTP Client must not be installed, because TFTP has no authentication or encryption. Look for the TFTP application in Windows\\System32 and remove the feature through Turn Windows features on or off.",
+  "triage": "quick-win",
+  "automation": "manual",
+  "caution": "Anyone using TFTP to push firmware or configs to network gear will need an alternative.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-00-000125": {
+  "summary": "Remove the Microsoft Copilot app for all users so system information is not sent to the vendor and the feature cannot pull down uncontrolled updates. The check and fix are both PowerShell commands given in the rule.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Feature updates may reinstall the app, so re-check after upgrades.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-00-000126": {
+  "summary": "Block sign-in with consumer (personal) Microsoft accounts so users cannot log into apps such as Notepad or Paint AI features with a personal subscription on an enterprise machine. Deploy via Group Policy or the Intune settings catalog as described in the rule.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "Users who currently sign into the Microsoft Store or other apps with a personal account will lose that ability.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-00-000130": {
+  "summary": "Search every drive for .p12 and .pfx software certificate files and delete them, because software certificates are weaker than hardware-based ones. Files legitimately required by server applications, or that are not really certificates, may stay but must be documented with the ISSO.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Deleting a file an application depends on (for example an Oracle Wallet) will break that application; confirm before removing.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-00-000135": {
+  "summary": "A host-based firewall must be installed and turned on to block unwanted inbound and outbound connections. The rule does not say which firewall; the detailed settings come from the firewall's own STIG.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Turning on a firewall without reviewing rules can block applications that need inbound connections.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-00-000140": {
+  "summary": "On domain workstations, every inbound firewall rule that allows a connection must be scoped to the IP addresses of authorized remote management hosts and apply to all firewall profiles. This limits lateral movement if credentials are stolen.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Scoping rules too tightly can lock out legitimate management or support tools, and the list of authorized hosts must be maintained.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-00-000155": {
+  "summary": "Disable the Windows PowerShell 2.0 optional feature, so attackers cannot downgrade to an old engine that bypasses modern script logging. The rule gives the PowerShell command to check and disable it; not applicable on Windows 11 24H2 or newer.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Very old scripts or tools that explicitly require the 2.0 engine will stop working.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-00-000160": {
+  "summary": "Disable the SMBv1 file-sharing protocol, which relies on the weak MD5 algorithm. The rule gives the PowerShell command to check and remove the feature; this is not applicable if the two related SMBv1 rules are already configured.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Access to old NAS devices or servers that only speak SMBv1 will stop working.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-00-000165": {
+  "summary": "Turn off SMBv1 on the server side (the part that shares files out) using the MS Security Guide policy, which needs the SecGuide templates from the STIG package installed first. Not applicable if SMBv1 was already removed under the related rule. A restart is required.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "Old devices that can only reach this machine's shares over SMBv1 will lose access; the change needs a reboot.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-00-000170": {
+  "summary": "Turn off the SMBv1 client driver so this machine cannot connect to shares over the weak SMBv1 protocol. Uses the MS Security Guide policy, which needs the SecGuide templates installed; not applicable if SMBv1 was already removed under the related rule. A restart is required.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "Connections to old NAS boxes or servers that only support SMBv1 will fail after the reboot.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-00-000175": {
+  "summary": "Set the Secondary Logon service to Disabled and make sure it is not running. It lets people run programs under different (often privileged) credentials from a normal session, which exposes those credentials to theft.",
+  "triage": "quick-win",
+  "automation": "manual",
+  "caution": "Administrators who rely on Run as a different user for day-to-day work will need a different approach, such as separate admin sessions.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-00-000190": {
+  "summary": "Review every User Rights Assignment for unresolved SIDs (entries starting with *S-1-) and remove any that do not belong to a valid current account or group. Leftover SIDs could regain rights if the account is ever recreated. Temporary domain disconnects can also cause unresolved SIDs, so confirm before removing.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Removing a SID that actually belongs to a valid domain account (just unreachable at the time) strips that account's rights.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-00-000210": {
+  "summary": "Turn the Bluetooth radio off unless the organization has approved its use and documented that approval with the ISSO. This prevents rogue devices from pairing with the machine. Intune deployment steps are given in the rule; not applicable on hardware without Bluetooth.",
+  "triage": "needs-judgment",
+  "automation": "automatable",
+  "caution": "Users with Bluetooth keyboards, mice, or headsets will lose them unless an exception is approved.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-00-000230": {
+  "summary": "If Bluetooth is allowed, turn on the setting that alerts the user when a new Bluetooth device tries to connect, so unexpected pairing attempts are noticed. Not applicable if Bluetooth is absent or turned off by policy.",
+  "triage": "quick-win",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-00-000395": {
+  "summary": "Make sure no port-proxy forwarding rules exist, because port proxies can be used to relay traffic through the machine in a man-in-the-middle attack. Check the PortProxy registry key and the netsh interface portproxy show all output; remove anything found.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "If a legitimate application set up a port proxy, removing it will break that forwarding.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-00-000400": {
+  "summary": "Disable any Wi-Fi Direct adapters, since Wi-Fi Direct creates peer-to-peer links with weak authentication. The rule gives PowerShell commands to list the adapters and disable them.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Features that use Wi-Fi Direct, such as wireless display casting, will stop working.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AC-000005": {
+  "summary": "Set the account lockout duration to 15 minutes or more (or 0, meaning an administrator must unlock the account). This slows down brute-force password guessing.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "A value of 0 means every lockout generates a help-desk call to unlock the account.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AC-000010": {
+  "summary": "Set the account lockout threshold to three or fewer bad logon attempts, but never 0, which disables lockout entirely. This limits password-guessing attacks while still allowing for ordinary typos.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "A low threshold means more accidental lockouts, and an attacker can deliberately lock accounts by entering wrong passwords.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AC-000015": {
+  "summary": "Set Reset account lockout counter after to 15 minutes so failed logon attempts keep counting toward a lockout for at least that long. A shorter reset window lets an attacker keep guessing without ever triggering the lockout.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AC-000020": {
+  "summary": "Enforce a password history of 24 so users cannot cycle back to a recently used password. On GPO-managed systems this is in Password Policy; Intune-managed systems check the DevicePasswordHistory registry value and adjust the Intune policy instead.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AC-000025": {
+  "summary": "Set the maximum password age to 60 days or fewer, and never 0, so passwords are changed regularly and a stolen password has a limited useful life.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "Rolling this out forces password changes for anyone whose current password is already older than the limit.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AC-000030": {
+  "summary": "Set the minimum password age to at least 1 day so users cannot change a password many times in a row to flush the history and return to an old favorite.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "A user who sets a password they immediately regret will need an administrator to reset it that same day.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AC-000035": {
+  "summary": "Require passwords to be at least 14 characters long, making them far harder to guess or crack.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "Existing shorter passwords remain valid until changed; users will need notice before the next required change.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AC-000040": {
+  "summary": "Turn on the built-in password complexity check so new passwords must mix character types. If the site uses a third-party password filter that requires this setting to be off, that is acceptable and not a finding.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "Check for a site password filter before enabling, since the two can conflict.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AU-000005": {
+  "summary": "Turn on auditing of failed credential validation under Account Logon so failed logon attempts are recorded in the security log. The rule notes that the subcategory-override security option must be enabled for this to take effect, and shows how to verify with AuditPol.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "More audit events mean the security log fills faster; make sure log size and collection can handle it.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AU-000010": {
+  "summary": "Turn on auditing of successful credential validation under Account Logon so successful logons leave a trail for investigation. Requires the subcategory-override security option to be enabled; verify with AuditPol as described in the rule.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "Success auditing generates a high volume of events on busy systems.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AU-000030": {
+  "summary": "Audit successful Security Group Management events so that creating, deleting, or changing security groups and their membership is logged. Requires the subcategory-override security option to be enabled; verify with AuditPol.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AU-000035": {
+  "summary": "Audit failed User Account Management events so attempts to create, change, delete, or disable user accounts that fail are recorded. Requires the subcategory-override security option to be enabled; verify with AuditPol.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AU-000040": {
+  "summary": "Audit successful User Account Management events so that creating, renaming, disabling, or deleting user accounts is recorded. Requires the subcategory-override security option to be enabled; verify with AuditPol.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AU-000045": {
+  "summary": "Audit successful Plug and Play events so the connection of external devices such as USB drives is logged. Requires the subcategory-override security option to be enabled; verify with AuditPol.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AU-000050": {
+  "summary": "Audit successful Process Creation so every program launch, and what launched it, is written to the security log. This is one of the most useful records for investigating malware. Requires the subcategory-override security option; verify with AuditPol.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "Process creation auditing is high-volume; increase security log size or forward logs so older events are not overwritten.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AU-000054": {
+  "summary": "Audit Account Lockout failures under Logon/Logoff so lockouts, which often signal password-guessing attacks, are logged. Requires the subcategory-override security option; verify with AuditPol.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AU-000060": {
+  "summary": "Audit successful Group Membership events so each logon records which groups the user's token contained. This helps show what access a user actually had at the time. Requires the subcategory-override security option; verify with AuditPol.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "Adds an extra event per logon, increasing log volume.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AU-000065": {
+  "summary": "Audit successful Logoff events so the end of each user session is recorded alongside the logon. Requires the subcategory-override security option; verify with AuditPol.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AU-000070": {
+  "summary": "Audit failed Logon events so unsuccessful sign-in attempts, whether local or over the network, are recorded. Requires the subcategory-override security option; verify with AuditPol.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AU-000075": {
+  "summary": "Audit successful Logon events so every successful sign-in is recorded for later investigation. Requires the subcategory-override security option; verify with AuditPol.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "Success logon auditing can be noisy on systems with many network connections.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AU-000080": {
+  "summary": "Audit successful Special Logon events, which record sign-ins that carry administrative privileges and could be used to elevate processes. Requires the subcategory-override security option; verify with AuditPol.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AU-000081": {
+  "summary": "Audit failed File Share access so denied attempts to connect to shares, including administrative shares such as C$, are logged. Requires the subcategory-override security option; verify with AuditPol.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AU-000082": {
+  "summary": "Audit successful File Share connections so access to shares, including administrative shares such as C$, is recorded. Requires the subcategory-override security option; verify with AuditPol.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "On machines that host busy shares this produces a large number of events.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AU-000083": {
+  "summary": "Audit successful Other Object Access events, which cover management of scheduled tasks and COM+ objects, both of which attackers commonly use for persistence. Requires the subcategory-override security option; verify with AuditPol.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AU-000084": {
+  "summary": "Audit failed Other Object Access events so denied attempts to manage scheduled tasks or COM+ objects are logged. Requires the subcategory-override security option; verify with AuditPol.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AU-000085": {
+  "summary": "Audit failed access to files on removable storage so blocked attempts to read or write USB drives and similar media are logged. Requires the subcategory-override security option; verify with AuditPol. Virtual machines that generate excessive events may leave this Not Configured if documented with the ISSO.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "Some VMs log a flood of events for their own virtual disk; document an exception with mitigations rather than drowning the log.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AU-000090": {
+  "summary": "Audit successful access to files on removable storage so reads and writes to USB drives and similar media are recorded. Requires the subcategory-override security option; verify with AuditPol. VMs with excessive events may leave this Not Configured if documented with the ISSO.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "Success auditing of removable storage is high-volume, and some VMs log every access to the virtual disk itself.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AU-000100": {
+  "summary": "Audit successful Audit Policy Change events so any change to what the system audits is itself recorded, making it harder for an attacker to quietly switch logging off. Requires the subcategory-override security option; verify with AuditPol.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AU-000105": {
+  "summary": "Audit successful Authentication Policy Change events so changes to Kerberos policy and trust relationships are logged. Requires the subcategory-override security option; verify with AuditPol.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AU-000107": {
+  "summary": "Audit successful Authorization Policy Change events so changes to user rights assignments, such as granting Create a token object, are logged. Requires the subcategory-override security option; verify with AuditPol.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AU-000110": {
+  "summary": "Audit failed Sensitive Privilege Use so denied attempts to exercise powerful rights such as Act as part of the operating system or Debug programs are logged. Requires the subcategory-override security option; verify with AuditPol.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AU-000115": {
+  "summary": "Audit successful Sensitive Privilege Use so every use of powerful rights such as Act as part of the operating system or Debug programs is recorded. Requires the subcategory-override security option; verify with AuditPol.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "Success auditing of sensitive privileges can be very noisy, especially from backup and system processes.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AU-000120": {
+  "summary": "Audit IPsec Driver failures so problems such as dropped IPsec packets are logged. Requires the subcategory-override security option; verify with AuditPol.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AU-000130": {
+  "summary": "Audit successful Other System Events, which record cryptographic key operations and Windows Firewall service activity. Requires the subcategory-override security option; verify with AuditPol.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AU-000135": {
+  "summary": "Audit failed Other System Events so failures in cryptographic key operations or the Windows Firewall service are logged. Requires the subcategory-override security option; verify with AuditPol.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AU-000140": {
+  "summary": "Audit successful Security State Change events so system startup, shutdown, and similar changes are recorded. Requires the subcategory-override security option; verify with AuditPol.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AU-000150": {
+  "summary": "Audit successful Security System Extension events so it is logged whenever extension code is loaded into the security subsystem, which could indicate tampering. Requires the subcategory-override security option; verify with AuditPol.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AU-000155": {
+  "summary": "Audit System Integrity failures so violations of the security subsystem's integrity are logged. Requires the subcategory-override security option; verify with AuditPol.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AU-000160": {
+  "summary": "Audit System Integrity successes so integrity-related events in the security subsystem are recorded. Requires the subcategory-override security option; verify with AuditPol.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AU-000500": {
+  "summary": "Set the Application event log maximum size to at least 32768 KB so it does not fill and start overwriting events too quickly. Not applicable if logs are sent straight to an audit server, which must be documented with the ISSO.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Larger logs use more disk space.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AU-000505": {
+  "summary": "Set the Security event log maximum size large enough to hold at least one week of audit records; the rule's example value assumes about 5 GB per week, but the right size depends on how busy the system is. Not applicable if logs go straight to an audit server, documented with the ISSO.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Administrators must measure actual weekly log volume and revisit the size; a multi-gigabyte log needs corresponding disk space.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AU-000510": {
+  "summary": "Set the System event log maximum size to at least 32768 KB so it does not fill and start overwriting events too quickly. Not applicable if logs are sent straight to an audit server, documented with the ISSO.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Larger logs use more disk space.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AU-000515": {
+  "summary": "Check the file permissions on Application.evtx so only Eventlog, SYSTEM, and Administrators have access; standard users must have none. The default permissions already meet this, so it is mainly a matter of confirming nobody loosened them or moved the logs.",
+  "triage": "quick-win",
+  "automation": "manual",
+  "caution": "If logs were relocated, the Eventlog account must be added as NT Service\\Eventlog or the service may not be able to write.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AU-000520": {
+  "summary": "Check the file permissions on Security.evtx so only Eventlog, SYSTEM, and Administrators have access and standard users cannot read or tamper with the security log. Default permissions satisfy this; verify they are still in place, especially if the logs were moved.",
+  "triage": "quick-win",
+  "automation": "manual",
+  "caution": "If logs were relocated, the Eventlog account must be added as NT Service\\Eventlog or the service may not be able to write.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AU-000525": {
+  "summary": "Check the file permissions on System.evtx so only Eventlog, SYSTEM, and Administrators have access and standard users cannot tamper with the system log. Default permissions satisfy this; confirm they are unchanged, especially if the logs were moved.",
+  "triage": "quick-win",
+  "automation": "manual",
+  "caution": "If logs were relocated, the Eventlog account must be added as NT Service\\Eventlog or the service may not be able to write.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AU-000555": {
+  "summary": "Audit failed Other Policy Change events, which cover things like EFS recovery agent policy, Windows Filtering Platform filters, and Central Access Policy changes. Verify with AuditPol.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AU-000560": {
+  "summary": "Audit successful Other Logon/Logoff events, which capture session activity not covered by the main logon and logoff categories. Verify with AuditPol.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AU-000565": {
+  "summary": "Audit failed Other Logon/Logoff events so unusual session failures outside the main logon categories are recorded. Verify with AuditPol.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AU-000570": {
+  "summary": "Audit Detailed File Share failures, which log each denied attempt to access a file or folder on a share along with the reason access was refused. This is more granular than the File Share category. Verify with AuditPol.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "Detailed file share auditing logs an event per file access and can grow the security log quickly on file-sharing hosts.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AU-000575": {
+  "summary": "Audit successful MPSSVC Rule-Level Policy Change events so every change to Windows Firewall rules is recorded. Verify with AuditPol.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AU-000580": {
+  "summary": "Audit failed MPSSVC Rule-Level Policy Change events so unsuccessful attempts to change Windows Firewall rules are recorded. Verify with AuditPol.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AU-000583": {
+  "summary": "Set Audit Handle Manipulation to record failures so denied attempts to obtain handles to objects are logged. The check is done in the Advanced Audit Policy Configuration under Object Access.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "Handle manipulation auditing can be noisy when combined with other object access auditing.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AU-000585": {
+  "summary": "Set Audit Process Creation to also record failures, so the system logs when a program fails to start and who tried to start it. This complements the success auditing required by the related rule.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AU-000586": {
+  "summary": "Enable Audit Registry for successes so successful access to audited registry keys is recorded. Only keys that have an audit entry in their own security settings will generate events.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "If broad registry audit entries are set, success auditing can produce a large event volume.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AU-000587": {
+  "summary": "Enable Audit Sensitive Privilege Use for successes so every use of powerful rights such as debugging or backup privileges is recorded. This duplicates the intent of an earlier rule, checked here through the Advanced Audit Policy Configuration in the policy editor.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "Success auditing of privilege use is noisy on systems running backup or monitoring agents.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AU-000588": {
+  "summary": "Enable Audit Sensitive Privilege Use for failures so denied attempts to use powerful rights are recorded. Checked through the Advanced Audit Policy Configuration in the policy editor.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-AU-000589": {
+  "summary": "Enable Audit Registry for failures so denied attempts to read or change audited registry keys are recorded. Only keys with an audit entry in their security settings will generate events.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000005": {
+  "summary": "Prevent the camera from being used from the lock screen, so someone must sign in before the camera can be used. Not applicable on devices without a camera.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000007": {
+  "summary": "When a camera is not in use it must be physically covered (built-in) or disconnectable (external), or disabled in the BIOS; otherwise the webcam consent registry value must be set to Deny. Not applicable to devices without a camera, mobile devices, or centrally managed VTC suites.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Setting the webcam value to Deny blocks the camera for all apps, including approved video conferencing, so decide between a cover and the registry block per device.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000010": {
+  "summary": "Turn off lock-screen slide shows so photos or other content are not displayed to people who have not signed in.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000020": {
+  "summary": "Completely disable IPv6 source routing, which lets a sender dictate the path a packet takes and can be abused for spoofing. The policy needs the MSS-Legacy templates from the STIG package installed first.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "The setting only appears in Group Policy after the MSS-Legacy templates are copied into the PolicyDefinitions folders.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000025": {
+  "summary": "Completely disable IPv4 source routing so a sender cannot dictate the path a packet takes, protecting against spoofing. The policy needs the MSS-Legacy templates from the STIG package installed first.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "The setting only appears in Group Policy after the MSS-Legacy templates are copied into the PolicyDefinitions folders.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000037": {
+  "summary": "On domain-joined machines, apply UAC token filtering to local administrator accounts so their elevated rights cannot be used over the network. This limits how far an attacker can spread with one stolen local admin password. Requires the SecGuide templates from the STIG package.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "Remote administration that relies on local (non-domain) admin accounts over the network will stop working.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000038": {
+  "summary": "Enforce that WDigest authentication stays disabled so plain-text passwords are not kept in memory by LSASS where they could be stolen. It is already off by default in Windows 11; the policy makes sure it stays that way. Requires the SecGuide templates.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000039": {
+  "summary": "Remove the Run as different user option from right-click menus on executables, scripts, and consoles, so privileged credentials are not typed into a standard user session where they could be captured. Requires the SecGuide templates.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Administrators used to launching tools as another account from the context menu will need another approach.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000040": {
+  "summary": "Disable insecure guest logons to SMB servers so this machine will not connect to shares that allow unauthenticated guest access. Shares should always require a real logon.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Connections to consumer NAS devices or old shares that only permit guest access will fail.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000044": {
+  "summary": "Prohibit Internet Connection Sharing so the machine cannot act as a hotspot for other devices, which would expose it to whatever connects through it.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000050": {
+  "summary": "On domain-joined machines, define Hardened UNC Paths so that connections to any SYSVOL and NETLOGON share require mutual authentication and integrity. This stops an attacker from spoofing the shares that deliver Group Policy and logon scripts. Standalone systems are exempt.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "If domain controllers or the network path cannot support the required authentication and signing, Group Policy processing will fail.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000052": {
+  "summary": "Set the ECC curve order so the longer NistP384 curve is preferred before NistP256 in TLS negotiations, favoring stronger encryption.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Rarely, a server that only supports other curves may fail to negotiate; test key applications.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000055": {
+  "summary": "Keep the setting that minimizes simultaneous network connections at its default (enabled, option 3), so Wi-Fi is dropped while the machine is on Ethernet. Having two active connections gives attackers an extra path in. A finding only occurs if someone has explicitly set the value to 0.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Users who expect Wi-Fi to stay up while docked will see it disconnect.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000060": {
+  "summary": "Block connections to non-domain networks while the machine is connected to a domain-authenticated network, so all traffic goes through the corporate connection.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "Laptops that connect to a home or guest Wi-Fi while also on a domain VPN or dock may lose the secondary connection.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000063": {
+  "summary": "The machine must be centrally managed, receiving policy from Group Policy (domain member) or an approved MDM such as Intune, so STIG settings are enforced rather than left to chance. The rule gives the gpresult and Get-Service checks to confirm which one is in use.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Standalone machines must be enrolled in an approved MDM; simply having the Intune service installed is not enough if it is not running.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000066": {
+  "summary": "Include the full command line in process creation audit events, so the log shows not just which program ran but the arguments it was given. This is invaluable when reconstructing what malware or an attacker did.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Command lines can contain passwords or other secrets, which will then appear in the security log; make sure log access is restricted.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000068": {
+  "summary": "Enable Remote host allows delegation of non-exportable credentials so the machine supports Restricted Admin mode and Remote Credential Guard, which keep credentials from being left in a stealable form on the remote host.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000070": {
+  "summary": "Virtualization-based security must be enabled and running with a platform security level of Secure Boot, or Secure Boot with DMA Protection. It is the foundation for Credential Guard and hypervisor-protected code integrity. Verify it is running, not just configured, since hardware must support it; a documented mission need can reduce the finding to CAT III.",
+  "triage": "risky-change",
+  "automation": "manual",
+  "caution": "Requires UEFI, Secure Boot, and a capable CPU; DMA Protection needs IOMMU support, and incompatible hardware or drivers can cause boot or performance problems.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000080": {
+  "summary": "Turn on virtualization-based protection of code integrity (hypervisor-enforced code integrity) so kernel memory and code-integrity checks are isolated from the rest of the OS. Enabled with UEFI lock is preferred, but Enabled without lock can be turned off remotely if problems appear. A documented mission need can lower the finding.",
+  "triage": "risky-change",
+  "automation": "manual",
+  "caution": "Incompatible or unsigned drivers will fail to load; with the UEFI lock, the setting cannot be undone through Group Policy if something breaks.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000085": {
+  "summary": "Set the Early Launch Antimalware boot-start driver policy to Good, unknown and bad but critical (or stricter), so drivers flagged as bad are blocked before Windows finishes booting. A value of 7 (load everything) or a missing value is a finding.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Stricter options such as Good only can prevent unrecognized but legitimate drivers from loading at boot.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000090": {
+  "summary": "Configure registry policy processing so Group Policy is re-applied even when nothing has changed. That way any local tampering with policy-controlled settings is overwritten on the next refresh.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Slightly more work at each policy refresh; local changes that conflict with policy will be reverted.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000100": {
+  "summary": "Stop Windows from downloading print driver packages over HTTP, so the machine does not fetch drivers from the internet and send information outside the enterprise.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Print drivers must then come from an internal source such as a print server or deployment tool.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000105": {
+  "summary": "Prevent the Web publishing and online ordering wizards from downloading a list of service providers from the internet, cutting off an unnecessary outbound connection to the vendor.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000110": {
+  "summary": "Turn off printing over HTTP so the machine cannot print to internet printers, which could leak documents or system information outside the enterprise.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Any intranet printers reached over HTTP will also stop working.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000115": {
+  "summary": "On domain-joined machines, leave Support device authentication using certificate at its default (Automatic) or explicitly enabled, so the device tries certificate-based authentication to the domain before falling back to a password. Only a value of 0 is a finding; standalone systems are exempt.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Choosing the always-use-certificates option will fail if domain controllers do not support device certificates.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000120": {
+  "summary": "Hide the network selection control on the logon screen so nobody can switch the machine to a different network without first signing in.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Users cannot join a new Wi-Fi network from the lock screen; they must sign in first, which can be awkward if cached credentials are unavailable.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000130": {
+  "summary": "On domain-joined machines, stop the logon screen from listing local user accounts, so an outsider cannot learn valid usernames just by looking at the screen. Standalone systems are exempt.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000145": {
+  "summary": "Require a password when the computer wakes from sleep while on battery, so an unattended laptop cannot be picked up and used.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000150": {
+  "summary": "Require a password when the computer wakes from sleep while plugged in, so an unattended machine cannot be used without authenticating.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000165": {
+  "summary": "Restrict unauthenticated RPC clients so anonymous remote procedure calls cannot connect to this machine's RPC server; only authenticated callers are allowed.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Legacy applications that make anonymous RPC connections may break.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000195": {
+  "summary": "Turn on enhanced anti-spoofing for Windows Hello facial recognition so a photo or video is less likely to fool the camera. The registry location differs between Group Policy and Intune management, so check the right one.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Devices whose cameras do not support enhanced anti-spoofing may lose face sign-in.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000200": {
+  "summary": "Do not list administrator accounts in the elevation (UAC) prompt; users must type an admin username and password themselves. This keeps admin account names from being revealed to anyone who triggers a prompt.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Slightly less convenient for users who elevate often, since the username must be typed.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000204": {
+  "summary": "If diagnostic data is set to Enhanced, limit it to the minimum needed for Windows Analytics so extra usage details are not sent to Microsoft. Not applicable if telemetry is already at Security or Basic.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000205": {
+  "summary": "Set Windows diagnostic data to Security (0) or Basic/required (1) so the machine never sends the Full level of telemetry to Microsoft, limiting what information leaves the enterprise.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "The Security level may prevent some Microsoft services that need Basic data from working.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000210": {
+  "summary": "On unclassified systems, enable Microsoft Defender SmartScreen for File Explorer with Warn and prevent bypass, so downloaded programs that look malicious are blocked and users cannot click past the warning. Not applicable on classified systems.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Legitimate but unrecognized in-house tools may be blocked until they gain reputation or are signed.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000215": {
+  "summary": "Keep Data Execution Prevention on for File Explorer, which is the default. It is only a finding if someone has explicitly set the policy to turn DEP off; fix by setting it to Not Configured or Disabled.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000225": {
+  "summary": "Keep the File Explorer shell protocol in protected mode, which is the default and limits which folders applications can open through it. It is only a finding if the turn-off policy has been explicitly enabled; fix by setting it to Not Configured or Disabled.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000252": {
+  "summary": "Disable Windows Game Recording and Broadcasting, since it can capture screenshots or video of any application and expose sensitive data. Not applicable on Windows 11 LTSC.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000255": {
+  "summary": "Require Windows Hello for Business to store its keys in a hardware security device (TPM) rather than software, so the keys cannot be copied to another machine. Non-persistent virtual desktops that are wiped at logoff are exempt.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "Devices without a working TPM will be unable to enroll in Windows Hello for Business.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000260": {
+  "summary": "Require Windows Hello PINs to be at least six characters long, making them harder to guess. The registry location differs between Group Policy and Intune management; adjust whichever applies.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "Users with shorter existing PINs will be prompted to change them.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000270": {
+  "summary": "Prevent users from saving passwords in the Remote Desktop client, so a stolen or shared machine cannot be used to connect to other systems with stored credentials.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Users will have to enter their password on every Remote Desktop connection.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000275": {
+  "summary": "Turn off drive redirection so local drives on this machine are not shared into Remote Desktop sessions, reducing the chance of sensitive files being exposed to the remote host.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Users who copy files between their PC and a remote session through mapped drives will need another transfer method.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000280": {
+  "summary": "Make Remote Desktop Services always prompt for a password when a client connects, so saved credentials in a connection file cannot be used to log in automatically.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000285": {
+  "summary": "Require secure (encrypted and authenticated) RPC communication for the Remote Desktop Session Host, so traffic between client and host cannot be intercepted or modified in a man-in-the-middle attack.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Very old Remote Desktop clients that cannot do secure RPC will be refused.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000290": {
+  "summary": "Set the Remote Desktop client connection encryption level to High so session traffic is encrypted in both directions with strong encryption.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Legacy clients that do not support high-level encryption will be unable to connect.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000295": {
+  "summary": "Prevent the Windows RSS platform from downloading attachments (enclosures) from feeds, since those files may be unsafe.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000300": {
+  "summary": "Keep the RSS platform from using Basic authentication over plain HTTP, which would send passwords in clear text. This is the default; it is only a finding if the policy has been explicitly turned on, so set it to Not Configured or Disabled.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000305": {
+  "summary": "Turn off indexing of encrypted files so Windows Search does not copy their contents into an unencrypted index. The registry location differs between Group Policy and Intune management.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Encrypted files will no longer show up in content searches.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000310": {
+  "summary": "Disable user control over Windows Installer installs so users cannot change installation options that might bypass security features set by administrators.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000320": {
+  "summary": "Keep the security prompt that warns users when a web-based program tries to install software, so they can refuse it. This is the default; only an explicit policy suppressing the prompt is a finding, so set it to Not Configured or Disabled.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000325": {
+  "summary": "Disable automatic sign-in of the last user after a system-initiated restart (such as after Windows Update), so credentials are not cached for that purpose and users know the machine restarted.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "After update restarts, users must sign in manually and their apps will not be reopened automatically.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000326": {
+  "summary": "Turn on PowerShell script block logging so the content of PowerShell commands and scripts is recorded in the event log, giving investigators detail on what ran, including obfuscated code.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Script block logs can be large and may contain sensitive data; protect and size the log accordingly.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000327": {
+  "summary": "Turn on PowerShell transcription so a text record of each PowerShell session is written. Point the transcript output directory at a central log server or another location users cannot access.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "Transcripts may capture secrets typed at the prompt; if the output folder is not secured or centralized, users could read or delete them.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000335": {
+  "summary": "Prevent the WinRM client from sending unencrypted traffic, so remote management sessions started from this machine cannot expose sensitive data on the wire.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Connections to remote hosts that only accept unencrypted WinRM will fail.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000350": {
+  "summary": "Prevent the WinRM service from accepting unencrypted traffic, so remote management sessions to this machine are always encrypted.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Management tools that connect over plain HTTP WinRM must be reconfigured to use encryption.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000355": {
+  "summary": "Stop the WinRM service from storing RunAs credentials for plug-ins, so administrative passwords are not kept on the machine where they could be recovered.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "WinRM plug-ins configured to run under stored alternate credentials will stop working.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000360": {
+  "summary": "Prevent the WinRM client from using Digest authentication, which is weaker than other methods and vulnerable to man-in-the-middle attacks.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000365": {
+  "summary": "Force-deny Windows apps from being activated by voice while the machine is locked, so nobody can use voice commands to operate apps without signing in. Not applicable if voice activation is already force-denied for all apps at all times.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000370": {
+  "summary": "Turn off convenience PIN sign-in for domain users, which is a simpler PIN mechanism separate from Windows Hello for Business and is less secure.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Users relying on the convenience PIN will have to sign in with their password or Windows Hello for Business.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000385": {
+  "summary": "Allow Windows Ink Workspace but disallow access to it from the lock screen, so pen-oriented apps cannot be used without signing in. The registry location differs between Group Policy and Intune management.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000391": {
+  "summary": "Internet Explorer 11 must be removed or disabled as a standalone browser on Windows 11, since it is no longer supported. The rule points to the Disable Internet Explorer 11 as a standalone browser policy set to Enabled with the option Never.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Legacy web apps that only work in IE need to be moved to Edge IE mode or another solution first.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-EP-000310": {
+  "summary": "Enable Kernel DMA Protection with the enumeration policy for incompatible external devices set to Block All, so a device plugged into a Thunderbolt port cannot read memory or inject code while the machine is locked.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "External Thunderbolt or PCIe devices whose drivers do not support DMA remapping will be blocked entirely.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-PK-000005": {
+  "summary": "Install the current, unexpired DoD Root CA certificates in the machine's Trusted Root store so DoD websites and signed code are validated correctly. The rule gives a PowerShell command and an MMC procedure to verify; the InstallRoot tool from Cyber Exchange installs them. The listed CAs are examples, not a complete list.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "Root CAs change over time; use the organization's approved list rather than treating the STIG's examples as definitive.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-PK-000010": {
+  "summary": "On unclassified systems, install the current External Certificate Authority (ECA) root certificates in the Trusted Root store so sites secured by ECA certificates validate. Verify with the PowerShell command or MMC procedure in the rule; the InstallRoot tool installs them. The listed CAs are examples only.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "Not applicable on classified systems; expired ECA roots left in place are still a finding.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-PK-000015": {
+  "summary": "On unclassified systems, install the DoD Interoperability Root CA cross-certificates into the Untrusted Certificates store so certificate chains stop at the DoD roots instead of chaining elsewhere and causing authentication failures. Verify with the PowerShell command or MMC procedure in the rule; InstallRoot installs them.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "Placing the wrong certificate in the Untrusted store can break certificate validation, so use the InstallRoot tool or the published bundles rather than hand-selecting.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-PK-000020": {
+  "summary": "On unclassified systems, install the US DoD CCEB Interoperability Root CA cross-certificate into the Untrusted Certificates store so certificate chains resolve to the DoD roots rather than an external root, avoiding authentication failures. Verify with the PowerShell command or MMC procedure in the rule; InstallRoot installs it.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "Use the InstallRoot tool or published bundles; placing the wrong certificate in the Untrusted store can break validation.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-RG-000005": {
+  "summary": "Keep the default permissions on the HKEY_LOCAL_MACHINE SECURITY, SOFTWARE, and SYSTEM registry keys. Non-privileged groups such as Everyone, Users, or Authenticated Users must have no more than Read. Check with Regedit as described; the rule lists the expected default entries.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Resetting permissions that an installed application deliberately changed can break that application; investigate before reverting.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-SO-000010": {
+  "summary": "Disable the built-in Guest account, a well-known account that exists on every Windows system and is created without a password.",
+  "triage": "quick-win",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-SO-000015": {
+  "summary": "Limit local accounts that have a blank password to console logon only, so even if such an account exists it cannot be used over the network.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-SO-000020": {
+  "summary": "Rename the built-in Administrator account to something other than Administrator so attackers cannot target it by its well-known name.",
+  "triage": "quick-win",
+  "automation": "manual",
+  "caution": "Scripts or documentation that reference the account by the old name will need updating.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-SO-000025": {
+  "summary": "Rename the built-in Guest account to something other than Guest so the well-known account name cannot be targeted.",
+  "triage": "quick-win",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-SO-000030": {
+  "summary": "Enable the option that makes audit subcategory settings override the legacy category settings. Without it, the detailed audit policies required by all the other audit rules do not take effect.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Any legacy category-level audit settings will stop applying; make sure the subcategory policies are configured first.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-SO-000035": {
+  "summary": "Require the domain member's secure channel traffic to the domain controller to always be encrypted or signed, protecting the channel used for authentication from tampering and eavesdropping.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "If any domain controller cannot sign or seal the channel, the machine will fail to authenticate to it.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-SO-000040": {
+  "summary": "Encrypt outgoing secure channel traffic to the domain controller whenever possible, so more than just passwords are protected on that channel.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-SO-000045": {
+  "summary": "Sign outgoing secure channel traffic to the domain controller whenever possible, adding integrity checking so the traffic cannot be altered in transit.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-SO-000060": {
+  "summary": "Require a strong (128-bit) session key for the secure channel to the domain controller. The rule warns this can prevent domain join if it is not set consistently across systems.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "If domain controllers are not configured to match, the machine may fail to join or authenticate to the domain.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-SO-000070": {
+  "summary": "Set the machine inactivity limit to 900 seconds (15 minutes) or less, but not 0, so an unattended machine locks itself and requires a password to resume.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Users in presentations or monitoring roles may find frequent locking disruptive; 0 disables the limit entirely and is not allowed.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-SO-000075": {
+  "summary": "Display the required U.S. Government legal notice text before anyone logs on at the console. Without the banner, legal action after unauthorized access may not hold up. The exact wording is given in the rule; if configured through a CSP, additional steps apply.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "The text must match the rule exactly; paraphrasing it counts as a finding.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-SO-000095": {
+  "summary": "Configure smart card removal behavior to Lock Workstation or Force Logoff so removing the card immediately secures the machine. Leaving it unconfigured is allowed only under documented conditions, such as application conflicts plus a manual-lock policy and a working screen saver lock, recorded with the ISSO.",
+  "triage": "needs-judgment",
+  "automation": "automatable",
+  "caution": "Force Logoff can close unsaved work; some applications misbehave when the card is removed mid-session.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-SO-000100": {
+  "summary": "Make the SMB client always digitally sign its communications so it only talks to servers that also sign, protecting file-sharing traffic from man-in-the-middle tampering.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Connections to servers or NAS devices that cannot sign SMB traffic will fail.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-SO-000110": {
+  "summary": "Do not allow the SMB client to send unencrypted (plain-text) passwords to third-party SMB servers. If a vendor device only supports plain-text authentication, ask the vendor for an alternative.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Old non-Microsoft file servers that require plain-text passwords will no longer be reachable.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-SO-000120": {
+  "summary": "Make the SMB server always digitally sign its communications so it only serves clients that sign, preventing tampering with shared-file traffic.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Clients that cannot sign SMB traffic will be unable to access this machine's shares.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-SO-000160": {
+  "summary": "Do not let Everyone permissions apply to anonymous users, so unauthenticated connections do not inherit the rights granted to the Everyone group. This is also what makes the default file-system permissions acceptable.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-SO-000167": {
+  "summary": "Restrict remote calls to the Security Account Manager to Administrators only, using the security descriptor given in the rule, so remote clients cannot query the local password database. A documented domain application account for a management tool may be added if vendor documentation requires it.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Management or scanning tools that enumerate local accounts remotely under a non-admin account will break unless documented and added.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-SO-000180": {
+  "summary": "Prevent NTLM from falling back to a null (unauthenticated) session when authentication fails, closing a path to unauthorized access.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-SO-000185": {
+  "summary": "Disable PKU2U authentication with online identities so peer-to-peer logons using Microsoft accounts cannot authenticate to the machine; only centrally managed Windows accounts are accepted.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-SO-000190": {
+  "summary": "Restrict Kerberos to AES128, AES256, and future encryption types, removing the weak DES and RC4 suites from use.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "Services or trusts that still depend on RC4 Kerberos tickets will fail to authenticate until they are updated.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-SO-000210": {
+  "summary": "Set the LDAP client signing requirement to at least Negotiate signing so directory queries are integrity-protected when the server supports it. Require signing may be used where the environment allows.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Require signing will break connections to LDAP servers that cannot sign.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-SO-000215": {
+  "summary": "Require NTLMv2 session security and 128-bit encryption for NTLM-based client connections (including secure RPC), so any NTLM session this machine starts uses the strongest available protection.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Connections to old servers that cannot provide NTLMv2 with 128-bit encryption will fail.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-SO-000220": {
+  "summary": "Require NTLMv2 session security and 128-bit encryption for NTLM-based connections this machine accepts as a server (including secure RPC).",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Old clients that cannot meet the requirement will be refused.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-SO-000230": {
+  "summary": "Force the operating system to use only FIPS-compliant algorithms for encryption, hashing, and signing. The rule warns that the machine will then be unable to talk over encrypted or signed protocols to servers that do not support these algorithms. Registry location differs between Group Policy and Intune.",
+  "triage": "risky-change",
+  "automation": "automatable",
+  "caution": "Applications using non-FIPS algorithms (some .NET code, older TLS configurations, third-party tools) can fail outright; test before broad rollout.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-SO-000245": {
+  "summary": "Run the built-in Administrator account in UAC Admin Approval Mode so even that account has to approve elevation rather than running everything with full rights all the time.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-SO-000250": {
+  "summary": "Make UAC prompt administrators for consent on the secure desktop when elevation is needed, so the prompt cannot be spoofed or clicked through by malware.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-SO-000251": {
+  "summary": "Domain-joined machines must use multifactor authentication (for example a CAC with PKI) for all accounts except local emergency accounts. The check is simply that the smart card reader and smart card registry keys exist and are populated; the organization must actually enforce MFA. Not applicable to standalone systems.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "The registry check only shows smart card infrastructure is present, not that MFA is enforced; treat this as a program-level requirement rather than a single setting.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-SO-000255": {
+  "summary": "Make UAC automatically deny elevation requests from standard users, so tasks needing admin rights must be started from an administrative account instead of prompting for credentials in a user session.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Standard users can no longer enter admin credentials at a prompt; help desks must handle elevation through a separate admin session.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-SO-000260": {
+  "summary": "Have UAC detect application installers and prompt for elevation, so a setup program cannot silently run with admin rights.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-SO-000265": {
+  "summary": "Only allow UIAccess applications (which can interact with elevated windows) to run elevated if they are installed in secure locations such as Program Files or Windows\\System32, so a user-writable copy cannot be abused.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Accessibility or automation tools installed in user profile folders may lose UIAccess capability.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-SO-000270": {
+  "summary": "Turn User Account Control on by running all administrators in Admin Approval Mode. This is the master switch for UAC; without it the other UAC settings have no effect.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Changing this setting requires a restart, and some poorly written legacy applications behave differently once UAC is active.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-SO-000275": {
+  "summary": "Enable UAC file and registry virtualization so older applications that try to write to protected locations are redirected to per-user locations and keep working instead of failing or requiring admin rights.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-SO-000280": {
+  "summary": "Any enabled local Administrator account must have its password changed at least every 60 days, and Windows LAPS must manage it (with 14-character complex passwords and a 60-day age) unless the AO approves an alternative. Check the PasswordLastSet date, the LAPS policy, and the LAPS operational log as described in the rule.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Deploying LAPS requires directory schema and policy setup; without it, someone must document a manual rotation process and evidence for the ISSM/ISSO.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-UC-000020": {
+  "summary": "Keep Windows marking downloaded attachments with their zone of origin (the default), so it can warn about files from the internet. It is only a finding if the user policy to stop preserving zone information has been explicitly enabled; set it to Not Configured or Disabled.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-UR-000005": {
+  "summary": "Make sure no group or account holds the Access Credential Manager as a trusted caller user right, since it could allow retrieving other users' stored credentials. The policy should be defined but left blank.",
+  "triage": "quick-win",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-UR-000025": {
+  "summary": "Limit the Allow log on locally user right to the Administrators and Users groups, so only intended accounts can sign in interactively at the machine.",
+  "triage": "quick-win",
+  "automation": "manual",
+  "caution": "Removing a group that service or kiosk accounts belong to will stop those accounts from logging on.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-UR-000010": {
+  "summary": "Limit the Access this computer from the network user right to Administrators and Remote Desktop Users. A domain application account for a management tool may be added if vendor documentation requires it and the exception is documented with the ISSO.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Removing Everyone or Authenticated Users from this right can break remote management, file sharing, and scanning tools that connect with other accounts.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-UR-000030": {
+  "summary": "Limit the Back up files and directories user right to the Administrators group, because it lets the holder read any file regardless of permissions.",
+  "triage": "quick-win",
+  "automation": "manual",
+  "caution": "Backup software running under a dedicated non-admin account will need that account added or reworked.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-UR-000035": {
+  "summary": "Limit the Change the system time user right to Administrators and LOCAL SERVICE, since altering the clock can break authentication and falsify event log timestamps.",
+  "triage": "quick-win",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-UR-000040": {
+  "summary": "Limit the Create a pagefile user right to the Administrators group, so ordinary users cannot resize the pagefile and degrade system performance.",
+  "triage": "quick-win",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-UR-000050": {
+  "summary": "Limit the Create global objects user right to Administrators, LOCAL SERVICE, NETWORK SERVICE, and SERVICE, so ordinary accounts cannot create objects visible to every user's session.",
+  "triage": "quick-win",
+  "automation": "manual",
+  "caution": "Some applications run under user accounts expect this right; check for them before removing.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-UR-000055": {
+  "summary": "Make sure no group or account holds the Create permanent shared objects user right; the policy should be defined but blank. The right could be used to expose sensitive data through shared objects.",
+  "triage": "quick-win",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-UR-000060": {
+  "summary": "Limit the Create symbolic links user right to the Administrators group. On workstations with an approved Hyper-V use, NT VIRTUAL MACHINES\\VIRTUAL MACHINE may also hold it.",
+  "triage": "quick-win",
+  "automation": "manual",
+  "caution": "Developer tooling that creates symlinks under a standard account will stop working.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-UR-000070": {
+  "summary": "Set the Deny access to this computer from the network right so the Guests group is always denied, and on domain systems also deny Enterprise Admins, Domain Admins, and the Local account group. This keeps stolen high-privilege or local credentials from being used to reach the workstation remotely. PAWs dedicated to AD management are exempt from denying the admin groups.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "Denying Local account blocks remote use of every local account, including any local admin used for support; plan an alternative before applying.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-UR-000075": {
+  "summary": "On domain-joined workstations, add the Enterprise Admins and Domain Admins groups to Deny log on as a batch job so those powerful accounts cannot run scheduled tasks on lower-trust machines. Standalone systems are exempt.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "Scheduled tasks configured to run as a domain admin account will stop running.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-UR-000080": {
+  "summary": "On domain-joined workstations, add the Enterprise Admins and Domain Admins groups to Deny log on as a service so those accounts cannot be used to run services on lower-trust machines. Standalone systems are exempt.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "The rule itself warns that incorrect configuration can prevent services from starting; confirm no service runs under a domain admin account first.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-UR-000085": {
+  "summary": "Set Deny log on locally so the Guests group is always denied, and on domain systems also deny Enterprise Admins and Domain Admins, so high-privilege domain accounts are never used interactively on ordinary workstations. PAWs dedicated to AD management are exempt from denying the admin groups.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "Administrators who habitually sign in to workstations with domain admin accounts will be locked out of that practice.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-UR-000090": {
+  "summary": "Set Deny log on through Remote Desktop Services so Guests are always denied, and on domain systems also deny Enterprise Admins, Domain Admins, and the Local account group. If Remote Desktop is not used at all, denying Everyone is acceptable instead. PAWs dedicated to AD management are exempt from denying the admin groups.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "Denying Everyone or Local account will cut off remote desktop support that relies on those accounts.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-UR-000095": {
+  "summary": "Make sure no group or account holds the Enable computer and user accounts to be trusted for delegation user right; the policy should be defined but blank. The right allows changing delegation settings, which could let someone impersonate other users.",
+  "triage": "quick-win",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-UR-000100": {
+  "summary": "Limit the Force shutdown from a remote system user right to the Administrators group, so nobody else can remotely shut the machine down and cause an outage.",
+  "triage": "quick-win",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-UR-000110": {
+  "summary": "Limit the Impersonate a client after authentication user right to Administrators, LOCAL SERVICE, NETWORK SERVICE, SERVICE, and RESTRICTED SERVICES\\PrintSpoolerService. The right lets a program act as another user and could be used to escalate privileges.",
+  "triage": "quick-win",
+  "automation": "manual",
+  "caution": "Server-style applications (web or database services) running under custom accounts may need this right and will break if it is removed.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-UR-000120": {
+  "summary": "Limit the Load and unload device drivers user right to the Administrators group, since loading a driver is an easy way to run malicious code in the kernel.",
+  "triage": "quick-win",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-UR-000125": {
+  "summary": "Make sure no group or account holds the Lock pages in memory user right; the policy should be defined but blank. The right lets a process pin physical memory, which can starve the system and cause a denial of service.",
+  "triage": "quick-win",
+  "automation": "manual",
+  "caution": "Some database software asks for this right for its service account; removing it may reduce that software's performance.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-UR-000130": {
+  "summary": "Limit the Manage auditing and security log user right to Administrators (an organizational Auditors group is also acceptable). Anyone with it can clear the security log or change audit settings and erase evidence of tampering.",
+  "triage": "quick-win",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-UR-000140": {
+  "summary": "Limit the Modify firmware environment values user right to the Administrators group, since changing firmware variables can cause hardware failures or prevent the system from booting.",
+  "triage": "quick-win",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-UR-000145": {
+  "summary": "Limit the Perform volume maintenance tasks user right to the Administrators group, because it allows managing or deleting disk volumes and could cause data loss.",
+  "triage": "quick-win",
+  "automation": "manual",
+  "caution": "Database software that uses instant file initialization under a service account will lose that capability.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-UR-000150": {
+  "summary": "Limit the Profile single process user right to the Administrators group, so ordinary users cannot monitor the performance of other processes to identify targets for attack.",
+  "triage": "quick-win",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-UR-000160": {
+  "summary": "Limit the Restore files and directories user right to the Administrators group, since it bypasses file permissions and could be used to overwrite current data.",
+  "triage": "quick-win",
+  "automation": "manual",
+  "caution": "Backup or restore software running under a dedicated non-admin account will need that account added or reworked.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-UR-000165": {
+  "summary": "Limit the Take ownership of files or other objects user right to the Administrators group, since taking ownership lets a user change permissions on anything and then modify it.",
+  "triage": "quick-win",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-00-000065": {
+  "summary": "Review local accounts and disable or delete any enabled account that has not logged on in the past 35 days, excluding the built-in Administrator, Guest, DefaultAccount, and the local administrator account. The rule gives a PowerShell script that lists each account's last logon. Inactive accounts that are still needed must be documented with the ISSO.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Disabling an account that a service or rarely used process depends on will break it; confirm before disabling.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-00-000085": {
+  "summary": "On a domain-joined workstation, the only local accounts should be the built-in ones (Administrator, Guest, DefaultAccount, defaultuser0, WDAGUtilityAccount) and local administrator accounts. Remove any other local user accounts; people should sign in with domain accounts. Standalone systems are exempt.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Deleting a local account removes its profile and data; confirm the account is not in use first.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-00-000260": {
+  "summary": "Make sure the Windows time service syncs with an authorized DoD time source. Domain-joined systems should show NT5DS (time from the domain) in the W32tm configuration output; systems that use an NTP server must point it at an authorized server through the Windows NTP Client policy.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Pointing at an unreachable or wrong time server causes clock drift, which breaks Kerberos authentication and log correlation.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000030": {
+  "summary": "Stop ICMP redirect messages from overriding the routing table, so an attacker on the network cannot redirect this machine's traffic. The policy requires the MSS-Legacy templates from the STIG package.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "The setting only appears in Group Policy after the MSS-Legacy templates are installed.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000035": {
+  "summary": "Make the machine ignore NetBIOS name release requests unless they come from a WINS server, preventing a denial-of-service trick that floods the machine with name release requests. The policy requires the MSS-Legacy templates.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "The setting only appears in Group Policy after the MSS-Legacy templates are installed.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000170": {
+  "summary": "Enable Allow Microsoft accounts to be optional so modern (Store-style) apps that support it can use enterprise credentials instead of requiring a personal Microsoft account.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000175": {
+  "summary": "Turn off the Application Compatibility Inventory Collector so the machine does not gather data about installed programs and send it to Microsoft.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000206": {
+  "summary": "Set Delivery Optimization Download Mode to anything except Internet, so Windows Update never exchanges update content with random PCs on the internet. LAN, Group, HTTP only, Simple, and Bypass are all acceptable; standalone systems are checked through a different registry value.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Choosing HTTP only or Bypass on a large network removes peer caching and increases bandwidth to Microsoft.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000220": {
+  "summary": "Keep File Explorer's heap termination on corruption enabled (the default), so a corrupted Explorer session is terminated rather than allowed to keep running with legacy plug-ins. Only an explicit policy turning it off is a finding; set it to Not Configured or Disabled.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-CC-000390": {
+  "summary": "Stop Windows spotlight from suggesting third-party apps and content to users. This is a per-user policy under User Configuration, so it must be applied to user accounts rather than the computer.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-SO-000050": {
+  "summary": "Do not disable automatic machine account password changes; the computer must keep rotating its own domain password. The policy Disable machine account password changes must be set to Disabled.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Environments that clone or snapshot domain-joined machines sometimes disable this to avoid trust breakage; re-enabling it may surface those cases.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-SO-000055": {
+  "summary": "Keep the maximum machine account password age at 30 days or less (never 0), which is the default, so the computer's domain password rotates monthly.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-SO-000080": {
+  "summary": "Set the logon message title to DoD Notice and Consent Banner, US Department of Defense Warning Statement, or a site-defined equivalent that does not alter the meaning of the required banner text.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "A custom title must not contradict or soften the banner text required by the related rule.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-SO-000085": {
+  "summary": "Limit cached domain logon credentials to 10 or fewer, which is the default. Cached credentials let users sign in when the domain is unreachable, but each one is a hash an attacker could try to crack. Only relevant on domain-joined systems.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Setting it too low can prevent users from signing in to a laptop while off the network.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-SO-000240": {
+  "summary": "Strengthen the default permissions on global system objects such as device names, mutexes, and semaphores, so non-admin users can read shared objects but not modify ones they did not create.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ },
+ "claude-cowork-2026-09:WN11-UC-000015": {
+  "summary": "Turn off toast notifications on the lock screen so message previews and other sensitive content are not shown to anyone who walks by. This is a per-user policy under User Configuration.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-06"
+ }
+}

@@ -1,0 +1,10 @@
+{
+  "stig_id": "APPL-26-005001",
+  "command": "/usr/bin/csrutil status | /usr/bin/grep -c 'System Integrity Protection status: enabled.'",
+  "stdout": "1",
+  "stderr": "",
+  "returncode": 0,
+  "error": "",
+  "_synthetic": true,
+  "_note": "Hand-authored demo fixture modelling an unmanaged Mac. Not a real recording."
+}
