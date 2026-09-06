@@ -115,12 +115,6 @@ def explain(benchmark, source_path, model: str = DEFAULT_MODEL,
     counted). Raises ExplainError on unrecoverable API failures.
     """
     api_key = os.environ.get("ANTHROPIC_API_KEY", "").strip()
-    if not api_key:
-        raise ExplainError(
-            "ANTHROPIC_API_KEY is not set. Get a key at "
-            "https://console.anthropic.com and run:\n"
-            '  export ANTHROPIC_API_KEY="sk-ant-..."'
-        )
 
     cache_file = _cache_path(Path(source_path))
     cache = {}
@@ -154,6 +148,20 @@ def explain(benchmark, source_path, model: str = DEFAULT_MODEL,
 
     if limit is not None:
         todo = todo[:limit]
+
+    if todo and not api_key:
+        covered = len(benchmark.rules) - len(todo)
+        raise ExplainError(
+            f"{covered} of {len(benchmark.rules)} rules are covered by committed "
+            f"annotations; the remaining {len(todo)} need an API call.\n"
+            "Either run the stig-explain skill (no key needed) or set a key:\n"
+            '  export ANTHROPIC_API_KEY="sk-ant-..."  (https://console.anthropic.com)'
+        )
+    if not todo:
+        if progress:
+            print(f"  AI: all {len(benchmark.rules)} rules annotated from cache, 0 API calls",
+                  file=sys.stderr)
+        return 0
 
     api_calls = 0
     for i in range(0, len(todo), BATCH_SIZE):

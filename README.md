@@ -51,32 +51,44 @@ python3 -m stigprep parse samples/sample_macos15_stig.xml
 
 ## AI triage & explanations
 
-With an [Anthropic API key](https://console.anthropic.com), stig-prep
-annotates every rule with a plain-English summary, a triage bucket, and
-an automation flag:
+Every rule can carry a plain-English summary, a triage bucket (`quick-win`,
+`config-profile`, `needs-judgment`, `risky-change`), an automation flag and a
+one-line caution. There are three ways to get them; the first two need no
+API key and no account.
 
-```bash
+**1. Already in the repository.** `annotations/` ships complete explanation
+sets. Parse the matching STIG and they are picked up automatically:
+
+```
+python3 -m stigprep parse U_MS_Windows_11_V2R9_STIG.zip --explain
+#  -> 257 rules annotated from annotations/, 0 API calls
+```
+
+Currently shipped: Microsoft Windows 11 V2R9 (257 rules). More follow.
+
+**2. With the AI assistant you already have.** The `stig-explain` skill
+(`skills/stig-explain/`) lets any assistant that supports skills write the
+same four fields, ten rules at a time. A helper script hands it the next
+batch, validates every answer — rejecting the batch if a rating is invalid,
+a field is missing, or a command appears that is not in the rule's own text
+— and files the results into the checklist and into `annotations/`. See the
+skill for the loop; it is how the Windows 11 set was produced.
+
+**3. Direct API call.** With an [Anthropic API key](https://console.anthropic.com/)
+stig-prep can annotate any rules not already covered:
+
+```
 export ANTHROPIC_API_KEY="sk-ant-..."
 
 # Cheap test drive: annotate just 5 rules first
 python3 -m stigprep parse U_Apple_macOS_15_V1R7_STIG.zip --explain --limit 5
 
-# Full run (results are cached next to the STIG file — re-runs are free)
+# Full run (results are cached next to the STIG file and in annotations/ — re-runs are free)
 python3 -m stigprep parse U_Apple_macOS_15_V1R7_STIG.zip --explain
 ```
 
-Triage buckets:
-
-- `quick-win` — fast and low-risk to apply now
-- `config-profile` — needs an MDM/configuration profile deployed
-- `needs-judgment` — depends on your environment; a human must decide
-- `risky-change` — can lock you out or break workflows if applied blindly
-
-The AI layer is deliberately conservative: it never invents commands that
-aren't in the STIG's own check/fix text, unknown triage values are
-downgraded to `needs-judgment`, and every annotation is labeled with the
-model that produced it. **AI output is an aid, not an authority — the
-official DISA STIG text is always the source of truth.**
+Whichever path produced them, the annotations land in the same place and the
+same format, so a set generated once is available to every later user.
 
 ## Module 2: stig-scan
 
