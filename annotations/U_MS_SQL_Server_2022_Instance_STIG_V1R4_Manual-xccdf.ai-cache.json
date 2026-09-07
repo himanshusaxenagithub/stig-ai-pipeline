@@ -1,0 +1,634 @@
+{
+ "claude-cowork-2026-09:SQLI-22-003700": {
+  "summary": "Run the instance in Windows Authentication mode so accounts are managed centrally by Active Directory, and if mixed mode is truly needed, get it documented and approved and keep every SQL login on an authorized list. Locally managed SQL logins bypass central account controls and are easy to lose track of.",
+  "triage": "risky-change",
+  "automation": "manual",
+  "caution": "Switching to Windows-only authentication requires a restart and will immediately break any application that connects with a SQL login.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-003800": {
+  "summary": "On domain-joined servers, make sure the SQL Server service account has correct Service Principal Names registered so clients authenticate with Kerberos instead of falling back to weaker NTLM.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Registering an SPN that is already attached to another account causes duplicate-SPN failures, and the instance must be restarted afterward.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-003900": {
+  "summary": "Compare the server-level permissions and role memberships actually granted on the instance against what your documentation says each type of login should have, and grant or revoke until they match. Undocumented permissions are how privilege creep happens.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Revoking permissions that an application silently depends on will break it, so confirm each removal against the documented requirements first.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-006700": {
+  "summary": "Check the SQL Server setup logs for which accounts have installed or modified the software, and make sure only the people documented as authorized installers have that access. Unauthorized installers can alter the database engine itself.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-007900": {
+  "summary": "If SQL logins are in use, set every active one to enforce the Windows password policy and password expiration (CHECK_POLICY and CHECK_EXPIRATION on), so database passwords meet the same complexity and lifetime rules as domain accounts.",
+  "triage": "risky-change",
+  "automation": "automatable",
+  "caution": "Turning on expiration for service-account logins will eventually expire their passwords and break the applications using them unless someone rotates them on schedule.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-008000": {
+  "summary": "If any contained databases exist, make sure their users are based on Windows or Microsoft Entra principals rather than local SQL passwords, so authentication still goes through the central directory.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Removing a contained SQL-authenticated user will cut off whatever connects with it until a directory-based user replaces it.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-008200": {
+  "summary": "When SQL logins are used, set Force Encryption to Yes on the instance's network protocols and bind a DOD-approved certificate, so passwords are never sent across the network in the clear.",
+  "triage": "risky-change",
+  "automation": "manual",
+  "caution": "Forcing encryption with a certificate clients do not trust will make every connection fail after the service restart; verify the certificate chain first.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-008300": {
+  "summary": "In the Windows SCHANNEL registry settings, enable TLS 1.2 for client and server and explicitly disable TLS 1.0, TLS 1.1, SSL 2.0, and SSL 3.0, so connections cannot negotiate an outdated protocol.",
+  "triage": "risky-change",
+  "automation": "automatable",
+  "caution": "Older clients and drivers that cannot speak TLS 1.2 will stop connecting, and a registry mistake can affect every service on the box, so back up the registry first.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-008700": {
+  "summary": "Enable the Windows security option that requires FIPS-compliant cryptographic algorithms, then restart, so SQL Server's encryption, hashing, and signing use validated implementations.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "FIPS mode can break applications or features that rely on non-validated algorithms, and it requires a Windows restart.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-009500": {
+  "summary": "Where the data owner and authorizing official require encryption at rest, confirm each user database is protected either by full-disk encryption or by Transparent Data Encryption; otherwise rely on documented physical and OS access controls appropriate to the data's sensitivity.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Enabling database encryption without safely backing up the master key and certificate can leave backups and databases unrecoverable.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-009600": {
+  "summary": "Back up the instance's Service Master Key to a password-protected file, store that backup securely somewhere other than the SQL Server itself, and document the procedure and who can access it. Without this key backup, encrypted credentials and linked-server passwords cannot be recovered after a rebuild.",
+  "triage": "quick-win",
+  "automation": "manual",
+  "caution": "The backup password itself must be protected and never stored in plain text, or the key backup is worthless.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-009700": {
+  "summary": "If data-at-rest encryption is required, back up the database Master Key to a password-protected file, keep it off the SQL Server in a secure location, and document the procedure and access restrictions so encrypted data can still be recovered after a failure.",
+  "triage": "quick-win",
+  "automation": "manual",
+  "caution": "Losing both the key and its backup password makes any data encrypted under that key permanently unreadable.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-018100": {
+  "summary": "Prefer Windows-only login mode; if mixed mode is required, document why tools like SQLCMD that accept plain-text passwords are needed, get AO approval, and train users never to put passwords on the command line where they can be seen or logged.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Switching the login mode to Windows-only will break any application or script that authenticates with a SQL login.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-018300": {
+  "summary": "Verify the installed SQL Server version and every database software component are still supported by Microsoft, and upgrade or decommission anything that has reached end of life so security fixes keep arriving.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "A major version upgrade needs application compatibility testing and a tested rollback plan before it touches production.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-003600": {
+  "summary": "Cap how many simultaneous sessions each account can open, either by setting a non-zero maximum connection limit on the instance or with a logon trigger, and record the chosen limits in the system documentation. This blunts connection-flooding attacks.",
+  "triage": "risky-change",
+  "automation": "manual",
+  "caution": "A limit set too low will reject legitimate connections and a badly written logon trigger can lock everyone out of the instance, including administrators.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-004000": {
+  "summary": "Make sure every SQL Server account belongs to one identifiable person, remove shared accounts that end users can reach, and log every use of any account that more than one administrator must share. Without this, actions cannot be traced to an individual.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Removing a shared account that an application depends on will break it until individual or service accounts are put in place.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-004100": {
+  "summary": "Check what permissions the local system account holds on the instance and revoke anything beyond the small set needed for clustering or availability groups, so nobody can hide administrative actions behind NT AUTHORITY\\SYSTEM.",
+  "triage": "needs-judgment",
+  "automation": "automatable",
+  "caution": "Revoking rights that a Windows service or cluster component actually relies on can break failover or monitoring; check clustering and availability-group status first.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-004200": {
+  "summary": "Look for logins ending in a dollar sign, confirm with Active Directory which of them are computer accounts, and remove those, because a computer account cannot be tied to an individual person.",
+  "triage": "needs-judgment",
+  "automation": "automatable",
+  "caution": "Dropping a computer-account login that a service on that machine uses to connect will break that service.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-004300": {
+  "summary": "Make sure at least one SQL Server Audit is enabled and that its server audit specification covers every event your documentation says must be audited, so security-relevant activity is actually recorded.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-004400": {
+  "summary": "Restrict the ability to create or change audit definitions to a dedicated audit-maintainer server role holding only ALTER ANY SERVER AUDIT, and strip that permission plus CONTROL SERVER, ALTER ANY DATABASE, CREATE ANY DATABASE, sysadmin and dbcreator from logins that are not approved audit maintainers.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Removing CONTROL SERVER or sysadmin from an account can strip other permissions it legitimately needs, so review each login before revoking.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-004600": {
+  "summary": "If your documentation requires auditing access to permissions, security objects, or classified data, make sure a server audit is running and its specification includes SCHEMA_OBJECT_ACCESS_GROUP so those accesses are recorded. The supplied STIG audit script covers this.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "SCHEMA_OBJECT_ACCESS_GROUP logs every object access and can generate very large audit files on a busy instance, so plan storage before enabling it.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-004700": {
+  "summary": "Make sure at least one server audit is defined and in the STARTED state; enabled audits start automatically with the instance, so no activity slips through unrecorded after a restart.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-005500": {
+  "summary": "Use SQL Server Audit (or an equivalent third-party auditing product) and confirm it captures any extra events or fields your organization's documentation requires beyond the standard audit; if none are documented, nothing more is needed.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-005900": {
+  "summary": "When audits write to files, lock down the audit folder and file permissions so only administrators and auditors can read them and only the audit administrator and the SQL Server service (plus SQL Agent if used) can write, preventing tampering with the audit trail.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Removing write access from the account the SQL Server service actually runs under will stop the audit from writing and can halt the instance if the audit is configured to shut down on failure.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-006300": {
+  "summary": "List which logins hold ALTER ANY SERVER AUDIT, ALTER ANY DATABASE AUDIT, or CONTROL SERVER, and deny or revoke those permissions from anyone not documented as an approved audit maintainer, so the audit configuration cannot be quietly changed.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Denying CONTROL SERVER to an administrative login removes far more than audit rights, so confirm what else that login needs first.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-006500": {
+  "summary": "Check who owns and who can modify the SQL Server binary folder and any shared software library paths on disk, and remove modify rights from anyone not documented as authorized so the engine's executables cannot be tampered with.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Removing permissions from the SQL Server service account or an installer account can prevent patching or stop the service from starting.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-006600": {
+  "summary": "Put a documented process in place that baselines the SQL Server program files by hash, ownership, and modification date, and alerts when any of them change, so unauthorized modification of the software is detected. A PowerShell hashing script is an acceptable approach.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Refresh the baseline after every patch or cumulative update, or the monitoring will raise false alerts.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-006800": {
+  "summary": "Confirm SQL Server's root directory is not inside the Windows directory or another application's directory; if it is, reinstall into a dedicated folder so file permissions and patching for the database do not collide with the OS or other software.",
+  "triage": "risky-change",
+  "automation": "manual",
+  "caution": "Fixing this means reinstalling SQL Server, which requires a full backup, downtime, and re-attaching or restoring every database.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-006900": {
+  "summary": "Look for vendor sample databases such as pubs, Northwind, AdventureWorks, WideWorldImporters, or Contoso on the production instance and drop them, because sample content ships with well-known accounts and objects attackers can exploit.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Sample databases may have been renamed, so confirm a database really is sample content before dropping it.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-007000": {
+  "summary": "Run the installed-features discovery report from the SQL Server Installation Center, compare it to the documented list of required components, and uninstall any feature that is not needed to shrink the attack surface.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Removing a feature that an application quietly relies on, such as Integration Services or Full-Text Search, will break that application.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-007200": {
+  "summary": "Check whether xp_cmdshell is enabled and turn it off unless its use is documented and approved, because it lets anyone with the right database permission run operating system commands as the SQL Server service account.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Any job or procedure that shells out through xp_cmdshell will stop working once it is disabled.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-007300": {
+  "summary": "Check whether CLR integration is enabled and disable it unless approved; for approved CLR assemblies, keep their permission set as tight as possible and sign them with a certificate, since CLR code runs inside the database engine process.",
+  "triage": "needs-judgment",
+  "automation": "automatable",
+  "caution": "Disabling CLR will break any application that uses CLR stored procedures, functions, or types.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-007400": {
+  "summary": "List any extended stored procedures that did not ship with SQL Server and drop the ones that are not documented and approved, because these are third-party DLLs running inside the SQL Server process itself.",
+  "triage": "needs-judgment",
+  "automation": "automatable",
+  "caution": "Dropping a nonstandard extended procedure an application depends on will break that application.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-007500": {
+  "summary": "List all linked servers and their login mappings, remove any that are not documented and approved, and make sure no linked-server login impersonates sysadmin on the remote side without a documented need.",
+  "triage": "needs-judgment",
+  "automation": "automatable",
+  "caution": "Dropping a linked server breaks every distributed query and job that uses it, so confirm with application owners before removing one.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-007600": {
+  "summary": "Review which network protocols are enabled for the instance in SQL Server Configuration Manager and disable any, such as Named Pipes, that are not documented and authorized under your ports-and-protocols guidance.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "Disabling a protocol that clients are actually using will cut off their connections.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-007700": {
+  "summary": "Confirm which TCP ports the instance listens on, use fixed ports that comply with your ports-and-protocols guidance or document and get approval for any exceptions, and close ports no longer needed.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Changing the listening port breaks every client connection string and firewall rule that assumes the old port.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-007800": {
+  "summary": "Review the server-level logins to identify any shared accounts or computer accounts, and remove them so every action on the instance can be traced to a specific person; shared accounts are only acceptable when users are individually authenticated first and that identity is captured in the audit.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Removing a shared or computer account that an application or service uses will break it until a proper individual or service account replaces it.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-009800": {
+  "summary": "Enable the common criteria compliance option so SQL Server overwrites freed memory before reusing it, preventing one session from reading leftover data from another. This is only available in Enterprise and Developer editions.",
+  "triage": "needs-judgment",
+  "automation": "automatable",
+  "caution": "The memory overwriting can noticeably slow very busy instances, and on Standard edition the option does not exist, so a documented exception may be required.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-009900": {
+  "summary": "Unless Instant File Initialization is documented as required, remove the SQL Server service account from the Perform volume maintenance tasks right so new data files are zeroed out and cannot expose leftover disk contents.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Disabling IFI makes data file creation and growth slower, which can lengthen restores and autogrowth events on large databases.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-010000": {
+  "summary": "Check the NTFS permissions on the data, log, and backup directories and remove any principal beyond database administrators, the SQL Server and Agent service SIDs, SYSTEM, and CREATOR OWNER unless it is documented as authorized, so database files cannot be read or altered outside the engine.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Removing an entry the SQL Server service actually uses, such as a domain service account instead of a service SID, will make databases inaccessible.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-010010": {
+  "summary": "Review stored procedures, functions, triggers, and application code for dynamic SQL, and rewrite it as static, parameterized statements wherever that would practically work, because dynamic SQL is the main door for injection attacks.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Rewriting database code requires developer time and regression testing; a hasty rewrite can change query behavior.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-010020": {
+  "summary": "Wherever dynamic SQL is genuinely necessary in database or application code, make sure the input it builds from is validated or otherwise protected against injection before it is executed.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Overly strict input filtering can reject legitimate values, so test the validation against real data.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-010100": {
+  "summary": "Limit who can see detailed SQL Server error messages: keep sysadmin and securityadmin membership and access to the error log folder to authorized people, and consider startup trace flag 3625 so nonadministrators only receive generic error text that reveals nothing about the system's internals.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Trace flag 3625 requires a service restart and will hide error details that developers and support staff may rely on for troubleshooting.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-010400": {
+  "summary": "Compare every server-level permission grant and built-in role membership against your documented requirements, and tighten the ability to grant permissions, join sysadmin or securityadmin, hold CONTROL SERVER, or use WITH GRANT so ordinary users cannot escalate their own privileges or disable security controls.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Revoking permissions without checking dependencies can break applications or lock administrators out of tasks they are responsible for.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-010500": {
+  "summary": "List all credentials and enabled SQL Agent proxy accounts and drop any that are not documented and authorized, because each one stores a set of Windows credentials that jobs can run external processes under.",
+  "triage": "needs-judgment",
+  "automation": "automatable",
+  "caution": "Dropping a credential or proxy that a scheduled job uses will make that job fail at its next run.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-010900": {
+  "summary": "For file-based audits, set a finite maximum file size and rollover count so the total possible audit volume fits on the destination drive, and confirm the drive actually has that much room; unlimited settings can fill the disk and stop auditing.",
+  "triage": "needs-judgment",
+  "automation": "automatable",
+  "caution": "A rollover count set too low will overwrite older audit records sooner than your retention policy allows.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-011000": {
+  "summary": "Set up an alert, using Windows monitoring, SQL Agent, or a management tool, that notifies support staff when the drive holding the SQL audit files reaches 75 percent full so auditing does not silently stop.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-011100": {
+  "summary": "Configure SQL Server, the operating system, or your logging tool to send an immediate alert to support staff whenever auditing fails for any reason, so gaps in the audit trail are noticed right away.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-011200": {
+  "summary": "Make sure the host keeps accurate time, either by being domain-joined or by synchronizing with an official NTP time server, so audit timestamps (which SQL Server stores in UTC) can be trusted and correlated with other systems.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "A large one-time clock correction can confuse scheduled jobs and Kerberos authentication, so adjust gradually or during a maintenance window.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-011400": {
+  "summary": "List which logins hold CONTROL SERVER, any WITH GRANT permission, or membership in sysadmin, securityadmin, or serveradmin, and remove any that are not documented as authorized, so only approved administrators can change the instance configuration.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Removing an account from sysadmin that is used for backups, monitoring, or deployments will break those processes.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-011500": {
+  "summary": "Review the members of the local Administrators group on the SQL Server host and remove anyone not documented as authorized, because a local administrator can change the instance configuration outside of SQL Server's own controls.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Removing an account used for patching, backups, or remote management from Administrators can break those processes.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-011800": {
+  "summary": "Make sure a server audit is running and its specification includes the full list of configuration- and privilege-change action groups (permission changes, role membership changes, principal changes, backup and restore, DBCC, and the rest) so any attempt to alter security settings is recorded. The supplied STIG audit script defines them all.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "Enabling many action groups increases audit volume, so size the audit storage accordingly.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-012300": {
+  "summary": "Unless CLR assemblies are documented as required, disable CLR integration so no managed code runs inside the SQL Server process where it could interfere with other sessions.",
+  "triage": "needs-judgment",
+  "automation": "automatable",
+  "caution": "Disabling CLR breaks any application that relies on CLR stored procedures, functions, or types.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-012400": {
+  "summary": "Run each SQL Server service (engine, Agent, and so on) under its own documented dedicated account, such as a virtual, managed, or group managed service account, so a compromise of one service does not hand over the others.",
+  "triage": "risky-change",
+  "automation": "manual",
+  "caution": "Changing a service account through anything other than SQL Server Configuration Manager can leave the new account without the file and registry permissions it needs, preventing the service from starting.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-012600": {
+  "summary": "Review database and application code, column data types, and constraints to make sure invalid input is rejected rather than stored or acted on; use parameterized queries, stored procedures, constraints, and foreign keys to validate data. Free-form text fields are exempt.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Adding constraints or changing data types on existing tables can fail on already-stored bad data and break applications that relied on the loose behavior.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-012800": {
+  "summary": "Keep SQL Server on a Microsoft-supported version and apply security patches within the deadlines set by your patching authority, keeping evidence that this happens consistently.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Cumulative updates require a service restart and should be tested against applications before production.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-013800": {
+  "summary": "Make sure a server audit is running and its specification includes SCHEMA_OBJECT_CHANGE_GROUP so every successful or failed attempt to alter or drop security-related objects is recorded.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-014800": {
+  "summary": "Record both successful and failed logins, either by including SUCCESSFUL_LOGIN_GROUP and FAILED_LOGIN_GROUP in the server audit specification or by setting Login auditing to both failed and successful in the instance properties, so connection attempts can be investigated.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Logging every successful login can produce a large volume of records on busy instances.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-015500": {
+  "summary": "Check whether any server audit has a filter predicate and remove or adjust any filter that excludes direct access to databases, so no user activity is silently left out of the audit trail.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Removing a filter can sharply increase audit volume if it was suppressing noisy application traffic.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-015900": {
+  "summary": "Ship SQL Server audit records to a central log management system, continuously and in near real time where a network connection exists or at least weekly for stand-alone systems, so the records survive tampering or loss on the database host.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-016000": {
+  "summary": "Set the CustomerFeedback and EnableErrorReporting registry values for the instance and the shared SQL Server key to 0 unless participation in Microsoft's Customer Experience Improvement Program is documented as authorized; on classified systems they must always be 0 so no telemetry or crash data leaves the server.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-016100": {
+  "summary": "If your documentation requires auditing of telemetry, create a local folder for the telemetry audit data, grant the SQLTELEMETRY account list, read, and write on it, point the UserRequestedLocalAuditDirectory registry value at it, and set the CEIP service to start automatically so you can see what is being sent to Microsoft.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "This only applies when telemetry auditing is documented as required; if telemetry is disabled under the related rule, enabling the CEIP service here would conflict.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-016200": {
+  "summary": "Disable the built-in sa login (principal ID 1) so the best-known administrative account in SQL Server cannot be used to log in, forcing administrators to use their own accountable accounts.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Any application or script still connecting as sa will fail once it is disabled, so check for such connections first.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-016300": {
+  "summary": "Rename the built-in sa login to something not easily guessed, so attackers cannot target the well-known account name with password guessing.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Scripts, jobs, or applications that reference the login by the name sa will break after the rename.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-016400": {
+  "summary": "List the stored procedures marked to run automatically at instance startup and turn off the startup option for any that are not documented, because a startup procedure runs with high privilege every time the service starts and is a convenient hiding place for malicious code.",
+  "triage": "needs-judgment",
+  "automation": "automatable",
+  "caution": "Disabling a startup procedure that initializes something an application relies on will break that application after the next restart.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-016500": {
+  "summary": "If database mirroring is in use, set the mirroring endpoint to require AES encryption so data replicated between servers cannot be read or altered in transit, unless the data owner has documented that end-to-end encryption is not required.",
+  "triage": "needs-judgment",
+  "automation": "automatable",
+  "caution": "Both partners must support the same encryption setting or the mirroring session will fail to reconnect after the change.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-016600": {
+  "summary": "If Service Broker is in use, set its endpoint to require AES encryption so messages between instances cannot be read or altered in transit, unless the data owner has documented that end-to-end encryption is not required.",
+  "triage": "needs-judgment",
+  "automation": "automatable",
+  "caution": "Remote Service Broker endpoints must be configured to match or conversations between them will stop being delivered.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-016700": {
+  "summary": "Revoke execute permission on the registry extended stored procedures (the xp_reg and xp_instance_reg family) from every user except dbo unless the access is documented and approved, since these procedures let database users read and write the Windows registry.",
+  "triage": "needs-judgment",
+  "automation": "automatable",
+  "caution": "Some administrative tools and setup scripts use these procedures, so confirm nothing depends on them before revoking.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-016800": {
+  "summary": "Unless FILESTREAM is documented as authorized, remove any FILESTREAM columns, filegroups, and data containers, set filestream access level to 0, and restart the service, because FILESTREAM exposes database data through the file system.",
+  "triage": "risky-change",
+  "automation": "manual",
+  "caution": "Dropping FILESTREAM columns permanently deletes the data stored in them, so back up first and confirm no application needs it.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-017000": {
+  "summary": "Check whether Ole Automation Procedures are enabled and turn the option off unless its use is documented and authorized, because it lets database code create and drive COM objects on the server.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Any procedure that uses sp_OACreate and related calls will fail once the option is disabled.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-017100": {
+  "summary": "Check the instance-wide user options setting and set it back to 0 unless a nonzero value is documented and authorized, so no global default query behaviors are silently imposed on every connection.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Applications that relied on the imposed default SET options may behave differently once the setting is cleared.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-017200": {
+  "summary": "Turn off the remote access option unless it is documented and approved; it is a legacy feature that lets remote servers execute stored procedures on this instance.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Legacy remote-server stored procedure calls will fail once the option is disabled, though linked servers are unaffected.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-017400": {
+  "summary": "Set the hadoop connectivity option to 0 unless PolyBase access to Hadoop is documented and approved, so the instance is not reaching out to external data stores nobody has sanctioned.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Any external tables that query Hadoop through PolyBase will stop working.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-017500": {
+  "summary": "Disable the allow polybase export option unless it is documented and approved, because it lets the instance write query results out to external storage such as Hadoop or Azure blobs.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Processes that insert into PolyBase external tables will fail once export is disabled.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-017600": {
+  "summary": "Disable the remote data archive option (Stretch Database) unless it is documented and approved, so table data cannot be migrated off the server to Azure without authorization.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "If any table is already stretched to Azure, disabling the option will make that remote data unreachable until it is brought back.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-017700": {
+  "summary": "Turn off the external scripts enabled option unless it is documented and approved, because it allows R and Python scripts to run on the server through the database engine.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Machine Learning Services workloads that call sp_execute_external_script will fail once this is disabled.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-017800": {
+  "summary": "Set the SQL Server Browser service to Disabled and stop it unless its use is documented and authorized; where it must run, hide instances that do not need to be discoverable, so the server does not advertise its instances and ports to the network.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Named instances on dynamic ports depend on the Browser service for client connections, so clients may need to specify the port explicitly once it is disabled.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-017900": {
+  "summary": "Disable the replication xps option unless replication is documented and approved, so the replication extended stored procedures are not available as an attack surface on instances that do not replicate.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Disabling this on an instance that actually uses replication will break publishing, distribution, or subscription.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLI-22-019500": {
+  "summary": "If SQL logins are in use, make sure every script or procedure that creates a login or resets its password includes the MUST_CHANGE option (with CHECK_EXPIRATION and CHECK_POLICY on) so the user must pick a new password at first use and the administrator never knows the working password.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "MUST_CHANGE cannot be used for service-account logins that connect noninteractively, since they have no way to set a new password.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ }
+}

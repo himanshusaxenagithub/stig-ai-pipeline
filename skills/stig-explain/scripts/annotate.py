@@ -83,15 +83,27 @@ def cmd_next(path, limit):
 
 
 def _suspicious_commands(item, rule):
-    """Flag command-looking tokens in the answer that do not appear in the
-    rule's own check/fix text. Conservative: only obvious shell/PowerShell
-    forms."""
+    """Flag command-looking text in the answer that does not appear in the rule's
+    own check/fix text. Prose mentions ("needs sudo rights", "set the sysctl
+    to 1") are not commands: a tool name counts only when the very next token
+    looks like an argument — a flag, a path, a dotted or assigned value, or a
+    digit-bearing token — or when it is ``sudo <tool> <argument>``."""
     src = ((rule.get("check_text") or "") + (rule.get("fix_text") or "")).lower()
     text = " ".join(str(item.get(k, "")) for k in ("summary", "caution")).lower()
+    tools = (r"(?:reg|regedit|gpedit|auditpol|secedit|sc|net|powershell|bash|chmod|chown|systemctl|"
+             r"sysctl|launchctl|defaults|manage-bde|dnf|apt|apt-get|rpm|grep|awk|sed|cat|ls|find|mount|"
+             r"ufw|iptables|nft|setsebool|semanage|useradd|usermod|passwd|chage|rm|mv|cp|dd|mkfs|kill|"
+             r"set-\w+|get-\w+|new-\w+|remove-\w+)")
+    arglike = re.compile(r"[-/=:\\]|\d|^[a-z]+\.[a-z]")
     found = []
-    for tok in re.findall(r"(?:^|\s)((?:sudo |set-|get-|new-|reg add|regedit|gpedit|auditpol|secedit|sc |net |powershell|bash|chmod|chown|systemctl|sysctl|launchctl|defaults write)[^\s,;.]*)", text):
-        if tok.strip() and tok.strip() not in src:
-            found.append(tok.strip())
+    pat = re.compile(r"(?:^|[\s(])(?:(sudo)\s+)?(" + tools + r")\s+(\S+)")
+    for m in pat.finditer(text):
+        sudo, tool, arg = m.group(1), m.group(2), m.group(3).rstrip(".,;:)")
+        if not (arglike.search(arg) or arg.isupper()):
+            continue
+        snippet = f"{tool} {arg}"
+        if snippet not in src:
+            found.append(("sudo " if sudo else "") + snippet)
     return found
 
 

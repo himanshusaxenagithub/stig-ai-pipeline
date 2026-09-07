@@ -1,0 +1,1282 @@
+{
+ "claude-cowork-2026-09:APPL-26-000054": {
+  "summary": "Restrict the SSH server to a fixed set of FIPS-approved ciphers, key exchange, MAC and key algorithms by writing them into an sshd include file, so remote sessions only use validated cryptography.",
+  "triage": "risky-change",
+  "automation": "automatable",
+  "caution": "Clients or automation that only support older algorithms will no longer be able to connect; test from a second session before disconnecting.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-000057": {
+  "summary": "Restrict the SSH client used by every local user account to the same FIPS-approved ciphers and algorithms, so outbound SSH from the Mac only negotiates validated cryptography.",
+  "triage": "risky-change",
+  "automation": "automatable",
+  "caution": "Users will lose the ability to reach older SSH servers that do not offer these algorithms.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-001150": {
+  "summary": "Turn off password and keyboard-interactive authentication for the SSH server so only key-based or other non-password methods are accepted, which stops password guessing over SSH.",
+  "triage": "risky-change",
+  "automation": "automatable",
+  "caution": "Anyone who still logs in over SSH with a password will be locked out; make sure keys or another accepted method are in place first.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002038": {
+  "summary": "Stop and disable the built-in TFTP service, an unauthenticated and unencrypted file transfer service that has no place on a workstation.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "The rule notes a restart may be needed for the change to take effect.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002060": {
+  "summary": "Push a configuration profile so Gatekeeper is enabled and only allows apps from identified developers, blocking software from unidentified sources.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "Unsigned in-house or legacy applications will be blocked from launching.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002062": {
+  "summary": "Push a configuration profile that disables Bluetooth entirely so the radio is not available unless an approved device is needed.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "Wireless keyboards, mice and headsets stop working; confirm no user depends on a Bluetooth peripheral before deploying.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002064": {
+  "summary": "Push a configuration profile that enables Gatekeeper so macOS assesses applications before they are allowed to run.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "Applications that fail Gatekeeper assessment will be blocked from launching.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002066": {
+  "summary": "Push a configuration profile that disables automatic login so the machine always prompts for credentials at boot instead of landing in a user session.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002069": {
+  "summary": "Rewrite the authorization database rules for the listed System Settings panes so only an administrator who authenticates can change systemwide preferences such as network, sharing, software update and startup disk.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Standard users lose the ability to change these settings themselves; the fix edits the authorization database, so a mistake can affect who can authenticate for settings changes.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-005001": {
+  "summary": "Make sure System Integrity Protection is enabled; if it is off, it must be turned back on from Recovery mode so the OS protects its own files and processes from tampering.",
+  "triage": "risky-change",
+  "automation": "manual",
+  "caution": "Re-enabling requires booting into Recovery and a physical presence at the machine, and any tooling that relied on SIP being off will stop working.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-005020": {
+  "summary": "Turn on FileVault full-disk encryption and push the profile that prevents users from disabling it, so data on a lost or stolen Mac cannot be read.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "Escrow the recovery key before enforcing; without it a locked disk is unrecoverable, and the rule points to a FileVault supplemental that must be followed.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-006000": {
+  "summary": "The Mac must run a version of macOS the vendor still supports so it keeps receiving security fixes; check the version in About This Mac and upgrade if it is out of support.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "A major OS upgrade can break applications and peripherals; plan and test it rather than upgrading in place blindly.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-999999": {
+  "summary": "Install security-relevant software updates within 30 days; the check compares the date of the last successful software update against 30 days ago.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Updates can require a restart and may change application behavior, so schedule them and confirm the update date is refreshed afterward.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-000001": {
+  "summary": "Push a configuration profile that stops an Apple Watch from unlocking the Mac, so a locked session can only be opened with the user's credentials.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-000002": {
+  "summary": "Push a configuration profile so a password is required to dismiss the screen saver, preventing anyone from picking up an unattended session.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-000003": {
+  "summary": "Push a configuration profile so the password prompt kicks in no more than five seconds after the screen saver starts, closing the window where a walk-up person could resume the session.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-000005": {
+  "summary": "Push a configuration profile so the session locks as soon as a smart card token is removed, tying the unlocked session to the presence of the user's card.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "The rule warns to consult the STIG supplemental guidance first so users are not locked out of the system.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-000007": {
+  "summary": "Push a configuration profile that sets all four hot corners to do nothing, so a stray mouse movement cannot disable the screen saver or expose the desktop.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-000009": {
+  "summary": "Push a configuration profile that prevents the login window from displaying host information such as system details, which would otherwise be exposed to anyone in front of the machine.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-000012": {
+  "summary": "Any temporary or emergency user account must be set up to disable itself within 72 hours, either through the directory service password policy or a local pwpolicy account policy; if no such accounts exist this does not apply.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Applying the policy to a regular account would disable it after 72 hours; confirm which accounts are genuinely temporary before loading the policy.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-000014": {
+  "summary": "Push a configuration profile that forces automatic time synchronization so the clock, and therefore log timestamps and certificate checks, stay accurate.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-000022": {
+  "summary": "Push the password policy profile so an account locks after no more than three consecutive failed login attempts, limiting password guessing.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "A low threshold means users who mistype their password a few times will be locked out and need to wait or get help.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-000023": {
+  "summary": "Create a text file containing the Standard Mandatory DOD Notice and Consent Banner so the required text is displayed before remote access to the system is granted.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "The banner wording must match the DOD text exactly; the SSH banner rule depends on this file being in place.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-000024": {
+  "summary": "Configure the SSH server to display the contents of /etc/banner before login by adding a banner line to an sshd include file.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "If /etc/banner does not exist yet, create it from the remote-login banner rule first.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-000025": {
+  "summary": "Create a PolicyBanner file in /Library/Security containing the standard DOD notice and consent text, so the banner is displayed at the login window.",
+  "triage": "quick-win",
+  "automation": "manual",
+  "caution": "The file must contain the exact required text; the check only confirms the file exists, so the wording still has to be verified by hand.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-000030": {
+  "summary": "Remove any access control lists from the audit log files under /var/audit so the log permissions are governed only by standard file permissions.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-000031": {
+  "summary": "Remove any access control lists from the /var/audit folder itself so its permissions are governed only by standard file permissions.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-000033": {
+  "summary": "Push a configuration profile that disables FileVault automatic login, so unlocking the encrypted disk at boot does not also log the user straight into their session.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "The rule warns to consult the STIG supplemental guidance first so users are not locked out of the system.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-000051": {
+  "summary": "Set the SSH server's ClientAliveInterval to 900 seconds in an sshd include file so idle remote sessions are checked and can be dropped.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-000052": {
+  "summary": "Set the SSH server's ClientAliveCountMax to 1 in an sshd include file so an unresponsive client is disconnected after a single missed keepalive.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Combined with the alive interval, clients on flaky connections may be disconnected more often.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-000053": {
+  "summary": "Set the SSH server's LoginGraceTime to 30 seconds so an unauthenticated connection is dropped if the user does not finish logging in quickly.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-000060": {
+  "summary": "Push the password policy profile so a locked-out account stays locked for at least 15 minutes before it re-enables, slowing down password guessing.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "Legitimately locked-out users must wait the full period or get an administrator to help.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-000070": {
+  "summary": "Push a configuration profile so the screen saver starts after no more than 15 minutes of inactivity, so an unattended Mac locks itself.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-000090": {
+  "summary": "Change the screen saver authorization rule so only the session owner can unlock a locked session, preventing other users, including admins, from logging into someone else's active session.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Administrators will no longer be able to unlock another user's locked screen; the session must be logged out instead.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-000100": {
+  "summary": "Disable direct login as the root account by setting its shell to /usr/bin/false, so all privileged work goes through named administrator accounts.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Any process or workflow that logs in directly as root will stop working.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-000110": {
+  "summary": "Set the SSH client's ServerAliveInterval to 900 for every local user so outbound SSH sessions send keepalives and idle connections can be detected.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-000120": {
+  "summary": "Set the SSH server's ChannelTimeout to 900 seconds in an sshd include file so idle session channels are closed automatically.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Long-running but idle interactive sessions will be closed after 15 minutes.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-000130": {
+  "summary": "Set the SSH server's UnusedConnectionTimeout to 900 seconds in an sshd include file so connections with no open channels are dropped.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-000140": {
+  "summary": "Set the SSH client's ServerAliveCountMax to 0 for every local user so the client does not keep retrying a server that stops responding.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-000160": {
+  "summary": "Push a configuration profile that automatically logs users out after 86400 seconds (24 hours) of inactivity so abandoned sessions do not persist indefinitely.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "Unsaved work in a session that sits idle for a full day will be lost when the logout fires.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-000170": {
+  "summary": "Push a configuration profile that points the Mac at an authorized DOD time server so clocks stay synchronized with an approved source rather than an arbitrary internet server.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "The check requires a human to confirm the configured server is an authoritative DOD-designated one; pointing at an unreachable server leaves the clock drifting.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-000180": {
+  "summary": "Make sure the time synchronization daemon is loaded so the clock is actually kept in sync with the configured time server.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "The rule notes the timed service cannot be loaded or unloaded while System Integrity Protection is enabled, so on a healthy system this should already be running.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-000190": {
+  "summary": "Configure the privilege-escalation tool to log every command it allows, by removing any setting that suppresses this logging and adding a log_allowed default, so privilege escalation leaves an audit trail.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "The fix edits every sudoers file in place; a syntax error there can break privilege escalation entirely, so verify administrators can still elevate afterward.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-001001": {
+  "summary": "Add the ad audit flag to the audit_control file so administrative actions are recorded by the audit system.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-001002": {
+  "summary": "Add the lo audit flag to the audit_control file so all login and logout events are recorded.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-001003": {
+  "summary": "Enable and start the auditd service, creating audit_control from the example file if it is missing, so security events are actually being recorded.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-001012": {
+  "summary": "Make sure every audit log file in the audit directory is owned by root so only privileged accounts can tamper with them.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-001013": {
+  "summary": "Make sure the audit log folder is owned by root so only privileged accounts can alter or remove logs.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-001014": {
+  "summary": "Set the group of every audit log file to wheel so ordinary user groups have no ownership rights over the logs.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-001015": {
+  "summary": "Set the group of the audit log folder to wheel so ordinary user groups have no ownership rights over it.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-001016": {
+  "summary": "Set audit log files to mode 440 or tighter so they are read-only for root and wheel and inaccessible to everyone else.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-001017": {
+  "summary": "Set the audit log folder to mode 700 or tighter so only root can enter or list it.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-001020": {
+  "summary": "Add the -fd audit flag to audit_control so failed deletions of files and their attributes are recorded.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-001021": {
+  "summary": "Add the fm audit flag to audit_control so changes to file attributes are recorded.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Auditing all attribute changes can noticeably increase audit log volume.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-001022": {
+  "summary": "Add the -fr audit flag to audit_control so failed file read attempts are recorded, which helps spot probing of files a user should not see.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-001023": {
+  "summary": "Add the -fw audit flag to audit_control so failed file write attempts are recorded.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-001024": {
+  "summary": "Add the -ex audit flag to audit_control so failed attempts to execute programs are recorded.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-001030": {
+  "summary": "Set minfree to 25 in audit_control so the system warns when free space for audit records drops below 25 percent, before logging is at risk of stopping.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-001031": {
+  "summary": "Change the audit_warn script so its logger call uses the -s flag, causing audit failure warnings to also be sent to standard error where they are more visible.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-001044": {
+  "summary": "Add the aa audit flag to audit_control so authentication and authorization events are recorded.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-001060": {
+  "summary": "Push the smart card profile that sets certificate trust checking to moderate, so the revocation status of a user's smart card certificate is checked before it is accepted.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "The rule warns to consult the STIG supplemental first; if revocation checks cannot complete, smart card users may be unable to log in.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-001100": {
+  "summary": "Set PermitRootLogin to no in an sshd include file so nobody can log in over SSH directly as root.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Any remote automation that connects as root will stop working and must use a named account instead.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-001110": {
+  "summary": "Set the group of /etc/security/audit_control to wheel so the audit configuration is not owned by an ordinary user group.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-001120": {
+  "summary": "Make sure /etc/security/audit_control is owned by root so only privileged accounts can change what gets audited.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-001130": {
+  "summary": "Set /etc/security/audit_control to mode 440 or tighter so the audit configuration is read-only and hidden from ordinary users.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-001140": {
+  "summary": "Remove any access control lists from /etc/security/audit_control so its access is governed only by standard ownership and mode.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002001": {
+  "summary": "Disable the SMB file sharing service so the Mac does not offer Windows-style file shares on the network.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Anyone relying on this Mac to share folders will lose access; a restart may be needed for the change to take effect.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002003": {
+  "summary": "Disable the NFS server and delete the /etc/exports file so the Mac does not export file systems over the network.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "The fix deletes /etc/exports outright, so any NFS export definitions are lost; a restart may be needed for the change to take effect.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002004": {
+  "summary": "Turn off Location Services by writing the locationd preference and restarting the location daemon, so the Mac does not track or report its physical location.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Apps that depend on location, such as time-zone auto-detection or Find My, will stop getting location data.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002005": {
+  "summary": "Push a configuration profile that stops Bonjour from advertising services over multicast, so the Mac does not announce itself and its services to the local network.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "Discovery of printers, AirPlay targets and other local services may no longer work automatically.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002006": {
+  "summary": "Stop and disable the legacy UUCP service, an old file-copy protocol with no legitimate use on a modern workstation.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "The rule notes a restart may be needed for the change to take effect.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002007": {
+  "summary": "Push a configuration profile that forces Internet Sharing off so the Mac cannot be turned into a network bridge or hotspot for other devices.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002008": {
+  "summary": "Stop and disable the built-in Apache web server so the Mac is not serving web content unless it is specifically meant to.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Any locally hosted web service on this Mac goes offline; a restart may be needed for the change to take effect.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002009": {
+  "summary": "Push a configuration profile that disables AirDrop so files cannot be exchanged wirelessly with nearby Apple devices outside of managed channels.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "Users who share files by AirDrop will need another approved way to transfer them.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002010": {
+  "summary": "Push a configuration profile that blocks the FaceTime application from running so the built-in video calling client cannot be used.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002012": {
+  "summary": "Push a configuration profile that disables iCloud Calendar so calendar data is not synchronized to Apple's cloud.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002013": {
+  "summary": "Push a configuration profile that disables iCloud Reminders so reminder data is not synchronized to Apple's cloud.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002014": {
+  "summary": "Push a configuration profile that disables iCloud Address Book so contact data is not synchronized to Apple's cloud.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002015": {
+  "summary": "Push a configuration profile that disables iCloud Mail so mail is not routed through or stored in Apple's cloud.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002016": {
+  "summary": "Push a configuration profile that disables iCloud Notes so notes are not synchronized to Apple's cloud.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002017": {
+  "summary": "The camera must be physically covered, disconnected or disabled when not in use; where that is not done, push a configuration profile that disables the camera. Machines with no camera, mobile devices and managed VTC suites are exempt.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Disabling the camera by profile breaks video conferencing for everyone on the machine; decide between a physical cover and the profile based on how the Mac is used.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002020": {
+  "summary": "Push a configuration profile that disables Siri so voice requests and the data behind them are not sent to Apple.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002021": {
+  "summary": "Push a configuration profile that turns off automatic submission of diagnostic and usage data to Apple, so system details are not sent off the machine.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002022": {
+  "summary": "Turn off Remote Apple Events and disable its service so other machines cannot send AppleScript commands to this Mac over the network.",
+  "triage": "quick-win",
+  "automation": "manual",
+  "caution": "The rule notes the systemsetup step fails unless Full Disk Access is granted to it or its parent process, so this needs supervision.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002023": {
+  "summary": "Push a configuration profile that stops Siri audio recordings and transcripts from being sent to Apple.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002024": {
+  "summary": "Push a configuration profile that stops Spotlight from sending search queries to Apple.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002035": {
+  "summary": "Push a Setup Assistant profile that skips the Apple ID step so new users are not prompted to sign in with a personal Apple account during first-run setup.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002036": {
+  "summary": "Push a Setup Assistant profile that skips the Privacy step so first-run setup does not offer to enable data-sharing options.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002037": {
+  "summary": "Push a Setup Assistant profile that skips the iCloud storage step so first-run setup does not offer to move files into iCloud.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002039": {
+  "summary": "Push a Setup Assistant profile that skips the Siri step so first-run setup does not offer to enable Siri.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002040": {
+  "summary": "Push a configuration profile that turns off iCloud Keychain sync, so user passwords are not copied to Apple's cloud where the organization cannot control them.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "Users who rely on iCloud Keychain to carry passwords between devices will lose that sync, so provide an approved password manager first.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002041": {
+  "summary": "Push a configuration profile that turns off iCloud Drive document sync, so organizational files are not copied to personal or unapproved cloud storage.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "Any documents users currently keep only in iCloud Drive become unreachable from the Mac, so have them move files locally first.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002042": {
+  "summary": "Push a configuration profile that stops Safari from syncing bookmarks through iCloud, keeping browsing data off unapproved cloud services.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002043": {
+  "summary": "Push a configuration profile that disconnects the Photos app from iCloud Photo Library, so images are not synchronized to Apple's cloud.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "Photos stored only in iCloud will no longer appear on the Mac, so users should download anything they need locally first.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002050": {
+  "summary": "Stop and disable the Screen Sharing service, which also covers Apple Remote Desktop, so nobody can view or control this Mac's screen over the network.",
+  "triage": "risky-change",
+  "automation": "automatable",
+  "caution": "If administrators manage this Mac remotely through Screen Sharing or ARD, they lose that access and need another path such as SSH or physical access.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002052": {
+  "summary": "Push a configuration profile that hides the Wallet and Apple Pay pane in System Settings so users cannot set up payment features on the Mac.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002053": {
+  "summary": "Push a configuration profile that hides the Siri pane in System Settings so users cannot turn on or configure Siri.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002063": {
+  "summary": "Push a configuration profile that disables the Guest account so anonymous users cannot log in and browse files on the Mac.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002068": {
+  "summary": "Tighten permissions on every user's home folder so other local users cannot list or read its top level; by default macOS lets any user see into other home folders.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Anything deliberately shared from inside a home folder (other than the Shared folder) becomes inaccessible to other users.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002080": {
+  "summary": "Push a configuration profile that turns off AirPlay Receiver so other devices cannot stream content onto this Mac's screen.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002090": {
+  "summary": "Push a configuration profile that stops Touch ID from unlocking the Mac, so users must authenticate with an approved method such as a password or smart card; the fingerprint sensor is not an approved authenticator for federal use.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "Users accustomed to fingerprint unlock will need to type their password every time, so tell them in advance.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002100": {
+  "summary": "Push a configuration profile that turns off Media Sharing and prevents users from re-enabling it, so the Mac does not run a network service that shares the user's music library to the local subnet.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002110": {
+  "summary": "Turn off Bluetooth Sharing for the logged-in user so files cannot be sent to or pulled from the Mac by nearby phones and tablets over Bluetooth.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "The setting is per-user and is written for whoever is at the console, so it must be applied for each user account and re-checked after new users are added.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002120": {
+  "summary": "Push a configuration profile that blocks users from adding or changing Apple ID and internet accounts in System Settings, so only approved mail, calendar, and contacts accounts end up on the Mac.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "The rule notes some organizations allow the built-in Mail, Calendar, and Contacts apps; with this applied, users cannot add or fix those accounts themselves, so decide whether that fits your environment first.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002140": {
+  "summary": "Push a configuration profile that turns off Content Caching so an employee's Mac cannot act as a local cache server for Apple software and iCloud content.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002150": {
+  "summary": "Push a configuration profile that stops the Desktop and Documents folders from syncing to iCloud Drive, keeping organizational files off unapproved cloud storage.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "Users who already sync these folders may find files that exist only in iCloud vanish from the Mac, so have them pull copies down first.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002160": {
+  "summary": "Push a configuration profile that disables Game Center, since it authenticates with a personal Apple ID and shares data through Apple's services; this only works on supervised (MDM-enrolled) devices.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "The setting has no effect on devices that are not supervised by MDM.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002170": {
+  "summary": "Push a configuration profile that turns off iCloud Private Relay, so the Mac's web traffic is not tunneled through Apple's relay and can still be inspected by the enterprise network.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002180": {
+  "summary": "Push configuration profiles that turn off Find My (device and friends) and hide its iCloud setting, because remote lock and wipe must come from your MDM rather than a personal Apple ID.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "Make sure MDM remote lock and wipe actually work before removing Find My, or you lose the ability to locate or wipe a lost Mac.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002200": {
+  "summary": "Push a configuration profile that turns off Apple personalized advertising so apps and advertisers cannot track user interests on the Mac.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002210": {
+  "summary": "Push a configuration profile that opts the Mac out of sharing Siri and Dictation audio with Apple, so recordings of what users say are not stored or reviewed off the machine.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002220": {
+  "summary": "On Apple Silicon Macs, push a configuration profile that forces Dictation to process speech on the device only, so spoken text is never sent to Apple's servers. Not applicable to Intel Macs.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002230": {
+  "summary": "On Intel Macs, push a configuration profile that disables Dictation entirely, because those machines cannot do on-device-only dictation. Not applicable to Apple Silicon Macs.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "Users who depend on Dictation for accessibility lose the feature on Intel hardware, so plan an alternative.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002240": {
+  "summary": "Turn off Printer Sharing in CUPS and mark every configured printer as not shared, so the Mac does not offer its printers to other machines on the network.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "If this Mac is intentionally serving a printer to other computers, those clients lose access.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002250": {
+  "summary": "Deactivate and stop the Apple Remote Desktop agent so the Mac cannot be remotely managed or controlled through Remote Management.",
+  "triage": "risky-change",
+  "automation": "automatable",
+  "caution": "Administrators who rely on Apple Remote Desktop to reach this Mac will lose that access, so confirm another remote path exists first.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002260": {
+  "summary": "Push a configuration profile that hides the Bluetooth pane in System Settings so users cannot change Bluetooth configuration.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "Users will be unable to pair or fix Bluetooth keyboards, mice, or headsets themselves, so make sure needed peripherals are paired before applying this.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002270": {
+  "summary": "Push a configuration profile that disconnects the Freeform app from iCloud so its boards are not synchronized through Apple's cloud.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-002271": {
+  "summary": "Push a configuration profile that turns off iPhone Mirroring, so an iPhone's screen and apps cannot be used from the Mac and files cannot move between the devices that way.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-003001": {
+  "summary": "Make sure the System Keychain contains only certificate authorities your organization approves, and install any approved certificates it is missing; the check is a manual review of the certificate list.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Deciding which authorities are approved is an organizational judgment, and removing a CA that is still in use can break TLS connections to internal services.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-003007": {
+  "summary": "Push a password-policy configuration profile that requires at least one number in every new password, making passwords harder to guess.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "Existing passwords are not changed, but users will be held to the rule the next time they set one.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-003008": {
+  "summary": "Push a password-policy configuration profile that forces users to change their password at least every 60 days, limiting how long a stolen password stays useful.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "Users whose passwords are already older than 60 days will be forced to change them at next login, so announce the change ahead of time.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-003010": {
+  "summary": "Push a password-policy configuration profile that requires new passwords to be at least 14 characters long, making brute-force guessing much harder.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "Existing shorter passwords keep working until changed, but any local service accounts with fixed short passwords will fail the next time they are reset.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-003011": {
+  "summary": "Push a password-policy configuration profile that requires at least one special character such as a punctuation mark in every new password.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-003012": {
+  "summary": "Push a login-window configuration profile that sets the hint retry count to zero, so the login screen never displays a password hint that could give an attacker a clue.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-003014": {
+  "summary": "Delete any stored password hints from every regular user account in the local directory, since hints reveal information about passwords still in use.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-003020": {
+  "summary": "Push a smart card configuration profile that requires a smart card for login, authorization, and screen-saver unlock on the whole system, so a password alone is never enough.",
+  "triage": "risky-change",
+  "automation": "manual",
+  "caution": "The rule itself warns this applies system-wide and no one can log in with just a password afterward, so every user must have a working smart card and the STIG's supplemental guidance must be followed first or the Mac becomes inaccessible.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-003030": {
+  "summary": "Push a smart card configuration profile that allows smart cards to be used for login, authorization, and screen-saver unlock, which is the foundation for multifactor authentication on the Mac.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "Consult the STIG's supplemental guidance before applying the profile so continued access to the system is preserved.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-003050": {
+  "summary": "Rewrite the PAM configuration for the login service so a smart card is accepted first and everything else is ultimately denied, forcing multifactor authentication at console and terminal login.",
+  "triage": "risky-change",
+  "automation": "automatable",
+  "caution": "If smart cards are not fully working for every user, this locks everyone out of login; the rule also notes that editing PAM files now requires user authorization or a PPPC profile from MDM.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-003051": {
+  "summary": "Rewrite the PAM configuration for the su command so switching users requires a smart card unless you are already root, enforcing multifactor authentication for that path.",
+  "triage": "risky-change",
+  "automation": "automatable",
+  "caution": "Scripts or admins that use su with a password will stop working, and editing PAM files now requires user authorization or a PPPC profile from MDM.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-003052": {
+  "summary": "Rewrite the PAM configuration for sudo so privilege escalation requires a smart card and password-only sudo is denied, then lock the file down to read-only.",
+  "triage": "risky-change",
+  "automation": "automatable",
+  "caution": "Any automation or admin that relies on password-based sudo will break, and if smart cards are not working you can lose the ability to gain root; editing PAM files also requires user authorization or a PPPC profile from MDM.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-003060": {
+  "summary": "Push a password-policy configuration profile that requires new passwords to include both uppercase and lowercase letters, so passwords are harder to guess.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-003070": {
+  "summary": "Add a minimum password lifetime of 24 hours to the local password policy, so users cannot change a password repeatedly in one sitting to cycle back to an old favorite.",
+  "triage": "quick-win",
+  "automation": "manual",
+  "caution": "The fix requires hand-editing the exported policy XML and reloading it; a malformed policy file can break password changes for everyone.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-003080": {
+  "summary": "Add a rule to the local password policy that disables any account that has not logged in for 35 days, so forgotten accounts cannot be quietly used by an attacker.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Service accounts, rarely used admin accounts, and staff returning from leave will be locked out after 35 idle days, so identify those before enabling it.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-004001": {
+  "summary": "Make sure every Apple System Log file listed in the ASL configuration is owned by root and the wheel group, so ordinary users cannot tamper with logs that hold sensitive system details.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-004002": {
+  "summary": "Set every Apple System Log file listed in the ASL configuration to mode 640, so only root can write and only root and wheel can read the logs.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Any monitoring tool that reads these logs as a non-root, non-wheel user will lose access.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-004022": {
+  "summary": "Set the sudo authentication timeout to zero so users must re-enter their password every time they run sudo, rather than coasting on a cached credential for several minutes.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Scripts that run several sudo commands in a row will prompt for a password each time, which can break unattended automation.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-004030": {
+  "summary": "Make sure every system log file listed in the newsyslog configuration is owned by root and the wheel group, so ordinary users cannot tamper with sensitive logs.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-004040": {
+  "summary": "Set every system log file listed in the newsyslog configuration to mode 640, so only root can write and only root and wheel can read the logs.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Any monitoring tool that reads these logs as a non-root, non-wheel user will lose access.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-004060": {
+  "summary": "Remove any sudoers settings that share sudo credentials across terminals, so sudo uses per-terminal (tty) timestamps and prompts for a password in each new terminal window.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "The fix edits every file under the sudoers path with an in-place sed, so back those files up first and confirm sudo still parses them afterward.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-005050": {
+  "summary": "Push a configuration profile that turns on the built-in macOS Application Firewall so incoming connections are controlled by approved rules.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "Applications that must accept inbound connections may start prompting or be blocked until explicitly allowed.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-005052": {
+  "summary": "Push a login-window configuration profile that replaces the list of user accounts with blank username and password fields, so an attacker cannot see which accounts exist on the Mac.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "Users must know their exact account name to log in; those used to clicking their picture may need a reminder.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-005054": {
+  "summary": "Push a Setup Assistant profile that skips the Touch ID setup step, so new users are not invited to enable fingerprint unlock that would conflict with organizational policy.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-005055": {
+  "summary": "Push a Setup Assistant profile that skips the Screen Time setup step so first-run setup does not offer to enable that service.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-005056": {
+  "summary": "Push a Setup Assistant profile that skips the Apple Watch unlock step, so users are not offered a way to unlock the Mac without proper authentication.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-005058": {
+  "summary": "Push a configuration profile that turns off Handoff so in-progress documents and activity are not passed between this Mac and other Apple devices.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-005060": {
+  "summary": "Push a configuration profile that stops the Mac from requesting or sharing passwords with nearby Apple devices, a feature that is on by default.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-005061": {
+  "summary": "Push a configuration profile that removes the Erase All Content and Settings option, so a user or intruder cannot wipe a compromised Mac and destroy forensic evidence.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "Reprovisioning a Mac for a new user will need to be done through MDM or Recovery instead of the built-in erase option.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-005070": {
+  "summary": "Confirm Authenticated Root is on, so macOS boots only from a cryptographically signed system volume that cannot be tampered with; it is enabled by default and re-enabling it requires running the command from Recovery mode.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "The rule warns that the command hangs waiting for input if more than one macOS partition is present, and the fix must be run from Recovery mode.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-005080": {
+  "summary": "Push a configuration profile that blocks applications from running out of the /Users/ directory, so regular users cannot install and run untested software in their home folders.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Any legitimate tools users run from their home folders, including developer tooling and per-user app installs, will be blocked until relocated.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-005090": {
+  "summary": "Push a configuration profile that turns on USB restricted mode so new USB devices must be approved before the Mac will talk to them, keeping unknown hardware off the system.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "The rule notes this feature is removed once a smart card is paired or smart card attribute mapping is configured, so it may silently not apply on smart card systems.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-005100": {
+  "summary": "Confirm Secure Boot is at Full Security, the default on T2 and Apple Silicon Macs, so the Mac verifies the operating system's integrity before it boots; changing it requires booting into Recovery Mode.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Only T2 and Apple Silicon Macs report a meaningful result, and the fix requires hands-on access to Recovery Mode.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-005110": {
+  "summary": "Make sure the Mac is enrolled in your MDM through User Approved or Apple Business/School Manager enrollment, since many security settings such as FileVault, kernel extension, and privacy policies can only be managed that way.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Enrollment normally needs the user or an Automated Device Enrollment workflow, and a Mac that was not enrolled at setup may need to be wiped and re-enrolled.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-005120": {
+  "summary": "On Apple Silicon Macs, use your MDM to set a Recovery Lock password so startup key combinations cannot be used to reach Recovery, Startup Manager, or similar tools without it. Not applicable to Intel Macs.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "Store the Recovery Lock password securely; without it, recovery and reinstall operations on that Mac are blocked.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-005130": {
+  "summary": "Push a Software Update configuration profile that installs XProtect Remediator and Gatekeeper definition updates automatically, so newly identified malware is blocked without waiting for an admin or a restart.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-005140": {
+  "summary": "Push a configuration profile that disables Genmoji, an Apple Intelligence feature, because off-device AI processing can leak organizational data.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-005150": {
+  "summary": "Push a configuration profile that disables Image Playground, an Apple Intelligence feature, because off-device AI processing can leak organizational data.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-005160": {
+  "summary": "Push a configuration profile that disables Apple Intelligence Writing Tools, because sending text to off-device AI can leak organizational data.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-005170": {
+  "summary": "Push a Setup Assistant profile that skips the Apple Intelligence step so new users are not offered to enable off-device AI features during first-run setup.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-001029": {
+  "summary": "Set the audit service to keep audit logs for at least seven days before expiring them, so security records are not deleted before anyone can review them.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Holding seven days of audit data needs enough disk space, particularly on a busy system with a full audit policy.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:APPL-26-004050": {
+  "summary": "Change the ASL configuration for install.log so software-install records are kept for 365 days, giving a year-long history of what was installed on the Mac.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "The rule notes that if more than one file under /etc/asl handles install.log, the extras must be removed by hand or the check keeps failing.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ }
+}

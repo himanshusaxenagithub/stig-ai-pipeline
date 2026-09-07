@@ -63,7 +63,7 @@ python3 -m stigprep parse U_MS_Windows_11_V2R9_STIG.zip --explain
 #  explanations: all 257 rules annotated from filed sets
 ```
 
-Currently shipped: Microsoft Windows 11 V2R9 (257 rules). More follow.
+Currently shipped, 1,440 rules across seven STIGs: Microsoft Windows 11 V2R9 (257), Windows Server 2019 V3R8 (282), Red Hat Enterprise Linux 9 V2R9 (445), Ubuntu 24.04 LTS V1R6 (194), Apple macOS 26 V1R3 (160), SQL Server 2022 Instance V1R4 (79) and Database V1R3 (23).
 
 **Produce them for any other STIG.** The `stig-explain` skill
 (`skills/stig-explain/`) lets the AI assistant you already have write the
@@ -195,8 +195,8 @@ at a time. A helper script hands the assistant the next batch
 and validates and files the answers. Results land in the checklist JSON and in
 `annotations/<stig>.ai-cache.json`, which `--explain` attaches — so
 annotations committed to this repository are available to every user, with or
-without an assistant. `annotations/` currently carries the complete Windows 11
-V2R9 set (257 rules).
+without an assistant. `annotations/` carries complete sets for seven STIGs
+(1,440 rules).
 
 ## AI skills: scanning
 

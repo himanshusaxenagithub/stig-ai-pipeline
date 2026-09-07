@@ -1,0 +1,186 @@
+{
+ "claude-cowork-2026-09:SQLD-22-000100": {
+  "summary": "Keep authentication centralized: leave contained database authentication off, run the instance in Windows Authentication mode where possible, and if mixed mode or SQL-authenticated database users are needed, get them documented and approved and remove any that are not on the list.",
+  "triage": "risky-change",
+  "automation": "manual",
+  "caution": "Switching to Windows-only authentication or dropping SQL users will immediately break any application that connects with a SQL login or password.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLD-22-000300": {
+  "summary": "Compare the permissions and role memberships actually granted inside each user database against what your documentation says each type of user should have, and grant, revoke, or deny until they match so users can only reach data they are authorized for. Does not apply to tempdb.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Revoking a permission an application silently depends on will break it, so confirm each change against the documented requirements first.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLD-22-003200": {
+  "summary": "If the database holds classified or sensitive data, make sure Windows FIPS mode is enabled and that any symmetric keys in the database use AES 256 or Triple DES; recreate keys that use weaker algorithms. Documentation must also state what classification of data the database holds.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Replacing an existing symmetric key means decrypting and re-encrypting everything protected by it, which needs a backup and a maintenance window.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLD-22-003300": {
+  "summary": "Where your organization has identified data at rest that must be protected (PII and classified data at minimum), make sure it is actually encrypted, whether by full-disk encryption, Transparent Data Encryption on the database, or column-level encryption such as Always Encrypted, as your documentation calls for.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Enabling TDE or Always Encrypted without backing up the certificates and keys first can make the data and its backups unrecoverable.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLD-22-000500": {
+  "summary": "If your documentation requires keeping historical versions of certain tables, convert those tables to system-versioned temporal tables with a history retention period at least as long as the documented one, and include a column recording who last modified each row so changes cannot be denied later.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Adding system versioning changes the table's structure and grows storage with every update, so test the impact on the application and disk space first.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLD-22-000600": {
+  "summary": "Turn off the TRUSTWORTHY property on any database (other than msdb) that is owned by a privileged account such as a sysadmin unless the setting is documented and authorized, because a trustworthy database owned by a sysadmin lets code inside it escalate to server-level rights.",
+  "triage": "needs-judgment",
+  "automation": "automatable",
+  "caution": "Cross-database queries, CLR assemblies with external access, or impersonation that relied on the trust relationship will fail once it is turned off.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLD-22-000700": {
+  "summary": "Restrict the ability to create or change database audit specifications to a dedicated audit-maintainer role holding only ALTER ANY DATABASE AUDIT, and remove that permission, CONTROL on the database, and db_owner membership from anyone not documented as an approved audit maintainer.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Removing db_owner or CONTROL from an account strips many other rights it may legitimately use, so review each principal before revoking.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLD-22-001200": {
+  "summary": "List who owns each schema in the database and transfer ownership of any schema held by an unauthorized principal to an approved one, so only accountable owners can change the objects and code inside it.",
+  "triage": "needs-judgment",
+  "automation": "automatable",
+  "caution": "Changing a schema's owner also changes the effective ownership chain for its objects, which can alter which permissions apply to procedures and views.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLD-22-001300": {
+  "summary": "Keep a documented, approved list of accounts allowed to own database objects, compare it to the actual owners of tables, procedures, and other user objects, and transfer any object owned by an unapproved account to an authorized owner.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Transferring ownership breaks ownership chaining for objects that referenced the old owner and can revoke the previous owner's implicit permissions.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLD-22-001400": {
+  "summary": "On production and test systems, check which users and roles can alter database objects (ALTER permissions plus db_ddladmin and db_owner membership) and revoke that ability from anyone not documented as authorized, so schema and code changes only come from approved people. Pure development instances are exempt.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Revoking ALTER from a deployment or application account will make schema migrations and self-updating applications fail.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLD-22-001500": {
+  "summary": "Document each database's recovery model, backup schedule, and restore-testing plan; make sure the actual recovery model matches, backup jobs exist and run without gaps, and a restore is tested and recorded at least yearly so the database can be recovered after a failure.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Switching a database to the full recovery model without scheduling log backups will let the transaction log grow until the disk fills.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLD-22-001600": {
+  "summary": "Where a database has a Database Master Key protected by a password, make sure that password meets DOD complexity rules (at least 15 characters mixing upper, lower, numeric, and special characters), and regenerate the key with a compliant password if it does not.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Regenerating the master key decrypts and re-encrypts everything it protects, so do it in a low-demand window after a full backup and a review of the effects.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLD-22-001700": {
+  "summary": "For any database whose master key is automatically decrypted by the instance's Service Master Key, confirm the information owner has approved that arrangement; if DBAs must be kept away from the encrypted data, protect the key with a password known only to the application administrator, or at least add auditing and alerts on access to the key.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Removing Service Master Key protection means the database master key must be opened manually with its password before encrypted data can be used, which can break automated processes.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLD-22-001800": {
+  "summary": "If data-at-rest encryption is in use, back up the encryption certificate and its private key to password-protected files, store them securely off the SQL Server (including an off-site copy), and document the procedure and who can access the backup so encrypted data can be recovered after a server loss.",
+  "triage": "quick-win",
+  "automation": "manual",
+  "caution": "Losing the certificate backup or its password makes any TDE-encrypted database and its backups permanently unreadable.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLD-22-001900": {
+  "summary": "Keep security-related objects such as permission lists, authentication data, and audit code in their own database, schema, or table, separated from the application's business logic, so they can be protected and permissioned independently. Where separation is impossible, document why.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Moving objects to a new schema or database requires updating every reference in application code and stored procedures.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLD-22-002000": {
+  "summary": "Review the scripts and procedures used to copy production data to development, test, or any other location, make sure they follow your organization's data transfer policy, and confirm no copies of production data are left lying in unprotected places.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLD-22-002100": {
+  "summary": "Review database and application code, column data types, and constraints to make sure invalid input is rejected rather than stored or acted on, using parameterized queries, constraints, and foreign keys; free-form text fields are exempt, and unfixable vendor code should be raised with the vendor.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Adding constraints or changing data types can fail on existing bad data and break applications that relied on the looser behavior.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLD-22-002400": {
+  "summary": "Make sure error messages returned to ordinary users explain the problem without exposing personal data, sensitive business data, or details about the host or database structure; adjust custom code accordingly and consider startup trace flag 3625 to mask system-level error details from nonadministrators.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Trace flag 3625 requires an instance restart and hides error details that developers and support staff may rely on for troubleshooting.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLD-22-002600": {
+  "summary": "If your documentation requires security labels on data, implement them reliably with SQL Server Row-Level Security, a third-party product, or custom label columns and application code; if labeling is not required, nothing is needed.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Row-Level Security predicates apply to every query against the table and can change what existing applications see or how they perform.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLD-22-002800": {
+  "summary": "Check which schemas and objects are owned by individual principals and which users have been granted permissions WITH GRANT OPTION, and correct any ownership or delegation right that is not documented and authorized so control of data stays with the intended owners.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Changing ownership or revoking grant rights can silently remove permissions that were derived from them, breaking dependent application access.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLD-22-002900": {
+  "summary": "List the stored procedures and functions that use EXECUTE AS impersonation (excluding the built-in system procedures), and remove the EXECUTE AS clause from any that are not documented as needing it, so code does not run under a higher-privileged identity than the caller.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Removing EXECUTE AS from a procedure that relied on it to reach objects the caller cannot access directly will make that procedure fail for ordinary users.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLD-22-003100": {
+  "summary": "Find user databases owned by a login that belongs to a fixed server role, confirm those role memberships are documented and authorized, and otherwise either remove the login from the roles or change the database owner to an authorized login so a database owner cannot leverage server-level privileges.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Changing a database's owner can break code that depends on the owner through ownership chaining or the dbo mapping.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:SQLD-22-004250": {
+  "summary": "Look for database users ending in a dollar sign, confirm with Active Directory which are computer accounts, and remove those along with any undocumented or shared accounts, so every action in the database traces back to an individual person.",
+  "triage": "needs-judgment",
+  "automation": "automatable",
+  "caution": "Dropping a computer-account user that a service on that machine uses to connect will break that service.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ }
+}

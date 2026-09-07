@@ -1,0 +1,1554 @@
+{
+ "claude-cowork-2026-09:UBTU-24-100030": {
+  "summary": "Remove the telnetd package. Telnet sends logins and everything else in clear text, so a telnet server on the box lets anyone on the network capture credentials.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Confirm nothing still relies on telnet for remote access before removing it; SSH should already be in place as the replacement.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-100040": {
+  "summary": "Remove the rsh-server package. The old remote shell services trust hosts by name and pass data unencrypted, so they should not be present at all.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Any legacy scripts still using rsh or rlogin will stop working once the package is gone.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-100050": {
+  "summary": "Remove the nfs-common and nfs-kernel-server packages (and their leftover dependencies) so the machine is neither serving nor mounting NFS shares unless that is a documented need.",
+  "triage": "needs-judgment",
+  "automation": "automatable",
+  "caution": "If this host actually exports or mounts NFS filesystems, purging these packages will break those mounts; check for active NFS use first.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-100800": {
+  "summary": "Make sure the openssh server package is installed so that remote administration happens over an encrypted, authenticated channel rather than something weaker.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-100810": {
+  "summary": "The ssh service must be enabled to start at boot and be running, so remote access always goes through SSH, which protects the confidentiality and integrity of the traffic.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Starting SSH opens a listening port; make sure the firewall and sshd_config are already hardened so you are not exposing a default setup.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-102000": {
+  "summary": "Set a GRUB boot password so that booting into single-user or maintenance mode requires authentication; otherwise anyone at the console can get a root shell by editing the boot entry.",
+  "triage": "risky-change",
+  "automation": "manual",
+  "caution": "A mistake in /etc/grub.d/40_custom or a lost GRUB password can make the system unbootable or leave you unable to enter recovery mode; keep the hash and test a reboot with console access available.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-300022": {
+  "summary": "Set X11Forwarding to no in sshd_config so remote users cannot tunnel graphical applications through SSH, unless the ISSO has documented a real operational need for it.",
+  "triage": "needs-judgment",
+  "automation": "automatable",
+  "caution": "Users who legitimately run remote graphical tools over SSH will lose that ability once SSH is restarted with this setting.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-300025": {
+  "summary": "On systems with a graphical desktop, unbind the GNOME logout media key so pressing Ctrl-Alt-Delete does not log out or reboot the machine, preventing an accidental or malicious shutdown from the console.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Only applies when a graphical interface is installed; the dconf profile must exist for the update to take effect.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-300026": {
+  "summary": "Disable and mask the ctrl-alt-del.target so pressing Ctrl-Alt-Delete at a text console does not reboot the system, avoiding accidental or unauthorized reboots that lose data.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-300027": {
+  "summary": "No account in /etc/shadow may have an empty password field; either set a password for each such account or lock it, because a blank password lets anyone log in as that user.",
+  "triage": "quick-win",
+  "automation": "manual",
+  "caution": "Locking a service or automation account that was relying on a blank password will break whatever it runs; check what each affected account is used for before locking it.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-300028": {
+  "summary": "Remove the nullok option from the PAM common-password and common-auth files so PAM never accepts an empty password at login.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Any account that currently has no password will be unable to log in afterward; give those accounts a password first.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-300031": {
+  "summary": "In sshd_config, set PermitEmptyPasswords and PermitUserEnvironment to no so SSH never lets someone in without a password and users cannot inject environment variables to bypass controls.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Any account depending on an empty password or on environment settings pushed through SSH will stop working after the service restart.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-400370": {
+  "summary": "Configure SSSD with the ldap_user_certificate setting so a smart card certificate is tied to a specific directory user account, ensuring PKI logins map to the right person.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "Only meaningful if SSSD is already joined to a directory that publishes user certificates; a wrong attribute name will make certificate logins fail.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-600030": {
+  "summary": "Run the kernel in FIPS mode using the Ubuntu Pro FIPS modules so all cryptography (signatures, hashes, encryption) uses NIST-validated implementations. This requires an Ubuntu Pro subscription and is best done at install time.",
+  "triage": "risky-change",
+  "automation": "manual",
+  "caution": "Enabling FIPS on an existing system replaces the kernel and crypto libraries and can break software that uses non-approved algorithms; follow the Ubuntu Pro documentation and test on a non-production box first.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-600130": {
+  "summary": "Only people who genuinely need to run privileged commands may be members of the sudo group; remove everyone else so ordinary users cannot become root.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Removing the wrong person can leave nobody able to administer the box; confirm who needs sudo before removing accounts.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-700400": {
+  "summary": "The system must be running a version of Ubuntu 24.04 LTS that Canonical still supports, so it keeps receiving security patches; check the release and the Ubuntu Pro subscription status and upgrade if it has fallen out of support.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "A release upgrade is a major change that can break installed software; plan and test it rather than doing it in place on a production system.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-100100": {
+  "summary": "Install AIDE (or confirm another file integrity tool is in use) so the system can detect unauthorized changes to security-relevant files and binaries.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Installing the package alone does nothing useful until the AIDE database is initialized and scheduled checks are running.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-100110": {
+  "summary": "If AIDE is the integrity tool, initialize its database and run a check so it actually has a baseline to compare the filesystem against; an installed but uninitialized AIDE protects nothing.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Initialize the database on a known-clean system, because anything already tampered with will be baked into the baseline; the initial run can take several minutes.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-100120": {
+  "summary": "Keep the AIDE configuration file and its daily check script identical to the ones shipped in the aide-common package, and make sure the scheduled check runs at least every 30 days, so nobody has quietly weakened the integrity checks.",
+  "triage": "needs-judgment",
+  "automation": "automatable",
+  "caution": "Restoring the stock aide.conf will discard any local exclusions you added, which may produce a flood of false-positive change reports until re-tuned.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-100130": {
+  "summary": "Set SILENTREPORTS=no in /etc/default/aide so AIDE sends its change reports to the administrator instead of silently discarding them; detection is worthless if nobody is told.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Reports go out via local mail, so make sure that mail actually reaches a person or they will pile up unread.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-100200": {
+  "summary": "Install rsyslog and make sure it is enabled and running so log messages, including those from failure events, are captured and kept rather than lost.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-100300": {
+  "summary": "Install the ufw firewall package (or confirm another application firewall is present) so the machine can control which remote connections are allowed in.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Installing ufw does not turn it on; enabling it is a separate step with its own risk of cutting off remote sessions.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-100310": {
+  "summary": "Turn on ufw so the firewall is actively filtering traffic, unless a different firewall is already active on the system.",
+  "triage": "risky-change",
+  "automation": "automatable",
+  "caution": "The rule itself warns that enabling the firewall can drop active SSH sessions; add an allow rule for SSH first and have console access available.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-100400": {
+  "summary": "Install the auditd package so the system can record who did what and when, which is the foundation for every other audit requirement.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-100410": {
+  "summary": "Enable and start the auditd service and load its rules so audit records are actually generated in near real time, not just possible in theory.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "If the audit rule files are empty or broken, loading them will fail and the service may run without recording anything useful.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-100500": {
+  "summary": "Install AppArmor so the system can confine applications with mandatory access control profiles, limiting the damage a compromised program can do.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "The package alone is not enough; profiles must be configured for the applications on this system, which is environment-specific work.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-100510": {
+  "summary": "Enable and start the apparmor service so the confinement profiles are actually enforced at runtime.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "Profiles in enforce mode can block applications from files or network access they legitimately need; review profile behavior before relying on it in production.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-100600": {
+  "summary": "Install libpam-pwquality, the PAM module that checks password strength; the later password-complexity rules depend on it being present.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-100650": {
+  "summary": "Install the sssd package along with its PAM and NSS modules (libpam-sss and libnss-sss) so the system can authenticate users against a central directory and support smart card multifactor login.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "Installing the packages is harmless, but a half-configured SSSD wired into PAM can slow or break logins until a directory is properly set up.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-100660": {
+  "summary": "Enable and start the sssd service so it is running at boot and available to handle multifactor authentication.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "The service will fail to start or behave unpredictably if /etc/sssd/sssd.conf is missing or not yet pointed at a valid directory.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-100820": {
+  "summary": "Restrict the SSH server to the listed FIPS-approved AES ciphers by setting the Ciphers line in sshd_config, so no session can negotiate a weak encryption algorithm.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "Old SSH clients that only support ciphers outside this list will no longer be able to connect after the service restart.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-100830": {
+  "summary": "Restrict the SSH server to the listed SHA-2 based MACs by setting the MACs line in sshd_config, so message integrity is always checked with a FIPS-approved hash.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "Legacy clients that only offer MD5 or SHA-1 MACs will be refused once sshd restarts.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-100840": {
+  "summary": "Restrict the SSH server to the listed FIPS-validated key exchange algorithms by setting KexAlgorithms in sshd_config, so session keys are never negotiated with a weak method.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "Clients that cannot use any of these key exchange methods will be locked out; test a connection from a second session before closing the one you are working in.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-100850": {
+  "summary": "Set the Ciphers line in the system-wide SSH client configuration (ssh_config) to the FIPS-approved AES list so outbound SSH connections from this host also refuse weak encryption.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "Connections to older remote servers that do not support these ciphers will fail from this machine.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-100860": {
+  "summary": "Set the MACs line in the system-wide SSH client configuration (ssh_config) to the SHA-2 based list so outbound SSH connections only use FIPS-approved integrity checks.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "Outbound connections to legacy servers offering only older MACs will be refused.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-100900": {
+  "summary": "Install the opensc-pkcs11 package so the system has the smart card drivers needed to read PIV credentials.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-100910": {
+  "summary": "Install the libpam-pkcs11 package so PAM can authenticate users with PIV smart cards.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Installing the module is safe by itself, but wiring it into PAM without a working card setup can block logins; do that step separately and carefully.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-101000": {
+  "summary": "Install the vlock package so users at a text console can lock their session on demand when they step away, just as graphical users can.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-102010": {
+  "summary": "Add audit=1 to both GRUB_CMDLINE_LINUX and GRUB_CMDLINE_LINUX_DEFAULT in /etc/default/grub and regenerate the boot configuration so the kernel starts auditing from the moment it boots, before auditd is even running.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "A typo in /etc/default/grub can produce a boot configuration that fails to start; verify the generated grub.cfg before rebooting.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-200020": {
+  "summary": "On desktop systems, configure GNOME through dconf so the screen locks after no more than 10 minutes of inactivity, protecting an unattended session.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "Only applies if a graphical interface is installed; note the fix text's idle-delay and lock-delay values differ from those the check text expects, so verify the final settings with the check commands.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-200040": {
+  "summary": "Add a dconf lock on the GNOME automount-open setting so ordinary users cannot re-enable automatic mounting of removable media once it has been disabled.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "Only applies with the GNOME desktop; the lock file path assumes the local dconf database and must be adjusted if another database name is in use.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-200041": {
+  "summary": "Add a dconf lock on the GNOME autorun-never setting so users cannot turn autorun for removable media back on, unless the ISSO has documented a need.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "Only applies with the GNOME desktop installed.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-200042": {
+  "summary": "Add a dconf lock on the GNOME smart card removal-action setting so users cannot change what happens when their smart card is pulled out.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "Only applies with the GNOME desktop installed.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-200043": {
+  "summary": "Force the GNOME lock screen to show a blank image by setting picture-uri to empty and locking that setting, so nothing that was on screen can leak through the lock screen background.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "Only applies with the GNOME desktop installed.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-200060": {
+  "summary": "Set TMOUT=600 in a profile.d script so an idle shell session is automatically closed after 10 minutes, reducing the window in which an abandoned terminal can be hijacked.",
+  "triage": "needs-judgment",
+  "automation": "automatable",
+  "caution": "Long-running interactive sessions that sit idle, such as monitoring consoles or waiting operators, will be terminated; users should learn to expect it.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-200090": {
+  "summary": "Make sure rsyslog is writing the auth, authpriv, and daemon log facilities to a file so every remote login attempt and service event is recorded and can be reviewed.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "The default Ubuntu configuration already logs auth to /var/log/auth.log; adding the extra lines from the fix will duplicate those messages into additional files and consume more disk.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-200250": {
+  "summary": "Any temporary or emergency account must be given an expiration date no more than 72 hours out, so a short-term account does not linger as a permanent back door.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "You must first identify which accounts are temporary; setting an expiry on a regular account by mistake will lock that user out in three days.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-200260": {
+  "summary": "Set the default account inactivity period to 35 days (or fewer) so new accounts are automatically disabled if they sit unused after their password expires, closing off forgotten accounts.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "This only changes the default for accounts created afterward; existing accounts keep their current setting, and a value of 0 disables accounts the moment the password expires.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-200270": {
+  "summary": "Add audit watch rules on /etc/cron.d and /var/spool/cron so any change to scheduled jobs that run as root or another privileged user is recorded.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-200280": {
+  "summary": "Add an audit rule that records every write or attribute change to /etc/passwd so account creations, changes, and deletions leave a trail.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-200290": {
+  "summary": "Add an audit rule that records every write or attribute change to /etc/group so group membership changes are logged.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-200300": {
+  "summary": "Add an audit rule that records every write or attribute change to /etc/shadow so password and account status changes are logged.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-200310": {
+  "summary": "Add an audit rule that records every write or attribute change to /etc/gshadow so group password and administrator changes are logged.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-200320": {
+  "summary": "Add an audit rule that records every write or attribute change to /etc/security/opasswd, the old-password history file, so tampering with password reuse history is logged.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-200580": {
+  "summary": "Add audit rules that log every program execution where the effective user or group becomes root while the real one is not, so uses of setuid and setgid privilege escalation are recorded.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "These rules can generate a large volume of audit events on busy systems; make sure audit log storage and rotation can handle it.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-200640": {
+  "summary": "Point the SSH Banner option at /etc/issue.net and put the exact Standard Mandatory DOD Notice and Consent Banner text in that file so every SSH user sees the legal notice before logging in.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "The banner text must match word for word; a stray edit or character change will still be a finding.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-200650": {
+  "summary": "On desktop systems, turn on banner-message-enable in the GDM greeter defaults so the graphical login screen shows the DOD notice before anyone signs in.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Restarting gdm3 will end any active graphical session on the machine; do it when nobody is logged in at the console.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-200660": {
+  "summary": "On desktop systems, set banner-message-text in the GDM greeter defaults to the exact Standard Mandatory DOD Notice and Consent Banner so the graphical login screen displays the required legal text.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "The text must match exactly, including the newline escapes, and restarting gdm3 will drop any active graphical session.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-200680": {
+  "summary": "Install a profile.d script that, for SSH sessions, prints the DOD banner and makes the user type an acknowledgement before their shell continues, so consent is actively confirmed rather than just displayed.",
+  "triage": "needs-judgment",
+  "automation": "automatable",
+  "caution": "Anything that logs in over SSH non-interactively, such as scripts, backup jobs, or configuration management, may hang waiting at the prompt if the script runs in their session.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-300006": {
+  "summary": "No shared library file under /lib, /lib64, /usr/lib, or /usr/lib64 may be writable by group or others; strip those write bits so an unprivileged user cannot replace library code that every program loads.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Some third-party software installs libraries with loose permissions; tightening them is normally harmless but check for files a specific application expects to write to.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-300007": {
+  "summary": "Every shared library file under /lib, /lib64, /usr/lib, and /usr/lib64 must be owned by root, so no ordinary user account has the ability to alter code that runs inside other programs.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Libraries installed by hand or by a third-party installer under a service account will change ownership; confirm that application does not need to update them itself.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-300008": {
+  "summary": "The system library directories themselves (/lib, /lib64, /usr/lib, /usr/lib64 and their subdirectories) must be owned by root so nobody else can add or swap files in them.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-300009": {
+  "summary": "Shared library files under the system library directories must be group-owned by root, closing another path by which a non-root group could modify system code.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Check whether any third-party application deliberately uses a different group on its libraries before changing them wholesale.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-300010": {
+  "summary": "The system library directories must be group-owned by root so no other group has directory-level control over the files inside.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-300011": {
+  "summary": "No command in the system bin and sbin directories (including /usr/local) may be writable by group or others; set such files to 0755 so users cannot modify programs that administrators and root run.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "The fix sets found files to exactly 0755, which will also strip any setuid or setgid bit from a file that happened to be group-writable; review the check output before running the fix.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-300012": {
+  "summary": "Commands in the system bin and sbin directories must be owned by root or a required system account; change the owner of any that are not, so a compromised user account cannot alter them.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Some packages legitimately install commands owned by a service account; decide which accounts count as required before changing ownership.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-300013": {
+  "summary": "Commands in the system bin and sbin directories must be group-owned by root or a required system account such as daemon, adm, or shadow; fix the group on any that are not.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "The list of acceptable system groups varies by installed software; extend the filter for your environment rather than blindly changing groups.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-300014": {
+  "summary": "Set dictcheck=1 in pwquality.conf so new passwords are rejected if they are dictionary words, which are the first thing a password-guessing attack tries.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Users will start seeing rejections when they pick common words; give them a heads-up.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-300016": {
+  "summary": "Make pwquality actually enforce its rules by setting enforcing = 1 and ensuring the pam_pwquality module is required in common-password with a retry value between 1 and 3, so weak passwords are rejected rather than merely warned about.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "Editing the PAM common-password stack incorrectly can prevent anyone from changing passwords; keep a root session open and test a password change before logging out.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-300019": {
+  "summary": "The sudoers configuration must not grant sudo rights to ALL users; remove any blanket ALL ALL=(ALL) ALL entries so only named people or groups can escalate privileges.",
+  "triage": "quick-win",
+  "automation": "manual",
+  "caution": "Before removing the blanket entry, make sure at least one real administrator account still has sudo access through another rule or you will lose root.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-300020": {
+  "summary": "Remove NOPASSWD from sudoers so users must enter their password when escalating privileges, unless the ISSO has documented an exception for an MFA-protected admin group.",
+  "triage": "needs-judgment",
+  "automation": "automatable",
+  "caution": "Automation and service accounts that run sudo commands non-interactively will start failing with a password prompt; identify those first.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-300021": {
+  "summary": "Remove any !authenticate option from sudoers so sudo never skips reauthentication when a user escalates privileges or changes roles.",
+  "triage": "quick-win",
+  "automation": "manual",
+  "caution": "Any unattended process relying on that option will begin prompting for a password and fail.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-300023": {
+  "summary": "Set X11UseLocalhost to yes in sshd_config so that if X11 forwarding is used, the forwarded display only listens on the loopback address and remote hosts cannot connect to it.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-300029": {
+  "summary": "Add an audit watch on /var/log/journal so any modification or deletion of the systemd journal files is itself recorded.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Journal files are written constantly, so this rule can add a noticeable amount of audit traffic on busy systems.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-300030": {
+  "summary": "Set UMASK to 077 in /etc/login.defs so files users create are private to them by default, rather than readable by everyone on the system.",
+  "triage": "needs-judgment",
+  "automation": "automatable",
+  "caution": "Shared working directories and collaborative workflows that depend on new files being group- or world-readable will break until permissions are managed explicitly.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-300039": {
+  "summary": "Block the usb-storage kernel module through a modprobe.d file (both an install-to-/bin/false line and a blacklist line) so USB flash drives and disks cannot be mounted, preventing data walking out or malware walking in on removable media.",
+  "triage": "needs-judgment",
+  "automation": "automatable",
+  "caution": "Anyone who relies on USB drives for backups, installs, or data transfer on this machine will lose that ability; other USB devices such as keyboards are unaffected.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-300041": {
+  "summary": "The ufw rule set must allow only the ports, protocols, and services listed in the site's PPSM CLSA and deny anything the PPSM CAL prohibits; compare the firewall rules to that document and adjust.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "A deny rule on a port the system actually uses, or an unnoticed default-accept policy, can either break a service or leave you thinking you are protected when you are not.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-400000": {
+  "summary": "No two interactive user accounts may share the same UID in /etc/passwd; give any duplicates a unique UID so every action can be traced to one person.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Changing a user's UID does not change the ownership of their existing files, so those files must be re-owned or the user will lose access to them.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-400020": {
+  "summary": "Add the pam_pkcs11.so module to the PAM common-auth stack so local and network logins can authenticate with a smart card, giving multifactor authentication for all accounts.",
+  "triage": "risky-change",
+  "automation": "automatable",
+  "caution": "A misconfigured common-auth stack, or one enabled before card readers and certificates are working, can lock every user out including administrators; keep a root session open while testing.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-400030": {
+  "summary": "Set PubkeyAuthentication to yes in sshd_config so SSH logins can use the key on a smart card, which is how multifactor authentication works over SSH.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-400060": {
+  "summary": "In pam_pkcs11.conf, every cert_policy line must include ocsp_on so a smart card certificate is checked against the issuer's revocation service before the login is accepted, not just validated locally.",
+  "triage": "config-profile",
+  "automation": "automatable",
+  "caution": "If the OCSP responder is unreachable from this machine, smart card logins will fail; confirm network access to it before turning this on.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-400110": {
+  "summary": "Lock the root account's password so nobody can log in directly as root; administrators must sign in as themselves and escalate, keeping every privileged action tied to a named person.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Make sure at least one account has working sudo access before locking root, or you will have no way to administer the machine except single-user mode.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-400220": {
+  "summary": "Configure the pam_unix line in common-password to hash passwords with sha512 and at least 100000 rounds, so stolen password hashes are far harder to crack.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Existing passwords keep their old hash until each user next changes their password; a wrong edit to this PAM line can break password changes for everyone.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-400260": {
+  "summary": "Set ucredit=-1 in pwquality.conf so every new password must contain at least one uppercase letter.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-400270": {
+  "summary": "Set lcredit=-1 in pwquality.conf so every new password must contain at least one lowercase letter.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-400280": {
+  "summary": "Set dcredit=-1 in pwquality.conf so every new password must contain at least one digit.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-400290": {
+  "summary": "Set difok=8 in pwquality.conf so a new password must differ from the old one in at least eight characters, stopping users from just nudging one character each time.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-400300": {
+  "summary": "Set PASS_MIN_DAYS to 1 in /etc/login.defs so a newly created user must keep a password at least one day before changing it, which stops cycling straight back to an old favorite.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "This only affects accounts created afterward; existing users keep whatever minimum age they already have.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-400310": {
+  "summary": "Set PASS_MAX_DAYS to 60 in /etc/login.defs so new users must change their password at least every 60 days, limiting how long a leaked password stays useful.",
+  "triage": "needs-judgment",
+  "automation": "automatable",
+  "caution": "Only affects accounts created afterward, and service accounts created with this default will have their passwords expire and stop working unless handled separately.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-400320": {
+  "summary": "Set minlen=15 in pwquality.conf so every new password is at least 15 characters long, which makes brute-force guessing impractical.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Users with shorter passwords will be required to pick a longer one at their next change; warn them ahead of time.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-400330": {
+  "summary": "Set the ocredit parameter to -1 in /etc/security/pwquality.conf so every new password must contain at least one special character, making passwords harder to guess or crack.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Existing passwords are not affected, but users will be rejected at their next password change until they include a special character.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-400360": {
+  "summary": "When smart card (PKI) logins go through SSSD, configure sssd.conf so the pam service is enabled, pam_cert_auth is True, and certificate_verification includes ca_cert (and ocsp) so a presented certificate is checked all the way up to a trusted CA including revocation status.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "Getting the domain section, CA bundle path, or OCSP reachability wrong can block all smart card logins, so test with a known-good card before rolling out.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-400375": {
+  "summary": "For smart card logins through pam_pkcs11, set cert_policy in /etc/pam_pkcs11/pam_pkcs11.conf to include ca (along with signature and ocsp_on) so certificates are validated against a trusted certificate authority chain rather than accepted at face value.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "If the CA chain or OCSP responder is not available to the host, enabling this can reject legitimate smart card logins.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-400380": {
+  "summary": "If smart card authentication is in use, add crl_auto or crl_offline to the cert_policy line in /etc/pam_pkcs11/pam_pkcs11.conf so the system can still check certificate revocation from a local copy when the network revocation service is unreachable. Not applicable if smart cards are not used.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "A stale or missing local CRL can cause valid cards to be rejected when the network is down, so make sure the CRL is actually kept current.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-400400": {
+  "summary": "Set ENCRYPT_METHOD to SHA512 in /etc/login.defs so newly stored password hashes use a FIPS 140-3 approved algorithm that is much harder to crack if the shadow file is ever exposed.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Only passwords changed after the setting takes effect get the new hash; existing hashes stay as they are until users change their passwords.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-500010": {
+  "summary": "Add an audit watch rule on /var/log/sudo.log (write and attribute changes) in /etc/audit/rules.d/stig.rules and reload the rules, so privileged and remote maintenance activity is recorded in the audit trail.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "The rule assumes the sudo command logs to /var/log/sudo.log; if it is not configured to write that file the watch records nothing useful.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-500050": {
+  "summary": "Set UsePAM yes in /etc/ssh/sshd_config so SSH logins go through the PAM stack, which is where the system's strong authentication and account controls are enforced.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Check for conflicting UsePAM lines in included sshd_config.d files, since a later contradictory setting still counts as a finding.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-600000": {
+  "summary": "Set ClientAliveCountMax 1 in /etc/ssh/sshd_config and restart SSH so an unresponsive SSH client is dropped after a single missed keepalive rather than lingering as an idle open connection.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Users on flaky network links may see sessions dropped more aggressively; restarting SSH does not kill existing sessions but do it from a console or a second session to be safe.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-600010": {
+  "summary": "Set ClientAliveInterval to 600 or less in /etc/ssh/sshd_config and restart SSH so idle SSH connections are terminated after at most 10 minutes of inactivity.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Long-running interactive sessions that sit idle will be disconnected, which can surprise users who leave shells open; combined with ClientAliveCountMax 1 the cutoff is strict.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-600060": {
+  "summary": "Install at least one DOD root CA certificate into /usr/local/share/ca-certificates, disable the vendor-supplied CAs in /etc/ca-certificates.conf, and run update-ca-certificates so the system only trusts DOD PKI for protected sessions.",
+  "triage": "risky-change",
+  "automation": "manual",
+  "caution": "Disabling all the default CAs breaks TLS to anything not signed by DOD PKI, including Ubuntu package repositories and most public sites, so plan for that before applying.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-600070": {
+  "summary": "Disable the kdump-tools service unless kernel crash dumps are genuinely needed and documented with the ISSO, because crash dumps can contain sensitive memory contents.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "If the system relies on crash dumps for troubleshooting, disabling the service removes that diagnostic capability; document the need instead of disabling.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-600090": {
+  "summary": "Every persistent disk partition except the boot partition must be encrypted and listed in /etc/crypttab, so data at rest cannot be read or altered if the disk is removed. Not applicable if there is a documented, approved requirement for unencrypted data at rest.",
+  "triage": "risky-change",
+  "automation": "manual",
+  "caution": "Encrypting an already-installed system requires resizing and rebuilding partitions and is best done by reinstalling; a mistake can destroy data or leave the system unbootable.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-600150": {
+  "summary": "Find every world-writable directory that lacks the sticky bit and set it, so users sharing a public directory can only delete or rename their own files rather than each other's.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Searching the whole filesystem can be slow and may flag directories on network or removable mounts; setting the sticky bit is otherwise harmless.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-600190": {
+  "summary": "Turn on TCP syncookies (net.ipv4.tcp_syncookies = 1) both at runtime and persistently in /etc/sysctl.conf so the system keeps accepting connections during a SYN flood denial-of-service attack.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Check the other sysctl.d locations listed in the check for a conflicting value, since a later file can override /etc/sysctl.conf.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-600200": {
+  "summary": "Enable the Uncomplicated Firewall (ufw) and add a LIMIT rule for every port the system is listening on, so repeated connection attempts are rate-limited to blunt denial-of-service attacks.",
+  "triage": "risky-change",
+  "automation": "manual",
+  "caution": "Enabling ufw for the first time can cut off remote access if SSH is not allowed, and LIMIT rules can throttle legitimate clients that connect frequently; add the SSH rule before enabling and test from a second session.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-600230": {
+  "summary": "On hardware with wireless radios, bring down every wireless interface, blacklist its kernel module in /etc/modprobe.d, and unload the module, unless the ISSO has documented and approved wireless use. Not applicable to systems without wireless hardware.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "If wireless is the only network path to the machine, disabling it will disconnect it; confirm a wired connection exists first.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-700010": {
+  "summary": "Set every log file under /var/log (except btmp, wtmp, lastlog, history and eipp.log.xz) to permissions 640 or tighter, so ordinary users cannot read error messages that might reveal exploitable details about the system.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Applications that run as a non-root user and expect to read or write their own logs in /var/log may fail after the permissions are tightened.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-700020": {
+  "summary": "Use a systemd tmpfiles drop-in (zzz-systemd-stig.conf) to set the journal directories and files under /run/log/journal and /var/log/journal to mode 0640, root owner and systemd-journal group, then reboot, so unprivileged users cannot read journal contents.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "The change only takes effect after a reboot, and users who relied on reading the journal directly will need to be in the systemd-journal group.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-700030": {
+  "summary": "Set the journalctl binary to mode 740 so only root and its group can run it, preventing unauthorized users from browsing system journal entries.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Non-root users and monitoring tools that call journalctl will stop working unless they are added to the root group or given another route to the logs; a package upgrade may also reset the mode.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-700040": {
+  "summary": "Make sure the journalctl binary is owned by root so that no other account can alter the tool used to read system logs.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-700050": {
+  "summary": "Make sure the journalctl binary is group-owned by root so that only the root group is granted the tool's group permissions.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "This works together with the 740 mode rule; changing the group means only root-group members can run journalctl.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-700060": {
+  "summary": "Use the zzz-systemd-stig.conf tmpfiles drop-in so the /run/log/journal and /var/log/journal directories are group-owned by systemd-journal, then reboot, keeping journal access limited to that group.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Takes effect only after a reboot.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-700070": {
+  "summary": "Use the zzz-systemd-stig.conf tmpfiles drop-in so all journal files under /run/log/journal and /var/log/journal are group-owned by systemd-journal, then reboot, keeping journal access limited to that group.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Takes effect only after a reboot.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-700080": {
+  "summary": "Use the zzz-systemd-stig.conf tmpfiles drop-in so the /run/log/journal and /var/log/journal directories are owned by root, then reboot, so only root controls where journal data is stored.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Takes effect only after a reboot.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-700090": {
+  "summary": "Use the zzz-systemd-stig.conf tmpfiles drop-in so all journal files under /run/log/journal and /var/log/journal are owned by root, then reboot, so only root controls the stored log data.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Takes effect only after a reboot.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-700100": {
+  "summary": "Make the /var/log directory group-owned by syslog so the logging service can write there while access for everyone else stays limited.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-700110": {
+  "summary": "Make the /var/log directory owned by root so only root controls the top-level log location.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-700120": {
+  "summary": "Set the /var/log directory to mode 0755 or tighter so ordinary users cannot create or remove files in the system log area. Not applicable if rsyslog is active and enabled.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-700130": {
+  "summary": "Make /var/log/syslog group-owned by adm so only administrators in that group can read the main system log.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Log rotation recreates the file, so confirm the rotation configuration also assigns the adm group or the setting will drift.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-700140": {
+  "summary": "Make /var/log/syslog owned by the syslog user so the logging daemon, and not some other account, controls the main system log file.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Log rotation recreates the file, so confirm the rotation configuration keeps syslog as the owner.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-700150": {
+  "summary": "Set /var/log/syslog to mode 0640 or tighter so unprivileged users cannot read the main system log, which may contain information useful to an attacker.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Log rotation recreates the file, so confirm the rotation configuration keeps the restrictive mode.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-700300": {
+  "summary": "Confirm the CPU's NX (Execute Disable) protection is active, as reported by the kernel at boot or by the nx flag in /proc/cpuinfo; if it is not, enable the No Execution bit in the BIOS setup so memory holding data cannot be executed as code.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Changing the BIOS setting requires a reboot and physical or out-of-band console access; on some hardware the option cannot be toggled at all.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-700310": {
+  "summary": "Ensure address space layout randomization is fully on by keeping kernel.randomize_va_space at its default of 2, removing any override in /etc/sysctl.conf or /etc/sysctl.d, and reloading the sysctl settings, so attackers cannot rely on predictable memory addresses.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Rare legacy applications that break under full ASLR would need to be identified before removing an override that was put there deliberately.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-700320": {
+  "summary": "Set Remove-Unused-Dependencies and Remove-Unused-Kernel-Packages to true in /etc/apt/apt.conf.d/50unattended-upgrades so leftover old packages and kernels are cleaned up after updates, reducing the pile of outdated software an attacker could exploit.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Old kernels will be removed automatically, so make sure you are happy losing the ability to boot a previous kernel if a new one misbehaves.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-900040": {
+  "summary": "Set /etc/audit/audit.rules, everything under /etc/audit/rules.d, and /etc/audit/auditd.conf to mode 0640 or tighter so unauthorized users cannot tamper with what the system audits.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-900050": {
+  "summary": "Make sure /etc/audit/audit.rules, the files under /etc/audit/rules.d, and /etc/audit/auditd.conf are all owned by root so only root can control the audit configuration.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-900060": {
+  "summary": "Make sure /etc/audit/audit.rules, the files under /etc/audit/rules.d, and /etc/audit/auditd.conf are all group-owned by root so no other group can influence the audit configuration.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-900070": {
+  "summary": "Add an audit rule to /etc/audit/rules.d/stig.rules that records every execution of /bin/su by a real user, then reload the rules, so attempts to switch to another account are captured in the audit log.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-900080": {
+  "summary": "Add an audit rule to /etc/audit/rules.d/stig.rules that records every execution of /usr/bin/chfn by a real user, then reload the rules, so changes to user account information are captured in the audit log.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-900090": {
+  "summary": "Add an audit rule to /etc/audit/rules.d/stig.rules that records every execution of /usr/bin/mount by a real user, then reload the rules, so attempts to attach filesystems are captured in the audit log.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-900100": {
+  "summary": "Add an audit rule to /etc/audit/rules.d/stig.rules that records every execution of /usr/bin/umount by a real user, then reload the rules, so attempts to detach filesystems are captured in the audit log.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-900110": {
+  "summary": "Add an audit rule to /etc/audit/rules.d/stig.rules that records every execution of /usr/bin/ssh-agent by a real user, then reload the rules, so use of the SSH key agent is captured in the audit log.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "On systems with many interactive SSH users this rule can add a noticeable volume of audit events.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-900120": {
+  "summary": "Add an audit rule to /etc/audit/rules.d/stig.rules that records every execution of /usr/lib/openssh/ssh-keysign by a real user, then reload the rules, so host-based SSH authentication attempts are captured in the audit log.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-900130": {
+  "summary": "Add audit rules to /etc/audit/rules.d/stig.rules (32-bit and 64-bit, for both regular users and root) covering the setxattr, fsetxattr, lsetxattr, removexattr, fremovexattr and lremovexattr system calls, so changes to file extended attributes are recorded.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Syscall rules fire on every matching call system-wide, so expect audit log growth on busy systems; on 32-bit hardware only the b32 lines are required.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-900140": {
+  "summary": "Add audit rules to /etc/audit/rules.d/stig.rules (32-bit and 64-bit) covering the chown, fchown, fchownat and lchown system calls by real users, then reload the rules, so file ownership changes are recorded.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Syscall rules can noticeably increase audit log volume on busy systems; on 32-bit hardware only the b32 lines are required.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-900150": {
+  "summary": "Add audit rules to /etc/audit/rules.d/stig.rules (32-bit and 64-bit) covering the chmod, fchmod and fchmodat system calls by real users, then reload the rules, so file permission changes are recorded.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Syscall rules can noticeably increase audit log volume on busy systems; on 32-bit hardware only the b32 lines are required.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-900160": {
+  "summary": "Add audit rules to /etc/audit/rules.d/stig.rules (32-bit and 64-bit) that record failed (EPERM or EACCES) attempts by real users to use creat, open, openat, open_by_handle_at, truncate and ftruncate, so denied file access attempts show up in the audit log.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Applications that routinely probe for files they cannot access will generate a steady stream of events, so watch audit log growth.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-900170": {
+  "summary": "Add an audit rule to /etc/audit/rules.d/stig.rules that records every execution of /usr/bin/sudo by a real user, then reload the rules, so all privileged command attempts are captured in the audit log.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-900180": {
+  "summary": "Add an audit rule to /etc/audit/rules.d/stig.rules that records every execution of /usr/bin/sudoedit by a real user, then reload the rules, so privileged file edits are captured in the audit log.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-900190": {
+  "summary": "Add an audit rule to /etc/audit/rules.d/stig.rules that records every execution of /usr/bin/chsh by a real user, then reload the rules, so login shell changes are captured in the audit log.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-900200": {
+  "summary": "Add an audit rule to /etc/audit/rules.d/stig.rules that records every execution of /usr/bin/newgrp by a real user, then reload the rules, so attempts to switch group identity are captured in the audit log.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-900210": {
+  "summary": "Add an audit rule to /etc/audit/rules.d/stig.rules that records every execution of /usr/bin/chcon by a real user, then reload the rules, so changes to file security context are captured in the audit log.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-900220": {
+  "summary": "Add an audit rule to /etc/audit/rules.d/stig.rules that records every execution of /sbin/apparmor_parser by a real user, then reload the rules, so loading or changing AppArmor profiles is captured in the audit log.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-900230": {
+  "summary": "Add an audit rule to /etc/audit/rules.d/stig.rules that records every execution of /usr/bin/setfacl by a real user, then reload the rules, so changes to file access control lists are captured in the audit log.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-900240": {
+  "summary": "Add an audit rule to /etc/audit/rules.d/stig.rules that records every execution of /usr/bin/chacl by a real user, then reload the rules, so changes to file access control lists are captured in the audit log.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "The check text contains a typo in the command name (audtctl); use auditctl as in the other rules.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-900250": {
+  "summary": "Add an audit watch on /var/log/faillog for writes and attribute changes in /etc/audit/rules.d/stig.rules, then reload the rules, so tampering with the failed-login record is captured.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-900260": {
+  "summary": "Add an audit watch on /var/log/lastlog for writes and attribute changes in /etc/audit/rules.d/stig.rules, then reload the rules, so tampering with the last-login record is captured.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Every successful login updates lastlog, so this watch fires on each login and adds to audit volume.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-900270": {
+  "summary": "Add an audit rule to /etc/audit/rules.d/stig.rules that records every execution of /usr/bin/passwd by a real user, then reload the rules, so password change attempts are captured in the audit log.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-900280": {
+  "summary": "Add an audit rule to /etc/audit/rules.d/stig.rules that records every execution of /sbin/unix_update by a real user, then reload the rules, so the helper that updates password files is captured in the audit log.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-900290": {
+  "summary": "Add an audit rule to /etc/audit/rules.d/stig.rules that records every execution of /usr/bin/gpasswd by a real user, then reload the rules, so group membership and group password changes are captured in the audit log.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-900300": {
+  "summary": "Add an audit rule to /etc/audit/rules.d/stig.rules that records every execution of /usr/bin/chage by a real user, then reload the rules, so changes to password aging settings are captured in the audit log.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-900310": {
+  "summary": "Add an audit rule to /etc/audit/rules.d/stig.rules that records every execution of /usr/sbin/usermod by a real user, then reload the rules, so changes to user accounts are captured in the audit log.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-900320": {
+  "summary": "Add an audit rule to /etc/audit/rules.d/stig.rules that records every execution of /usr/bin/crontab by a real user, then reload the rules, so changes to scheduled jobs are captured in the audit log.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-900330": {
+  "summary": "Add an audit rule to /etc/audit/rules.d/stig.rules that records every execution of /usr/sbin/pam_timestamp_check by a real user, then reload the rules, so checks of cached privilege-elevation credentials are captured in the audit log.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-900340": {
+  "summary": "Add audit rules to /etc/audit/rules.d/stig.rules (32-bit and 64-bit) covering the init_module and finit_module system calls by real users, so attempts to load kernel modules are recorded.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "On 32-bit hardware only the b32 lines are required.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-900350": {
+  "summary": "Add audit rules to /etc/audit/rules.d/stig.rules (32-bit and 64-bit) covering the delete_module system call by real users, then reload the rules, so attempts to unload kernel modules are recorded.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "On 32-bit hardware only the b32 lines are required.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-900510": {
+  "summary": "Add an audit watch on /etc/sudoers for writes and attribute changes in /etc/audit/rules.d/stig.rules, then reload the rules, so any change to who may run privileged commands is captured.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-900520": {
+  "summary": "Add an audit watch on the /etc/sudoers.d directory for writes and attribute changes in /etc/audit/rules.d/stig.rules, then reload the rules, so any change to the drop-in privilege files is captured.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-900540": {
+  "summary": "Add audit rules to /etc/audit/rules.d/stig.rules (32-bit and 64-bit) covering the unlink, unlinkat, rename, renameat and rmdir system calls by real users, so file deletions and renames are recorded.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "These syscalls happen constantly during normal use, so this rule can substantially increase audit log volume; make sure log storage and rotation can cope.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-900590": {
+  "summary": "Add an audit watch on /var/log/wtmp for writes and attribute changes in /etc/audit/rules.d/stig.rules, then reload the rules, so tampering with the login history record is captured.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Every login and logout writes to wtmp, so this watch generates an event each time.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-900600": {
+  "summary": "Add an audit watch on /var/run/utmp for writes and attribute changes in /etc/audit/rules.d/stig.rules, then reload the rules, so tampering with the record of currently logged-in users is captured.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "utmp is updated on every login and logout, so expect an audit event each time.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-900610": {
+  "summary": "Add an audit watch on /var/log/btmp for writes and attribute changes in /etc/audit/rules.d/stig.rules, then reload the rules, so tampering with the failed-login history record is captured.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-900730": {
+  "summary": "Add an audit watch on /sbin/modprobe for execution in /etc/audit/rules.d/stig.rules, then reload the rules, so every use of the kernel module loader is recorded.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-900740": {
+  "summary": "Add an audit watch on /bin/kmod for execution in /etc/audit/rules.d/stig.rules, then reload the rules, so every use of the kernel module management tool is recorded.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "The check example uses key module while the fix uses modules; the key name is arbitrary, so either is acceptable.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-900750": {
+  "summary": "Add an audit watch on /usr/sbin/fdisk for execution in /etc/audit/rules.d/stig.rules, then reload the rules, so every use of the partition management tool is recorded.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-901230": {
+  "summary": "Make sure the audit tools (auditctl, aureport, ausearch, autrace, auditd, audispd and augenrules under /sbin) have mode 0755 or tighter so unauthorized users cannot modify the programs that manage and read the audit trail.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-901240": {
+  "summary": "Make sure the audit tools (auditctl, aureport, ausearch, autrace, auditd, audispd and augenrules under /sbin) are owned by root so no other account can replace or alter them.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-901250": {
+  "summary": "Make sure the audit tools (auditctl, aureport, ausearch, autrace, auditd, audispd and augenrules under /sbin) are group-owned by root so no other group has control over them.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-901260": {
+  "summary": "Make sure none of the system command directories (/bin, /sbin, /usr/bin, /usr/sbin, /usr/local/bin, /usr/local/sbin) are group- or world-writable by setting them to mode 0755, so an unprivileged user cannot drop or replace commands that everyone runs.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "The fix applies mode 755 recursively to any offending directory, which also strips setuid, setgid and extra permission bits from every file beneath it; review what is inside before running it.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-901270": {
+  "summary": "Make sure every directory under the system command paths (/bin, /sbin, /usr/bin, /usr/sbin, /usr/local/bin, /usr/local/sbin) is owned by root so that only root controls where system commands live.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-901280": {
+  "summary": "Make sure every directory under the system command paths (/bin, /sbin, /usr/bin, /usr/sbin, /usr/local/bin, /usr/local/sbin) is group-owned by root so no other group can influence the system command locations.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-901300": {
+  "summary": "Find the audit log location from log_file in /etc/audit/auditd.conf and set every file in that directory to mode 0600 or tighter, so only root can read or alter the audit trail.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Any log collector or monitoring agent that reads the audit log as a non-root user will lose access.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-901310": {
+  "summary": "Find the audit log location from log_file in /etc/audit/auditd.conf and make every file in that directory owned by root, so no other account controls the audit trail.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-901350": {
+  "summary": "Set log_group = root in /etc/audit/auditd.conf and signal auditd to reload, so audit log files (current and newly created) are group-owned by root and not readable by other groups.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "If a log-forwarding agent relies on group access to the audit logs it will stop working after the group changes to root.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-901380": {
+  "summary": "Find the audit log directory from log_file in /etc/audit/auditd.conf and set it to mode 0750 or tighter so unauthorized users cannot add, remove or alter audit log files.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "The fix applies 750 recursively, which loosens any audit log files that were already at the stricter 0600 required by the companion rule, so re-apply the file mode afterwards.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-909000": {
+  "summary": "Put -e 2 as the last line of /etc/audit/rules.d/audit.rules so the loaded audit rules become immutable; once set, nobody can change or disable auditing without a reboot.",
+  "triage": "risky-change",
+  "automation": "automatable",
+  "caution": "After the immutable flag is active every audit rule change requires a reboot, so get all other audit rules right first and be aware some management tools that reload audit rules will fail.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-909890": {
+  "summary": "Add selection lines for the audit tools (/sbin/auditctl, auditd, ausearch, aureport, autrace, augenrules) to /etc/aide/aide.conf using the p+i+n+u+g+s+b+acl+xattrs+sha512 attribute set, so AIDE detects any tampering with the audit tools by cryptographic hash.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "AIDE only reports changes after its database has been initialized and it is run regularly, so adding the lines alone does not provide protection.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-100010": {
+  "summary": "Remove the systemd-timesyncd package (it is uninstalled when chrony is installed; purge the leftover configuration) so only one approved time synchronization service is present.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Make sure chrony is installed and configured first, otherwise the system will have no time synchronization.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-100020": {
+  "summary": "Remove the ntp package so the system does not run a second, unapproved time synchronization service alongside chrony.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Make sure chrony is installed and working first, otherwise removing ntp leaves the clock unsynchronized.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-100450": {
+  "summary": "Install the audispd-plugins package, set active = yes in /etc/audit/plugins.d/au-remote.conf, point remote_server in /etc/audit/audisp-remote.conf at a separate log server, and restart auditd so audit records are copied off the machine where an intruder cannot erase them.",
+  "triage": "config-profile",
+  "automation": "manual",
+  "caution": "A remote server address must exist and accept audisp-remote connections; if it is unreachable the plugin can generate errors or, depending on its failure settings, affect the audit service.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-100700": {
+  "summary": "Install the chrony package so the system keeps accurate network time; correct timestamps are essential for correlating logs and investigating incidents.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "If another time service such as systemd-timesyncd or ntpd is already running, installing chrony may conflict with it, so pick one time daemon.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-200000": {
+  "summary": "Add a hard limit of 10 concurrent logins per account in the PAM limits configuration, so a single account cannot open unlimited sessions and exhaust system resources.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Shared or automation accounts that legitimately open many parallel sessions will be refused once they reach 10.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-200610": {
+  "summary": "Configure pam_faillock so that three failed logins within 15 minutes lock the account until an administrator releases it, blunting password-guessing attacks.",
+  "triage": "risky-change",
+  "automation": "automatable",
+  "caution": "With unlock_time set to 0, locked accounts never unlock on their own, so a typo-prone user or an attacker deliberately spamming bad passwords can lock out administrators; a mistake in the PAM file can block all logins.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-300001": {
+  "summary": "Make sure no APT configuration file sets AllowUnauthenticated to true, so packages and updates are only installed when their signatures verify against trusted keys.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Any internal or third-party repository without valid signing keys will stop installing until it is properly signed.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-300017": {
+  "summary": "Add pam_faildelay to the common-auth PAM stack with a four-second delay, so each failed login attempt forces a pause that slows down password guessing.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Editing PAM configuration by hand carries some risk; a syntax error in common-auth can prevent all logins, so keep a root session open while testing.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-400340": {
+  "summary": "If smart card authentication is in use, set SSSD to expire cached credentials after one day, so stale offline logins cannot be used long after an account has been revoked. Not applicable without smart cards.",
+  "triage": "needs-judgment",
+  "automation": "automatable",
+  "caution": "Laptops that are offline for more than a day will be unable to log in with cached credentials until they reconnect to the identity provider.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-600140": {
+  "summary": "Set the kernel parameter kernel.dmesg_restrict to 1 in sysctl configuration and remove any conflicting entries, so only root can read the kernel message buffer and unprivileged users cannot mine it for system details.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Non-root users and monitoring tools that run dmesg will start getting permission errors.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-600160": {
+  "summary": "Point chrony at an authoritative DoD time server with a maxpoll of 16 or less, so the clock is checked at least every 24 hours and log timestamps stay trustworthy; not applicable on non-networked systems.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "You must choose a time source that is both authoritative and reachable from the system, and the chrony service needs a restart for changes to take effect.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-600180": {
+  "summary": "Set makestep 1 -1 in the chrony configuration so the clock is stepped immediately whenever it is more than one second off, rather than slowly slewing toward the correct time.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "A sudden clock jump can confuse time-sensitive applications, databases, and scheduled jobs running at that moment.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-900920": {
+  "summary": "Make sure the partition holding audit logs has enough free space for at least a week of audit records, resizing or creating a dedicated audit partition if needed, unless logs are shipped to a central collector immediately.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "How much space a week of audit data needs depends on system activity, and resizing or moving partitions on a live system can cause data loss if done carelessly.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-900950": {
+  "summary": "On a standalone (non-networked) system, place a script in the weekly cron directory that copies audit logs to external media so a single disk failure or tampering cannot erase the only copy. Not applicable to interconnected systems.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "The rule does not supply the script; you must write one that fits your external media and verify it actually offloads the logs.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-900960": {
+  "summary": "Configure auditd so that when free audit storage drops to 25 percent it emails the SA and ISSO or runs a script that notifies them, giving staff time to add capacity before audit logging stops.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "The email action only works if a mail package is installed and the address actually reaches security staff, and the space_left threshold must be calculated against your real partition size.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-900980": {
+  "summary": "Set action_mail_acct in the auditd configuration to a security staff account and restart auditd, so administrators are emailed when audit processing fails.",
+  "triage": "needs-judgment",
+  "automation": "manual",
+  "caution": "Notifications silently go nowhere if the system has no working mail delivery for that address, so verify mail flow after the change.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ },
+ "claude-cowork-2026-09:UBTU-24-901220": {
+  "summary": "Set the system time zone to UTC or GMT so audit timestamps line up with a common reference and can be compared across systems during an investigation.",
+  "triage": "quick-win",
+  "automation": "automatable",
+  "caution": "Applications and scheduled jobs that assume local time will see their clocks shift, so review cron schedules and user-facing timestamps after the change.",
+  "model": "claude-cowork-2026-09",
+  "date": "2026-09-07"
+ }
+}

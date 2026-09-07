@@ -37,9 +37,10 @@
   approves, the scanner runs only approved checks.
 - `skills/stig-scan-windows/` — states plainly that Windows scanning is not
   yet supported and what to do instead.
-- `annotations/U_MS_Windows_11_STIG_V2R9_Manual-xccdf.ai-cache.json` —
-  the complete Windows 11 V2R9 explanation set (257 rules), produced with
-  the skill.
+- `annotations/` — complete explanation sets for seven STIGs, 1,440 rules,
+  produced with the skill: Windows 11 V2R9, Windows Server 2019 V3R8,
+  RHEL 9 V2R9, Ubuntu 24.04 V1R6, macOS 26 V1R3, SQL Server 2022 Instance
+  V1R4 and Database V1R3.
 
 ### Removed
 
