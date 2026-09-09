@@ -1,29 +1,47 @@
 # stig-ai-pipeline
 
-**AI-assisted STIG compliance tooling.** Turn DISA STIGs from 300-page
-checklists into something an engineer can actually work through — parsed,
-prioritized, explained in plain English, and (eventually) checked and
-remediated automatically.
+**Apply Department of Defense security checklists to your own systems without a compliance specialist.**
+An open-source, AI-enabled toolkit consisting of AI skills and scripts that turns any DISA STIG into a plain-English plan, explains every rule, and checks a machine against it — with a human approving every check before it runs. Free, MIT licence, no account, no API key.
 
-Scanners like OpenSCAP can already tell you *that* you have 169 findings.
-The hard part is the last mile: understanding what each finding actually
-asks of you, deciding which ones are safe to fix right now, and turning
-check text into remediation — that translation layer is what this project
-uses an LLM for, with explicit flags for the rules where a human must
-decide.
+**New here?** Read the two-page overview with a worked example: [docs/overview.pdf](docs/overview.pdf).
+
+## Why this exists
+
+The US Department of Defense publishes free cybersecurity checklists called **STIGs** (Security Technical Implementation Guides) for almost every common system — Windows, Linux, macOS, SQL Server and hundreds more. Each one lists a few hundred settings that make the system secure against cyberattacks. They are the most thorough baselines available, and anyone can download them.
+
+Almost nobody outside government uses them. Each guide is a few hundred rules written for a security auditor; applying one means reading every rule, understanding it, ranking it by risk, and translating it into a change on a real machine. That takes a specialist, and most organisations do not have one. So the checklists sit unused, and the systems stay less secure than they could be for free.
+
+This toolkit does the interpreting. Scanners like OpenSCAP can already tell you *that* you have 169 findings; this project handles the last mile — what each finding actually asks of you, which fixes are safe to make today, and what could go wrong — with explicit flags for the rules where a human must decide.
+
+## Who it is for
+
+| If you are… | This gives you… |
+|---|---|
+| **An IT generalist** at a school district, clinic, small bank, municipal agency, or any organisation without a security team | A ranked, plain-English plan for securing each system, in one command, and a way to check your work |
+| **A managed service provider** looking after many small clients | One repeatable method across Windows, Linux, macOS and SQL Server, with a dated report per client per scan |
+| **A sysadmin at a DoD contractor or federal agency** where STIG compliance is mandatory | The translation from guide to tracker done for you, and evidence for the accreditation package that says exactly what was and was not evaluated |
+| **A security engineer** who already knows STIGs | A parser that reads any XCCDF as DISA ships it, explanation sets you can reuse, and a scanner whose safety model you can audit line by line |
+| **Someone answering "are our systems secure?"** to a board, an auditor, a customer or a cyber-insurer | A recognised baseline (each rule maps to NIST 800-53 through DISA's own identifiers) and a report to hand over instead of an opinion |
+
+## What you get
+
+- **A week of specialist work in one command.** `parse` turns a 300-page guide into a tracker: one row per rule, severity ranked, full check and fix text, as Excel, CSV, JSON or Markdown.
+- **Every rule explained.** What it makes you do and why, a rating (quick win / needs a policy pushed out / needs a decision / can break things), whether it can be scripted, and what could go wrong. Seven STIGs and 1,440 rules are explained already and shipped in this repository; the `stig-explain` skill produces more with the AI assistant you already have.
+- **A scan you can trust.** `stig-scan` checks a machine against its guide. Every check is unreviewed until a named person reads and approves it; approval freezes a fingerprint of the exact command; a safety gate refuses anything that could change the system; and the report says first how many rules were actually evaluated. AI may help write a check. It never runs one.
+- **Nothing to buy and nothing to sign up for.** Python 3.9+, no dependencies, no API key, no vendor. Works with any AI assistant that supports skills, or with none.
 
 ## Roadmap
 
 | Module | Status | What it does |
 |---|---|---|
 | **1. stig-prep** | ✅ this release | Parse any DISA STIG (XCCDF) into engineer-friendly checklists (Markdown / JSON / CSV) with optional AI triage & plain-English explanations |
-| **2. stig-scan** | ✅ v0.2 (macOS), v0.3 (Linux) | Run human-approved, content-frozen STIG checks against the local system and record pass/fail with an explicit evidence-coverage statement. Platform profiles: macOS, Linux; Windows safety vocabulary only |
+| **2. stig-scan** | ✅ v0.2 (macOS), v0.3 (Linux), v0.4 (Windows) | Run human-approved, content-frozen STIG checks against the local system and record pass/fail with an explicit evidence-coverage statement. Platform profiles: macOS, Linux, Windows |
 | 3. stig-assess | planned | AI-assisted assessment: interpret scan results, draft POA&M entries |
 | 4. stig-harden | planned | Generate remediation scripts for findings, with human-review gates |
 
 Everything is STIG-agnostic: the tools parse standard XCCDF, so the same
-code works for the Apple macOS 15/26 STIGs, Ubuntu, RHEL, or any other
-STIG that DISA publishes.
+code works for Windows 11, Windows Server, RHEL, Ubuntu, macOS, SQL Server,
+or any other STIG that DISA publishes.
 
 ## Quick start
 
@@ -104,7 +122,7 @@ mutating forms, the shell, and how the extractor reads DISA's check text.
 |---|---|---|---|
 | `macos` | ✅ | ✅ shell snippet + acceptance sentence | `macos-26-v1r3` (160 rules, 153 reducible) |
 | `linux` | ✅ | ✅ prompt lines + mapped sentence shapes | `ubuntu-24.04-v1r6` (194, 72 reducible), `rhel-9-v2r9` (445, 156 reducible) |
-| `windows` | ✗ refused | ✗ every rule UNSUPPORTED | — |
+| `windows` | ✅ PowerShell | ✅ registry / auditpol / secedit / quoted cmdlet shapes | `windows-11-v2r9` (257, 154 reducible), `windows-server-2019-v3r8` (282, 160 reducible) |
 
 A pack records its platform; `scan` will not run a pack on a host of a
 different platform. Every shipped pack is entirely unreviewed.
@@ -204,8 +222,7 @@ without an assistant. `annotations/` carries complete sets for seven STIGs
 Module 2 end to end — author, verify, walk the user through review, then scan
 and explain the report. The assistant never approves a check and never runs
 an unreviewed one; those lines are in the skill text and enforced by the
-scanner. `skills/stig-scan-windows/` exists to say plainly that Windows
-scanning is not yet supported.
+scanner. `skills/stig-scan-windows/` drives it on Windows through PowerShell.
 
 ## AI skill: one-command tracker
 

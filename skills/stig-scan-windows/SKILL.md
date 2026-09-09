@@ -1,39 +1,72 @@
 ---
 name: stig-scan-windows
-description: Placeholder for scanning a Windows system against its DISA STIG. Not yet supported — use this skill only to tell the user what exists today, what does not, and what they can do instead. Triggers on requests to scan, audit or check a Windows machine against a STIG.
+description: Check a Windows system (Windows 11, Windows Server) against its DISA STIG and report, in plain English, where it stands. Use this skill whenever the user asks to scan, audit, assess or check a Windows machine against a STIG, mentions a Windows checkpack, or says anything like "scan this PC", "run the STIG checks on this server", "how compliant is this Windows box" — even if they do not name the tool. It drives stig-scan (Module 2) on the Windows profile through PowerShell, never approves a check on the user's behalf, and never runs anything a human has not approved.
 ---
 
-# Scan a Windows system against its STIG — not yet supported
+# Scan a Windows system against its STIG
 
-## What to tell the user
+Same procedure as stig-scan-macos — locate → author → verify → review → the
+human approves → scan → explain — with the Windows profile. Read that skill
+for the full step text; this file carries only what is different on Windows.
 
-Windows scanning is **not available in this release**. Say so in the first
-sentence. Do not attempt to author or run Windows checks by other means.
+The guiding principle is unchanged: **nothing executes unless a named human
+has read it and approved it, and nothing that can change the system ever
+executes.**
 
-## What exists
+## What is different on Windows
 
-* The Windows safety profile in `stigscan/platforms/windows.py`: the
-  read-only PowerShell cmdlets and commands a check may use, and the
-  mutating forms it may not. `verify` and `review` work on a Windows pack.
-* `stigscan author --platform windows` runs, and marks every rule
-  UNSUPPORTED with the note "no extractor for platform 'windows' in this
-  release", so a Windows pack can hold human- or AI-authored checks once a
-  process for authoring them exists.
-* `stigscan scan` refuses a Windows pack with a clear error.
+**Checks run in PowerShell.** The scanner launches `pwsh` or
+`powershell.exe` with `-NoProfile -NonInteractive`. Python 3.9+ must be
+installed on the Windows host (python.org or the Microsoft Store build).
 
-## What does not exist, and why
+**Author with the Windows profile.**
 
-DISA writes Windows check text as registry paths, Group Policy paths and GUI
-steps, not as commands. Reducing that to executable checks needs a different
-authoring approach from the shell-snippet extractor used for macOS and
-Linux — most likely a registry-path-to-`Get-ItemProperty` mapping plus an
-AI-assisted pass for the rest, all landing UNREVIEWED as on other platforms.
-That is planned work, not shipped work.
+```powershell
+python -m stigprep parse U_MS_Windows_11_V2R9_STIG.zip --format json
+python -m stigscan author out\*windows_11*_checklist.json -o checkpacks\windows-11-v2r9.json --platform windows
+```
 
-## What the user can do today
+**DISA's Windows check text is not commands; the extractor maps four
+shapes.** Tell the user which shape each check came from when they review:
 
-* `stig-to-tracker` and `stig-explain` both work on Windows STIGs: the
-  Windows 11 V2R9 guide is fully parsed and annotated (257 rules). Offer to
-  build or open that tracker so they can work the checklist by hand.
-* If they need automated evidence now, the DISA SCAP benchmark for their
-  Windows release with a SCAP-validated scanner is the supported route.
+| DISA writes | The check becomes | Confidence |
+|---|---|---|
+| Registry Hive / Path / Value Name / Value | `Get-ItemProperty` on that value, compared to the stated value | high |
+| `AuditPol /get` plus a "Category >> Subcategory - Success" line | `auditpol /get /subcategory:"…" /r`, regex on the CSV | medium |
+| A gpedit path **with** a `Secedit /Export` fallback and a key name | `secedit /export` to a temp file, read that key, delete the file | high |
+| A quoted read-only cmdlet with an acceptance sentence | that cmdlet | medium |
+
+A gpedit path **without** a secedit fallback, Computer Management, Server
+Manager, or an interview question is MANUAL. Anything else is UNSUPPORTED
+for a human or AI author. On Windows 11 V2R9 about 60 percent of rules
+reduce to a check; on Windows Server 2019 V3R8 about 57 percent. Say the
+numbers `author` prints.
+
+**Most checks need an elevated shell.** Registry policy keys, `auditpol` and
+`secedit` all require it. `author` marks those `requires_root`; the scan
+skips them unless PowerShell was started with "Run as administrator". Show
+the user how many before they run, and let them choose.
+
+**The safety gate refuses anything that changes the system** — any `Set-`,
+`New-`, `Remove-`, `Enable-`, `Disable-`, `Install-` cmdlet, `reg add`,
+`auditpol /set`, `secedit /configure`, `sc config`, `netsh` outside `show`,
+`manage-bde -on/-off`, file writes, network clients. The one exception is
+`Remove-Item $f -Force` on the scratch file the secedit read creates; any
+other `Remove-Item` is refused. A check that trips the gate is reported as
+ERROR, never pass or fail.
+
+**Empty output is not evidence.** A registry value that does not exist
+returns nothing; the STIG's own sentence ("does not exist or is not
+configured as specified, this is a finding") makes absence a finding, and
+the extractor records that sentence as the source. Explain that when it
+happens rather than calling it a bug.
+
+## Example
+
+Input: "scan this Windows 11 laptop against the STIG".
+
+Actions: `author --platform windows` → 257 rules, 154 reducible, 15 manual,
+88 unsupported → `verify` → `review --severity high --show` → user approves
+a handful by name → scan from an elevated PowerShell with `--record` →
+report: "N of 257 rules were actually evaluated; … ; the rest not evaluated
+(unreviewed, not yet authored, or need elevation)."

@@ -106,6 +106,38 @@ def candidate_from_rule(rule: dict, authored_at: str, platform: str | None = Non
         authored_at=authored_at,
     )
 
+    # A platform with its own mapping (Windows): use it, then the usual gates.
+    if hasattr(prof, "extract"):
+        got = prof.extract(check_text)
+        if got:
+            command, comparator, expected, source, conf, note = got
+            command, needs_root = _strip_sudo(command)
+            chk.mode = MODE_SHELL
+            chk.command = command
+            chk.comparator = comparator
+            chk.expected = expected
+            chk.expected_source = source
+            chk.requires_root = needs_root or bool(re.search(r"elevated privileges|Run as administrator", check_text, re.I))
+            problems = audit(command, prof.NAME)
+            if problems:
+                chk.author_confidence = "low"
+                chk.author_note = "safety gate objections: " + "; ".join(problems)
+            else:
+                chk.author_confidence = conf
+                chk.author_note = note
+            return chk
+        if prof.GUI_HINT.search(check_text):
+            chk.mode = MODE_MANUAL
+            chk.manual_instruction = check_text.strip()
+            chk.author_confidence = "high"
+            chk.author_note = "check text describes a GUI or interview procedure"
+            return chk
+        chk.mode = MODE_UNSUPPORTED
+        chk.manual_instruction = check_text.strip()
+        chk.author_confidence = "low"
+        chk.author_note = "no mapped shape in check text (not registry, auditpol, secedit or a quoted cmdlet) — needs human or AI authoring"
+        return chk
+
     # A platform without an extractor: say so, per rule, rather than guess.
     if not prof.EXTRACTOR:
         chk.mode = MODE_UNSUPPORTED

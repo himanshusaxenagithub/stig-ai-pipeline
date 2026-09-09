@@ -9,7 +9,7 @@ from pathlib import Path
 from stigscan import platforms
 from stigscan.evaluate import evaluate, ERROR, PASS, FAIL
 from stigscan.extract import build_pack, candidate_from_rule
-from stigscan.pack import CheckPack, MODE_SHELL, MODE_UNSUPPORTED
+from stigscan.pack import CheckPack, MODE_SHELL, MODE_UNSUPPORTED, MODE_MANUAL
 from stigscan.safety import audit
 
 
@@ -26,8 +26,7 @@ class ProfileRegistry(unittest.TestCase):
     def test_support_flags(self):
         self.assertTrue(platforms.macos.SUPPORTED and platforms.macos.EXTRACTOR)
         self.assertTrue(platforms.linux.SUPPORTED and platforms.linux.EXTRACTOR)
-        self.assertFalse(platforms.windows.SUPPORTED)
-        self.assertFalse(platforms.windows.EXTRACTOR)
+        self.assertTrue(platforms.windows.SUPPORTED and platforms.windows.EXTRACTOR)
 
 
 class LinuxSafetyGate(unittest.TestCase):
@@ -116,15 +115,70 @@ class LinuxExtractor(unittest.TestCase):
 
 
 class WindowsProfile(unittest.TestCase):
-    def test_author_marks_everything_unsupported(self):
-        rule = {"stig_id": "WN11-TEST", "severity": "high", "title": "t",
-                "check_text": "Run \"gpedit.msc\". If the value is not 1, this is a finding."}
-        c = candidate_from_rule(rule, "d", "windows")
-        self.assertEqual(c.mode, MODE_UNSUPPORTED)
-        self.assertIn("no extractor", c.author_note)
+    def _c(self, text, **kw):
+        rule = {"stig_id": "WN11-TEST", "severity": "high", "title": "t", "check_text": text}
+        rule.update(kw)
+        return candidate_from_rule(rule, "2026-09-09", "windows")
+
+    def test_registry_value_becomes_get_itemproperty(self):
+        c = self._c("If the following registry value does not exist or is not configured as specified, this is a finding:\n\n"
+                    "Registry Hive: HKEY_LOCAL_MACHINE\nRegistry Path: \\SYSTEM\\CurrentControlSet\\Services\\Tcpip6\\Parameters\\\n\n"
+                    "Value Name: DisableIPSourceRouting\n\nType: REG_DWORD\nValue: 0x00000002 (2)")
+        self.assertEqual(c.mode, MODE_SHELL)
+        self.assertIn("Get-ItemProperty -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip6\\Parameters'", c.command)
+        self.assertIn("-Name 'DisableIPSourceRouting'", c.command)
+        self.assertEqual((c.comparator, c.expected), ("equals", "2"))
+        self.assertEqual(c.author_confidence, "high")
+        self.assertEqual(audit(c.command, "windows"), [])
+
+    def test_registry_string_value(self):
+        c = self._c("Registry Hive: HKEY_LOCAL_MACHINE\nRegistry Path: \\SOFTWARE\\Policies\\X\\\nValue Name: Banner\nType: REG_SZ\nValue: \"Authorized use only\"")
+        self.assertEqual((c.comparator, c.expected), ("equals", "Authorized use only"))
+
+    def test_registry_or_less_becomes_range(self):
+        c = self._c("Registry Hive: HKEY_LOCAL_MACHINE\nRegistry Path: \\SOFTWARE\\X\\\nValue Name: CachedLogonsCount\nType: REG_SZ\nValue: 4 (or less)")
+        self.assertEqual(c.comparator, "int_le")
+        self.assertEqual(c.expected, "4")
+        self.assertEqual(c.author_confidence, "medium")
+
+    def test_auditpol_line_becomes_subcategory_check(self):
+        c = self._c('Use the "AuditPol" tool to review the current Audit Policy configuration:\n'
+                    'Enter "AuditPol /get /category:*"\n\nIf the system does not audit the following, this is a finding.\n\n'
+                    "Account Logon >> Credential Validation - Success")
+        self.assertEqual(c.mode, MODE_SHELL)
+        self.assertIn('auditpol /get /subcategory:"Credential Validation"', c.command)
+        self.assertEqual(c.comparator, "regex")
+        self.assertEqual(evaluate("Machine,System,Credential Validation,{guid},Success and Failure,", "regex", c.expected)[0], PASS)
+        self.assertEqual(evaluate("Machine,System,Credential Validation,{guid},No Auditing,", "regex", c.expected)[0], FAIL)
+        self.assertEqual(audit(c.command, "windows"), [])
+
+    def test_secedit_fallback_is_used(self):
+        c = self._c('Run "gpedit.msc". Navigate to ... Password Policy.\n'
+                    'If the value for "Store passwords using reversible encryption" is not set to "Disabled", this is a finding.\n'
+                    "For server core installations, run the following command:\n"
+                    "Secedit /Export /Areas SecurityPolicy /CFG C:\\Path\\FileName.Txt\n"
+                    'If "ClearTextPassword" equals "1" in the file, this is a finding.')
+        self.assertEqual(c.mode, MODE_SHELL)
+        self.assertIn("secedit /export /areas SecurityPolicy", c.command)
+        self.assertIn("'^ClearTextPassword\\s*='", c.command)
+        self.assertEqual((c.comparator, c.expected), ("not_equals", "1"))
+        self.assertEqual(audit(c.command, "windows"), [])   # Remove-Item $f -Force is the one permitted form
+
+    def test_gpedit_without_secedit_is_manual(self):
+        c = self._c('Run "gpedit.msc". Navigate to Local Computer Policy >> ... \nIf the value is not set to "Enabled", this is a finding.\n'
+                    "Verify in Computer Management that no standard user accounts are members.")
+        self.assertEqual(c.mode, MODE_MANUAL)
+
+    def test_quoted_cmdlet_with_any_output_sentence(self):
+        c = self._c('Open PowerShell.\nEnter "Get-LocalGroupMember -Group Administrators"\n'
+                    "If any results are returned, this is a finding.")
+        self.assertEqual(c.command, "Get-LocalGroupMember -Group Administrators")
+        self.assertEqual(c.comparator, "empty")
 
     def test_mutating_cmdlets_are_refused(self):
         self.assertTrue(audit("Set-ItemProperty -Path HKLM:\\x -Name y -Value 1", "windows"))
+        self.assertTrue(audit("Remove-Item C:\\Windows\\System32\\x", "windows"))
+        self.assertTrue(audit("auditpol /set /subcategory:x /success:enable", "windows"))
         self.assertEqual(audit("Get-ItemProperty -Path HKLM:\\x | Select-Object y", "windows"), [])
 
 

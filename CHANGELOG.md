@@ -1,5 +1,27 @@
 # Changelog
 
+## v0.4.0 — 2026-09-09
+
+### Added — Windows scanning
+
+- `stigscan/platforms/windows.py` now carries an extractor. DISA writes
+  Windows check text as structured descriptions rather than commands; four
+  regular shapes are mapped to read-only PowerShell: registry
+  hive/path/value → `Get-ItemProperty`; `AuditPol` plus a subcategory line
+  → `auditpol /get /subcategory /r`; a gpedit path with a `Secedit /Export`
+  fallback → `secedit /export` to a scratch file and one key read; a quoted
+  read-only cmdlet with an acceptance sentence → that cmdlet. GUI-only
+  procedures are MANUAL; the rest stay UNSUPPORTED for a human.
+- Authored packs: `checkpacks/windows-11-v2r9.json` (257 rules, 154
+  reducible, 15 manual), `checkpacks/windows-server-2019-v3r8.json` (282,
+  160 reducible, 23 manual). Both entirely unreviewed, by design.
+- `skills/stig-scan-windows/` — the scanning skill for Windows, replacing
+  the placeholder.
+- Windows safety gate: `Remove-Item` is permitted only as
+  `Remove-Item $f -Force` on the secedit scratch file; every other form is
+  refused.
+- 8 new tests (84 total).
+
 ## v0.3.0 — 2026-09-06
 
 ### Added — platform profiles for `stig-scan`
