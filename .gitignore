@@ -21,3 +21,4 @@ evidence/
 
 # portable builds (bundled Python, ~60 MB) — built per machine, never committed
 dist/
+stig-work/

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>stig-ai-pipeline</title>
+<title>STIG Checker</title>
 <style>
   :root{
     --ink:#1b2733; --muted:#5e6e7f; --line:#d9e1e9; --mist:#eef2f6;
@@ -16,6 +16,15 @@
   header{background:var(--navy);color:#fff;padding:18px 24px}
   header h1{margin:0;font-size:18px;font-weight:600;letter-spacing:.2px}
   header p{margin:4px 0 0;color:#9fb6d0;font-size:13px}
+  .head-row{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;
+            max-width:1100px;margin:0 auto}
+  .head-actions{display:flex;gap:8px;flex-shrink:0}
+  .head-actions button{border:1px solid #3b4d6b;background:transparent;color:#cfdcec;padding:6px 12px;
+            border-radius:8px;cursor:pointer;font:inherit;font-size:13px}
+  .head-actions button:hover{background:#243554;color:#fff}
+  .gone{background:var(--goldbg);color:#5a3f0b;border-bottom:1px solid #e8d9b3;padding:12px 24px;
+        font-size:14px;text-align:center}
+  .gone[hidden]{display:none}
   main{max-width:1100px;margin:0 auto;padding:0 20px 80px}
   nav{display:flex;gap:4px;margin:20px 0 0;flex-wrap:wrap}
   nav button{border:1px solid var(--line);background:var(--paper);padding:9px 16px;border-radius:8px;
@@ -79,9 +88,18 @@
 </head>
 <body>
 <header>
-  <h1>stig-ai-pipeline</h1>
-  <p>Apply Department of Defense security checklists to a MacBook or a Windows PC. Nothing leaves this machine.</p>
+  <div class="head-row">
+    <div>
+      <h1>STIG Checker</h1>
+      <p>Apply Department of Defense security checklists to a MacBook or a Windows PC. Nothing leaves this machine.</p>
+    </div>
+    <div class="head-actions">
+      <button id="show-files" title="Open the folder where reports are saved">Show files</button>
+      <button id="quit" title="Stop STIG Checker">Quit</button>
+    </div>
+  </div>
 </header>
+<div id="gone" class="gone" hidden>STIG Checker has stopped. Double-click it again to start over, then close this tab.</div>
 
 <main>
   <nav>
@@ -99,16 +117,17 @@
     <div id="catalog" class="picks"></div>
     <p class="muted" id="cli-note" style="margin:0 0 14px"></p>
     <p class="muted" id="fetch-note" style="margin:0 0 14px"></p>
-    <details style="margin-bottom:14px"><summary>I already have the file</summary></details>
-    <div class="drop" id="drop">
-      <p style="margin:0 0 12px">Drop the STIG file here</p>
-      <input type="file" id="file" accept=".zip,.xml">
-    </div>
-    <div class="bar">
-      <label><input type="checkbox" id="want-explain" checked> Attach the plain-English explanations</label>
-      <button class="go" id="go-parse" disabled>Read the guide</button>
-      <span class="muted" id="parse-status"></span>
-    </div>
+    <details id="have-file" style="margin-bottom:14px"><summary>I already have the file, or the download did not work</summary>
+      <div class="drop" id="drop" style="margin-top:12px">
+        <p style="margin:0 0 12px">Drop the STIG file here</p>
+        <input type="file" id="file" accept=".zip,.xml">
+      </div>
+      <div class="bar">
+        <label><input type="checkbox" id="want-explain" checked> Attach the plain-English explanations</label>
+        <button class="go" id="go-parse" disabled>Read the guide</button>
+        <span class="muted" id="parse-status"></span>
+      </div>
+    </details>
     <div id="guide-out"></div>
   </section>
 
@@ -136,7 +155,7 @@
   </section>
 
   <!-- 3 ---------------------------------------------------------------- -->
-  <section id="s-checks">
+  <section id="s-checks" hidden>
     <h2>Read every command before anything runs</h2>
     <p class="sub">A check is a read-only command. Nothing executes until you have read it and approved
       it under your own name. Approval freezes a fingerprint of the exact command; if it is edited
@@ -179,6 +198,31 @@ async function api(path, opts={}) {
 function showError(where, e) {
   $(where).insertAdjacentHTML("afterbegin", `<div class="err">${esc(e.message)}</div>`);
 }
+// ---- keep-alive: the server stops itself once nobody has the page open --
+let gone = false;
+function serverGone() {
+  if (gone) return;
+  gone = true;
+  $("#gone").hidden = false;
+  document.querySelectorAll("button, input").forEach(el => el.disabled = true);
+}
+async function ping() {
+  try { await api("/api/ping", {method:"POST"}); }
+  catch (e) { if (e instanceof TypeError) serverGone(); }   // network error = process gone
+}
+setInterval(ping, 20000);
+$("#quit").onclick = async () => {
+  try { await api("/api/quit", {method:"POST"}); } catch (e) {}
+  gone = true;
+  document.body.innerHTML = `<div style="max-width:560px;margin:80px auto;padding:0 20px;text-align:center">
+    <h2 style="font-weight:600">STIG Checker has stopped.</h2>
+    <p class="muted">Your reports are still in the files folder. You can close this tab.</p></div>`;
+};
+$("#show-files").onclick = async () => {
+  try { await api("/api/open-folder", {method:"POST"}); }
+  catch (e) { showError("#guide-out", e); }
+};
+
 function tab(name) {
   for (const n of ["guide","rules","checks","scan"]) {
     $("#tab-"+n).setAttribute("aria-selected", String(n === name));
@@ -204,6 +248,7 @@ async function getGuide(key, label, btn) {
   } catch (e) {
     $("#fetch-note").innerHTML = `<span class="err" style="display:block">${esc(e.message)}</span>`;
     $("#parse-status").textContent = "";
+    $("#have-file").open = true;
   }
   document.querySelectorAll("#catalog button").forEach(b => b.disabled = false);
 }

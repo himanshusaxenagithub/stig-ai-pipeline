@@ -26,10 +26,14 @@ from __future__ import annotations
 import argparse
 import json
 import mimetypes
+import os
 import secrets
 import socket
+import subprocess
 import sys
 import threading
+import time
+import urllib.request
 import webbrowser
 from datetime import date, datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -62,6 +66,72 @@ def _free_port() -> int:
     with socket.socket() as s:
         s.bind(("127.0.0.1", 0))
         return s.getsockname()[1]
+
+
+# ------------------------------------------------------------- app mode ----
+#
+# "App mode" is how the double-click program runs: no terminal, no working
+# directory to speak of, and a person who will simply double-click again if
+# nothing seems to happen. So in this mode the server keeps its files in the
+# per-user application folder, remembers that it is running, hands a second
+# launch to the first one, and stops itself when nobody has had the page
+# open for a while. The command-line behaviour is unchanged.
+
+APP_NAME = "STIG Checker"
+RUNNING_FILE = "running.json"
+IDLE_MINUTES = 10
+
+
+def app_data_dir() -> Path:
+    if sys.platform == "darwin":
+        return Path.home() / "Library" / "Application Support" / APP_NAME
+    if sys.platform.startswith("win"):
+        base = os.environ.get("LOCALAPPDATA") or str(Path.home() / "AppData" / "Local")
+        return Path(base) / APP_NAME
+    base = os.environ.get("XDG_DATA_HOME") or str(Path.home() / ".local" / "share")
+    return Path(base) / "stig-checker"
+
+
+def _already_running(workdir: Path) -> str | None:
+    """The URL of a live instance recorded in *workdir*, or None."""
+    marker = workdir / RUNNING_FILE
+    try:
+        info = json.loads(marker.read_text(encoding="utf-8"))
+        url = f"http://127.0.0.1:{int(info['port'])}/api/state"
+        req = urllib.request.Request(url, headers={"X-Stig-Token": info["token"]})
+        with urllib.request.urlopen(req, timeout=2) as r:
+            if r.status == 200:
+                return f"http://127.0.0.1:{int(info['port'])}/?t={info['token']}"
+    except (OSError, ValueError, KeyError):
+        pass
+    return None
+
+
+def _write_running(workdir: Path, port: int) -> None:
+    marker = workdir / RUNNING_FILE
+    marker.write_text(json.dumps({"port": port, "token": TOKEN, "pid": os.getpid(),
+                                  "started": _stamp()}), encoding="utf-8")
+    try:
+        marker.chmod(0o600)
+    except OSError:
+        pass
+
+
+def _clear_running(workdir: Path) -> None:
+    try:
+        (workdir / RUNNING_FILE).unlink()
+    except OSError:
+        pass
+
+
+def open_folder(path: Path) -> None:
+    """Show *path* in Finder / Explorer / the desktop's file manager."""
+    if sys.platform == "darwin":
+        subprocess.Popen(["open", str(path)])
+    elif sys.platform.startswith("win"):
+        os.startfile(str(path))  # type: ignore[attr-defined]
+    else:
+        subprocess.Popen(["xdg-open", str(path)])
 
 
 # ---------------------------------------------------------------- state ----
@@ -298,6 +368,9 @@ def shipped_packs(platform_name: str) -> list[dict]:
 class Handler(BaseHTTPRequestHandler):
     server_version = "stig-ui"
     session: Session
+    httpd: ThreadingHTTPServer | None = None
+    app_mode: bool = False
+    last_seen: float = 0.0
 
     def log_message(self, fmt, *args):  # quieter than the default
         pass
@@ -356,6 +429,8 @@ class Handler(BaseHTTPRequestHandler):
                 ],
                 "cli_only": [{"key": g.key, "label": g.label} for g in cli_only_guides()],
                 "workdir": str(self.session.workdir),
+                "files_dir": str(self.session.workdir / "out"),
+                "app": Handler.app_mode,
                 "packs": shipped_packs(platforms.detect()),
                 "pack": self.session.pack_state(),
             })
@@ -379,6 +454,27 @@ class Handler(BaseHTTPRequestHandler):
             return self._fail("not authorised", 403)
 
         session = self.session
+
+        # The page pings while it is open; the idle timer reads this.
+        if url.path == "/api/ping":
+            Handler.last_seen = time.monotonic()
+            return self._json({"ok": True})
+
+        if url.path == "/api/quit":
+            self._json({"ok": True})
+            if Handler.httpd is not None:
+                threading.Thread(target=Handler.httpd.shutdown, daemon=True).start()
+            return None
+
+        if url.path == "/api/open-folder":
+            target = session.workdir / "out"
+            target.mkdir(parents=True, exist_ok=True)
+            try:
+                open_folder(target)
+            except OSError as e:
+                return self._fail(f"could not open {target}: {e}")
+            return self._json({"path": str(target)})
+
         try:
             with session.lock:
                 if url.path == "/api/upload":
@@ -435,29 +531,73 @@ class Handler(BaseHTTPRequestHandler):
 
 # ----------------------------------------------------------------- main ----
 
+def _idle_watch(httpd: ThreadingHTTPServer, minutes: int) -> None:
+    """Stop the server once the page has been closed for *minutes*."""
+    limit = minutes * 60
+    while True:
+        time.sleep(15)
+        if time.monotonic() - Handler.last_seen > limit:
+            print(f"no page open for {minutes} minutes; stopping.", flush=True)
+            httpd.shutdown()
+            return
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(prog="stig-ui", description=__doc__.splitlines()[0])
     ap.add_argument("--port", type=int, default=0, help="port (default: pick a free one)")
-    ap.add_argument("--workdir", default="stig-work", help="where uploads and outputs go")
+    ap.add_argument("--workdir", default=None,
+                    help="where uploads and outputs go (default: ./stig-work, or the "
+                         "per-user application folder with --app)")
     ap.add_argument("--no-browser", action="store_true", help="do not open a browser")
+    ap.add_argument("--app", action="store_true",
+                    help="run as the double-click application: keep files in the "
+                         "per-user folder, reuse a running instance, log to a file, "
+                         "and stop when the page has been closed for a while")
+    ap.add_argument("--idle-minutes", type=int, default=None,
+                    help=f"stop after this long with no page open (app mode: {IDLE_MINUTES})")
     args = ap.parse_args(argv)
 
     if not PAGE.exists():
         print(f"error: {PAGE} is missing", file=sys.stderr)
         return 1
 
-    Handler.session = Session(Path(args.workdir).resolve())
+    workdir = Path(args.workdir).resolve() if args.workdir else (
+        app_data_dir() if args.app else Path("stig-work").resolve())
+    workdir.mkdir(parents=True, exist_ok=True)
+
+    if args.app:
+        # No terminal is attached. Everything that would have been printed
+        # goes to a log beside the files, where a person can find it.
+        log = open(workdir / "stig-checker.log", "a", encoding="utf-8", buffering=1)
+        sys.stdout = sys.stderr = log
+        print(f"--- {_stamp()} starting, pid {os.getpid()}")
+        live = _already_running(workdir)
+        if live:
+            print("already running; opening the page again.")
+            if not args.no_browser:
+                webbrowser.open(live)
+            return 0
+
+    Handler.session = Session(workdir)
+    Handler.app_mode = bool(args.app)
+    Handler.last_seen = time.monotonic()
     port = args.port or _free_port()
     httpd = ThreadingHTTPServer(("127.0.0.1", port), Handler)
+    Handler.httpd = httpd
     url = f"http://127.0.0.1:{port}/?t={TOKEN}"
 
     print("stig-ui is running.")
     print(f"  open   {url}")
     print(f"  files  {Handler.session.workdir}")
-    print("  stop   Ctrl-C")
+    print("  stop   Ctrl-C" if not args.app else "  stop   the Quit button on the page")
     print()
     print("This page is reachable only from this computer. Nothing is uploaded anywhere.")
 
+    idle = args.idle_minutes if args.idle_minutes is not None else (IDLE_MINUTES if args.app else 0)
+    if idle > 0:
+        threading.Thread(target=_idle_watch, args=(httpd, idle), daemon=True).start()
+    if args.app:
+        _write_running(workdir, port)
     if not args.no_browser:
         threading.Timer(0.4, lambda: webbrowser.open(url)).start()
     try:
@@ -466,6 +606,9 @@ def main(argv=None) -> int:
         print("\nstopped.")
     finally:
         httpd.server_close()
+        if args.app:
+            _clear_running(workdir)
+            print(f"--- {_stamp()} stopped")
     return 0
 
 
