@@ -27,6 +27,13 @@ from . import platforms
 DEFAULT_TIMEOUT = 30
 
 
+def hidden_process_kwargs() -> dict:
+    """Flags so a console helper (powershell.exe) does not pop a window."""
+    if os.name != "nt":
+        return {}
+    return {"creationflags": getattr(subprocess, "CREATE_NO_WINDOW", 0x08000000)}
+
+
 @dataclass
 class RunResult:
     stdout: str
@@ -72,6 +79,7 @@ class ShellRunner:
                 argv,
                 capture_output=True, text=True, timeout=self.timeout,
                 env={**os.environ, "LC_ALL": "C"},
+                **hidden_process_kwargs(),
             )
             result = RunResult(proc.stdout, proc.stderr, proc.returncode, "live")
         except subprocess.TimeoutExpired:
