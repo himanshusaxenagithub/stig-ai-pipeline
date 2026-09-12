@@ -71,6 +71,8 @@
   .note{background:var(--mist);border-radius:8px;padding:12px 14px;font-size:13.5px;color:var(--muted);margin-top:14px}
   .coverage{background:var(--navy);color:#e4ecf5;border-radius:10px;padding:16px 18px;font-size:15px;line-height:1.55}
   .bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:14px 0}
+  .progress{height:8px;background:var(--mist);border-radius:999px;overflow:hidden;margin:14px 0 8px}
+  .progress > span{display:block;height:100%;background:var(--navy);width:0;transition:width .15s linear}
   .muted{color:var(--muted)}
   .err{background:var(--redbg);color:var(--red);border-radius:8px;padding:10px 12px;margin-top:14px}
   details summary{cursor:pointer;color:var(--muted);font-size:13px}
@@ -413,32 +415,121 @@ function renderPack(p) {
 }
 
 // ---- 4. scan ---------------------------------------------------------
+function scanRow(x) {
+  return `<tr>
+    <td><span class="chip s-${esc(x.status)}">${esc(x.status)}</span></td>
+    <td><code>${esc(x.stig_id)}</code></td><td>${esc(x.cat || "")}</td>
+    <td>${esc(x.title)}</td><td class="muted">${esc(x.detail || "")}</td></tr>`;
+}
+function setScanBar(i, total) {
+  const bar = $("#scan-bar");
+  if (!bar) return;
+  bar.hidden = false;
+  bar.querySelector("span").style.width = (total ? Math.min(100, 100 * i / total) : 0) + "%";
+}
+function bumpScanCount(status) {
+  const id = {pass:"n-pass", fail:"n-fail", error:"n-error", skipped:"n-skip", manual:"n-skip"}[status];
+  if (!id) return;
+  const el = $("#" + id);
+  el.textContent = String(Number(el.textContent || 0) + 1);
+  $("#scan-stats").hidden = false;
+}
+function finishScan(r) {
+  const c = r.counts || {};
+  $("#scan-coverage").hidden = false;
+  $("#scan-coverage").textContent = r.coverage || "";
+  $("#n-pass").textContent = c.pass ?? 0;
+  $("#n-fail").textContent = c.fail ?? 0;
+  $("#n-error").textContent = c.error ?? 0;
+  $("#n-skip").textContent = (c.skipped ?? 0) + (c.manual ?? 0);
+  $("#scan-stats").hidden = false;
+  if (r.evidence || (r.files && r.files.length)) {
+    $("#scan-files").hidden = false;
+    $("#scan-files").innerHTML = `Evidence recorded in <code>${esc(r.evidence || "")}</code> ·
+      ${(r.files || []).map(f => `<a href="/api/download?file=${encodeURIComponent(f)}&t=${TOKEN}"
+        download>${esc(f)}</a>`).join(" · ")}`;
+  }
+  if (r.results && !$("#scan-table tbody").children.length) {
+    $("#scan-table tbody").innerHTML = r.results.map(scanRow).join("");
+  }
+  $("#scan-table").hidden = false;
+  setScanBar(r.total || (r.results || []).length, r.total || (r.results || []).length);
+  $("#scan-status").textContent = "done";
+}
+function handleScanEvent(ev) {
+  if (ev.phase === "error") throw new Error(ev.error || "scan failed");
+  if (ev.phase === "check") {
+    $("#scan-status").textContent = `${ev.index} of ${ev.total} — ${ev.stig_id} ${ev.title || ""}`;
+    setScanBar(Math.max(0, ev.index - 1), ev.total);
+    $("#scan-table").hidden = false;
+    return;
+  }
+  if (ev.phase === "result") {
+    bumpScanCount(ev.status);
+    $("#scan-table tbody").insertAdjacentHTML("beforeend", scanRow(ev));
+    $("#scan-table").hidden = false;
+    setScanBar(ev.index, ev.total);
+    $("#scan-status").textContent = `${ev.index} of ${ev.total} — ${ev.status}`;
+    return;
+  }
+  if (ev.phase === "done") finishScan(ev);
+}
+async function readScanStream(r) {
+  if (!r.body) {
+    const data = await r.json();
+    if (data.error) throw new Error(data.error);
+    finishScan(data);
+    return;
+  }
+  const reader = r.body.getReader();
+  const dec = new TextDecoder();
+  let buf = "";
+  const consume = (block) => {
+    const line = block.split("\n").find(l => l.startsWith("data: "));
+    if (line) handleScanEvent(JSON.parse(line.slice(6)));
+  };
+  while (true) {
+    const {value, done} = await reader.read();
+    if (done) break;
+    buf += dec.decode(value, {stream: true});
+    const parts = buf.split("\n\n");
+    buf = parts.pop();
+    parts.forEach(consume);
+  }
+  if (buf.trim()) consume(buf);
+}
+
 $("#go-scan").onclick = async () => {
-  $("#go-scan").disabled = true; $("#scan-status").textContent = "running…";
+  $("#go-scan").disabled = true; $("#scan-status").textContent = "starting…";
+  $("#scan-out").innerHTML = `
+    <div class="progress" id="scan-bar" hidden><span></span></div>
+    <div class="coverage" id="scan-coverage" hidden></div>
+    <div class="stats" id="scan-stats" hidden>
+      <div class="stat"><b id="n-pass">0</b><span>met the requirement</span></div>
+      <div class="stat"><b id="n-fail">0</b><span>did not</span></div>
+      <div class="stat"><b id="n-error">0</b><span>could not be judged</span></div>
+      <div class="stat"><b id="n-skip">0</b><span>not run</span></div>
+    </div>
+    <p class="muted" id="scan-files" hidden></p>
+    <div class="wrap"><table id="scan-table" hidden><thead><tr>
+      <th>Status</th><th>Rule</th><th>Severity</th><th>Requirement</th><th>Detail</th>
+    </tr></thead><tbody></tbody></table></div>`;
   try {
-    const r = await api("/api/scan", {method:"POST",
-      headers:{"Content-Type":"application/json"},
+    const r = await fetch("/api/scan", {method:"POST",
+      headers:{"Content-Type":"application/json", "Accept":"text/event-stream",
+               "X-Stig-Token":TOKEN},
       body: JSON.stringify({include_unreviewed: $("#incl").checked})});
-    const c = r.counts;
-    $("#scan-out").innerHTML = `
-      <div class="coverage">${esc(r.coverage)}</div>
-      <div class="stats">
-        <div class="stat"><b>${c.pass}</b><span>met the requirement</span></div>
-        <div class="stat"><b>${c.fail}</b><span>did not</span></div>
-        <div class="stat"><b>${c.error}</b><span>could not be judged</span></div>
-        <div class="stat"><b>${c.skipped}</b><span>not run</span></div>
-      </div>
-      <p class="muted">Evidence recorded in <code>${esc(r.evidence)}</code> ·
-        ${r.files.map(f => `<a href="/api/download?file=${encodeURIComponent(f)}&t=${TOKEN}"
-          download>${esc(f)}</a>`).join(" · ")}</p>
-      <div class="wrap"><table><thead><tr><th>Status</th><th>Rule</th><th>Severity</th>
-        <th>Requirement</th><th>Detail</th></tr></thead><tbody>
-        ${r.results.map(x => `<tr>
-          <td><span class="chip s-${esc(x.status)}">${esc(x.status)}</span></td>
-          <td><code>${esc(x.stig_id)}</code></td><td>${esc(x.cat)}</td>
-          <td>${esc(x.title)}</td><td class="muted">${esc(x.detail)}</td></tr>`).join("")}
-      </tbody></table></div>`;
-    $("#scan-status").textContent = "done";
+    const ctype = (r.headers.get("Content-Type") || "").toLowerCase();
+    if (!r.ok) {
+      const data = await r.json().catch(() => ({error: "HTTP " + r.status}));
+      throw new Error(data.error || ("HTTP " + r.status));
+    }
+    if (ctype.includes("event-stream")) await readScanStream(r);
+    else {
+      const data = await r.json();
+      if (data.error) throw new Error(data.error);
+      finishScan(data);
+    }
   } catch (e) { showError("#scan-out", e); $("#scan-status").textContent = ""; }
   $("#go-scan").disabled = false;
 };

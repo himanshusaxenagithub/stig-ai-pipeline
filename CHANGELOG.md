@@ -60,6 +60,13 @@
 
 ### Fixed
 
+- Scan progress is now visible while a scan is running. The page used to sit
+  on "running…" until every check had finished, which on Windows — where the
+  PowerShell window is hidden and a STIG has a couple of hundred checks —
+  looked like nothing was happening. Each check now streams to the page as it
+  starts and as it returns, and the command line prints the same, flushed so
+  a Windows console cannot hold the lines until the end.
+
 - `--explain` found no filed explanations when it was handed a DISA `.zip`
   rather than the XCCDF inside it, because filed sets are named after the XCCDF.
   The lookup now tries the source name, then each XCCDF member of the archive,

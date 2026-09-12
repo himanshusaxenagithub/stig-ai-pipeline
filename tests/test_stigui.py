@@ -144,5 +144,96 @@ class TestAppMode(unittest.TestCase):
             self.assertIn("stopped", (Path(tmp) / "stig-checker.log").read_text())
 
 
+class TestLiveScanProgress(unittest.TestCase):
+    """Windows hides the PowerShell window, so the page is the only place a
+    person can see that a scan is moving. Progress has to leave the server
+    after each check, not as one blob when everything is finished."""
+
+    def test_page_consumes_an_event_stream(self):
+        html = (Path(ui.__file__).resolve().parent / "app.html").read_text(encoding="utf-8")
+        self.assertIn("text/event-stream", html)
+        self.assertIn("readScanStream", html)
+        self.assertIn("handleScanEvent", html)
+        self.assertNotIn("running…", html)
+
+    def _tiny_pack(self, folder: Path):
+        from stigscan.pack import Check, CheckPack
+        pack = CheckPack(
+            pack_id="live-test",
+            platform=platforms.detect(),
+            checks=[
+                Check(stig_id="TST-0001", title="first", mode="shell",
+                      command="/bin/echo 1", comparator="equals", expected="1"),
+                Check(stig_id="TST-0002", title="second", mode="shell",
+                      command="/bin/echo 1", comparator="equals", expected="1"),
+            ],
+        )
+        for c in pack.checks:
+            c.approve("tester", "t")
+        path = folder / "live-test.json"
+        pack.save(path)
+        return path
+
+    def test_scan_stream_reaches_the_client_before_the_scan_finishes(self):
+        import http.client
+        from stigscan.runner import RunResult
+
+        class SlowRunner:
+            def __init__(self, *a, **k):
+                pass
+            def run(self, stig_id, command):
+                time.sleep(0.4)
+                return RunResult("1\n", "", 0, "live")
+
+        with TemporaryDirectory() as tmp:
+            pack_path = self._tiny_pack(Path(tmp))
+            port = ui._free_port()
+            with mock.patch.object(ui, "ShellRunner", SlowRunner):
+                th, done = TestAppMode()._start(tmp, port)
+                try:
+                    import urllib.request
+                    req = urllib.request.Request(
+                        f"http://127.0.0.1:{port}/api/pack/load", method="POST",
+                        headers={"X-Stig-Token": TOKEN, "Content-Type": "application/json",
+                                 "Host": "127.0.0.1"},
+                        data=json.dumps({"path": str(pack_path)}).encode())
+                    with urllib.request.urlopen(req, timeout=5) as r:
+                        self.assertTrue(json.loads(r.read())["loaded"])
+
+                    conn = http.client.HTTPConnection("127.0.0.1", port, timeout=15)
+                    t0 = time.time()
+                    conn.request(
+                        "POST", "/api/scan", body=b"{}",
+                        headers={"X-Stig-Token": TOKEN, "Content-Type": "application/json",
+                                 "Host": "127.0.0.1", "Accept": "text/event-stream"})
+                    resp = conn.getresponse()
+                    self.assertEqual(resp.status, 200)
+                    self.assertIn("event-stream", resp.getheader("Content-Type"))
+
+                    got = b""
+                    while b'"phase": "check"' not in got:
+                        chunk = resp.read(32)
+                        self.assertTrue(chunk, "stream closed before any progress arrived")
+                        got += chunk
+                    elapsed = time.time() - t0
+                    self.assertLess(
+                        elapsed, 0.25,
+                        f"first check event took {elapsed:.2f}s — the scan is buffering")
+                    self.assertNotIn(b'"phase": "done"', got)
+                    while True:
+                        more = resp.read(1024)
+                        if not more:
+                            break
+                        got += more
+                    self.assertIn(b'"phase": "done"', got)
+                    conn.close()
+                finally:
+                    try:
+                        TestAppMode()._api(port, "/api/quit", "POST")
+                    except Exception:
+                        pass
+                    th.join(timeout=10)
+
+
 if __name__ == "__main__":
     unittest.main()

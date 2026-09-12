@@ -281,6 +281,19 @@ class TestScanOrchestration(unittest.TestCase):
         rep = run_scan(self._pack([a, b]), self.runner, severities={"high"})
         self.assertEqual(len(rep.results), 1)
 
+    def test_on_progress_fires_for_each_check_then_its_result(self):
+        events = []
+        a = _check(stig_id="APPL-26-005001", command="/usr/bin/csrutil status", expected="1")
+        b = _check(stig_id="APPL-26-002001", command="/usr/bin/csrutil status", expected="PASS")
+        for c in (a, b):
+            c.approve("tester", "t")
+        run_scan(self._pack([a, b]), self.runner, on_progress=events.append)
+        self.assertEqual([e["phase"] for e in events],
+                         ["check", "result", "check", "result"])
+        self.assertEqual([e["index"] for e in events if e["phase"] == "check"], [1, 2])
+        self.assertEqual(events[0]["total"], 2)
+        self.assertEqual(events[1]["status"], PASS)
+
 
 class TestReport(unittest.TestCase):
     def _report(self, include_unreviewed=True):

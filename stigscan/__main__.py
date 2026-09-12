@@ -181,6 +181,20 @@ def cmd_verify(args) -> int:
     return 0
 
 
+def _scan_progress(ev: dict) -> None:
+    """Print one line as each check starts, and its verdict when it finishes.
+
+    stdout is flushed every time: a Windows console (and a redirected log)
+    otherwise holds the line until the whole scan ends, which is exactly
+    when live status is no use.
+    """
+    if ev.get("phase") == "check":
+        title = (ev.get("title") or "")[:50]
+        print(f"  [{ev['index']}/{ev['total']}] {ev['stig_id']}  {title}", flush=True)
+    elif ev.get("phase") == "result":
+        print(f"           {ev['status']}", flush=True)
+
+
 def cmd_scan(args) -> int:
     pack = CheckPack.load(args.pack)
     prof = platforms.get(pack.platform)
@@ -203,6 +217,7 @@ def cmd_scan(args) -> int:
         include_unreviewed=args.include_unreviewed,
         only_ids=set(args.id) if args.id else None,
         severities={args.severity} if args.severity else None,
+        on_progress=_scan_progress,
     )
 
     out_dir = Path(args.out)

@@ -272,7 +272,7 @@ class Session:
         self.pack.save(self.pack_path)
         return self.pack_state()
 
-    def scan(self, include_unreviewed: bool = False) -> dict:
+    def scan(self, include_unreviewed: bool = False, on_progress=None) -> dict:
         if self.pack is None:
             raise ValueError("no check pack loaded")
         prof = platforms.get(self.pack.platform)
@@ -286,7 +286,8 @@ class Session:
 
         record = self.workdir / "evidence" / datetime.now().strftime("%Y-%m-%d-%H%M%S")
         runner = ShellRunner(timeout=30, record_dir=str(record), platform=prof.NAME)
-        report = run_scan(self.pack, runner, include_unreviewed=include_unreviewed)
+        report = run_scan(self.pack, runner, include_unreviewed=include_unreviewed,
+                          on_progress=on_progress)
 
         out = self.workdir / "out"
         (out / f"{self.pack.pack_id}_scan.json").write_text(report_json(report), encoding="utf-8")
@@ -397,6 +398,60 @@ class Handler(BaseHTTPRequestHandler):
 
     def _fail(self, message: str, code: int = 400):
         self._json({"error": message}, code)
+
+    def _begin_sse(self):
+        """Open a flushed event stream. The page needs each check as it
+        finishes — on Windows a hidden PowerShell window is the only other
+        signal, and there isn't one."""
+        try:
+            self.connection.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+        except OSError:
+            pass
+        self.send_response(200)
+        self.send_header("Content-Type", "text/event-stream; charset=utf-8")
+        self.send_header("Cache-Control", "no-cache, no-store")
+        self.send_header("X-Accel-Buffering", "no")
+        self.send_header("X-Content-Type-Options", "nosniff")
+        self.end_headers()
+
+    def _write_sse(self, obj: dict) -> None:
+        payload = json.dumps(obj, ensure_ascii=False)
+        self.wfile.write(f"data: {payload}\n\n".encode("utf-8"))
+        self.wfile.flush()
+        raw = getattr(self.wfile, "raw", None)
+        if raw is not None:
+            try:
+                raw.flush()
+            except OSError:
+                pass
+
+    def _stream_scan(self, session: Session, include_unreviewed: bool) -> None:
+        try:
+            if session.pack is None:
+                raise ValueError("no check pack loaded")
+            prof = platforms.get(session.pack.platform)
+            here = platforms.detect()
+            if here != prof.NAME:
+                raise ValueError(
+                    f"this pack was authored for {prof.NAME} but this computer is {here}; "
+                    "refusing to run its commands here")
+            if not prof.SUPPORTED:
+                raise ValueError(f"scanning is not supported for {prof.NAME} in this release")
+        except ValueError as e:
+            return self._fail(str(e))
+
+        self._begin_sse()
+        try:
+            result = session.scan(include_unreviewed, on_progress=self._write_sse)
+            self._write_sse({"phase": "done", **result})
+        except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError):
+            return None
+        except Exception as e:
+            try:
+                self._write_sse({"phase": "error", "error": f"{type(e).__name__}: {e}"})
+            except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError):
+                pass
+        return None
 
     def _body(self) -> bytes:
         length = int(self.headers.get("Content-Length") or 0)
@@ -520,7 +575,7 @@ class Handler(BaseHTTPRequestHandler):
                     ))
 
                 if url.path == "/api/scan":
-                    return self._json(session.scan(bool(payload.get("include_unreviewed"))))
+                    return self._stream_scan(session, bool(payload.get("include_unreviewed")))
 
             return self._fail("not found", 404)
         except (ValueError, KeyError, PackError) as e:
