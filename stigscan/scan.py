@@ -8,7 +8,6 @@ for compliance. Every check that is skipped is reported with the reason.
 
 from __future__ import annotations
 
-import os
 from dataclasses import dataclass, field, asdict
 from datetime import datetime, timezone
 from typing import Any
@@ -80,7 +79,8 @@ def _skip(chk: Check, detail: str) -> Result:
 
 def run_scan(pack: CheckPack, runner, *, include_unreviewed: bool = False,
              only_ids: set[str] | None = None,
-             severities: set[str] | None = None) -> ScanReport:
+             severities: set[str] | None = None,
+             on_progress=None) -> ScanReport:
     facts = host_facts()
     is_root = facts.get("euid") == "0"
 
@@ -99,14 +99,38 @@ def run_scan(pack: CheckPack, runner, *, include_unreviewed: bool = False,
         },
     )
 
-    for chk in pack.checks:
-        if only_ids and chk.stig_id not in only_ids:
-            continue
-        if severities and chk.severity not in severities:
-            continue
+    queued = [c for c in pack.checks
+              if not ((only_ids and c.stig_id not in only_ids) or
+                      (severities and c.severity not in severities))]
+    total = len(queued)
+
+    def _emit(result: Result) -> Result:
+        report.results.append(result)
+        if on_progress:
+            on_progress({
+                "phase": "result",
+                "index": len(report.results),
+                "total": total,
+                "stig_id": result.stig_id,
+                "title": result.title,
+                "status": result.status,
+                "detail": result.detail,
+                "cat": SEVERITY_LABEL.get(result.severity, result.severity),
+            })
+        return result
+
+    for i, chk in enumerate(queued, start=1):
+        if on_progress:
+            on_progress({
+                "phase": "check",
+                "index": i,
+                "total": total,
+                "stig_id": chk.stig_id,
+                "title": chk.title,
+            })
 
         if chk.mode == MODE_MANUAL:
-            report.results.append(Result(
+            _emit(Result(
                 stig_id=chk.stig_id, group_id=chk.group_id, severity=chk.severity,
                 title=chk.title, status=MANUAL,
                 detail="requires human inspection; see manual_instruction in the pack",
@@ -115,30 +139,27 @@ def run_scan(pack: CheckPack, runner, *, include_unreviewed: bool = False,
             continue
 
         if chk.mode != MODE_SHELL:
-            report.results.append(_skip(chk, f"not automatable ({chk.author_note or chk.mode})"))
+            _emit(_skip(chk, f"not automatable ({chk.author_note or chk.mode})"))
             continue
 
         if chk.is_drifted():
-            report.results.append(_skip(
+            _emit(_skip(
                 chk, "APPROVAL DRIFTED — content changed after approval; re-review required"))
             continue
 
         if chk.review_status == REJECTED:
-            report.results.append(_skip(chk, f"rejected in review: {chk.review_note or 'no note'}"))
+            _emit(_skip(chk, f"rejected in review: {chk.review_note or 'no note'}"))
             continue
 
         trusted = chk.review_status == APPROVED
         if not trusted and not include_unreviewed:
-            report.results.append(_skip(
+            _emit(_skip(
                 chk, "unreviewed — approve it, or re-run with --include-unreviewed"))
             continue
 
-        # The safety gate is enforced here, not only inside ShellRunner, so
-        # that a check judged unsafe is never reported as a compliance result
-        # no matter which runner produced its output.
         problems = audit(chk.command, pack.platform)
         if problems:
-            report.results.append(Result(
+            _emit(Result(
                 stig_id=chk.stig_id, group_id=chk.group_id, severity=chk.severity,
                 title=chk.title, status=ERROR, command=chk.command,
                 detail="blocked by safety gate: " + "; ".join(problems),
@@ -147,7 +168,7 @@ def run_scan(pack: CheckPack, runner, *, include_unreviewed: bool = False,
             continue
 
         if chk.requires_root and not is_root:
-            report.results.append(_skip(
+            _emit(_skip(
                 chk, "requires root; re-run the scan with sudo to evaluate this check"))
             continue
 
@@ -161,16 +182,16 @@ def run_scan(pack: CheckPack, runner, *, include_unreviewed: bool = False,
         )
 
         if run.error:
-            report.results.append(Result(status=ERROR, detail=run.error, **base))
+            _emit(Result(status=ERROR, detail=run.error, **base))
             continue
 
         try:
             verdict, detail = evaluate(run.stdout, chk.comparator, chk.expected)
         except EvalError as e:
-            report.results.append(Result(status=ERROR, detail=str(e), **base))
+            _emit(Result(status=ERROR, detail=str(e), **base))
             continue
 
-        report.results.append(Result(status=verdict, detail=detail, **base))
+        _emit(Result(status=verdict, detail=detail, **base))
 
     report.finished = _now()
     return report
