@@ -85,11 +85,13 @@ read -r -p "Press return to close this window."
 '''
 
 START_BAT = '''@echo off
-REM Double-click this file. It opens a page in your browser.
+REM Double-click this. It opens a page in your browser.
 cd /d "%~dp0"
-python\\python.exe app\\run.py
-echo.
-pause
+if exist "program\\python\\pythonw.exe" (
+  start "" "program\\python\\pythonw.exe" "program\\app\\run.py"
+) else (
+  start "" "program\\python\\python.exe" "program\\app\\run.py"
+)
 '''
 
 READ_ME_TXT = '''stig-ai-pipeline
@@ -106,15 +108,18 @@ Nothing is installed. Nothing leaves this computer. Delete this folder to
 remove it completely.
 
 {gatekeeper}
-The program itself is in the app folder as ordinary Python files. You are
-meant to be able to read them.
+The program is ordinary Python files, not a compiled binary. On Windows
+they are in program\app. On a Mac, right-click the application and choose
+Show Package Contents, then Contents/Resources/app. You are meant to be
+able to read them.
 
 MIT licence. https://github.com/himanshusaxenagithub/stig-ai-pipeline
 '''
 
-GATEKEEPER_NOTE = '''The first time you open it, macOS may say it cannot check the file for
-malicious software, because it was downloaded from the internet. Right-click
-Start.command, choose Open, then click Open again. You only do this once.
+GATEKEEPER_NOTE = '''The first time you open it, macOS may say it cannot check the application
+for malicious software, because it was downloaded from the internet.
+Right-click STIG Checker, choose Open, then click Open again in the box
+that appears. You only have to do this once.
 
 '''
 
@@ -188,6 +193,43 @@ def macos_python(dest: Path, url: str) -> None:
     shutil.rmtree(dest.parent / "_py_tmp", ignore_errors=True)
 
 
+APP_NAME = "STIG Checker"
+
+# macOS: a real application bundle. One icon, one double-click, no terminal
+# window, and nothing for the person to read before they can start. The
+# payload sits in Contents/Resources exactly as it does on Windows.
+APP_LAUNCHER = """#!/bin/bash
+HERE="$(cd "$(dirname "$0")/../Resources" && pwd)"
+LOG="$HOME/Library/Logs/STIG Checker.log"
+mkdir -p "$HOME/Library/Logs"
+"$HERE/python/bin/python3" "$HERE/app/run.py" >"$LOG" 2>&1
+CODE=$?
+if [ $CODE -ne 0 ]; then
+  osascript -e 'display dialog "STIG Checker could not start. The details are in Console, under Log Reports, as STIG Checker.log." buttons {"OK"} default button 1 with icon caution with title "STIG Checker"' >/dev/null 2>&1
+fi
+exit $CODE
+"""
+
+INFO_PLIST = """<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>CFBundleName</key>            <string>{name}</string>
+  <key>CFBundleDisplayName</key>     <string>{name}</string>
+  <key>CFBundleExecutable</key>      <string>{name}</string>
+  <key>CFBundleIdentifier</key>      <string>io.github.himanshusaxenagithub.stigchecker</string>
+  <key>CFBundlePackageType</key>     <string>APPL</string>
+  <key>CFBundleShortVersionString</key> <string>0.5.0</string>
+  <key>CFBundleVersion</key>         <string>0.5.0</string>
+  <key>CFBundleInfoDictionaryVersion</key> <string>6.0</string>
+  <key>LSMinimumSystemVersion</key>  <string>11.0</string>
+  <key>LSUIElement</key>             <true/>
+  <key>NSHighResolutionCapable</key> <true/>
+</dict>
+</plist>
+"""
+
+
 # -------------------------------------------------------------- build ----
 
 def build(target: str, out_dir: Path, python_url: str | None,
@@ -196,7 +238,20 @@ def build(target: str, out_dir: Path, python_url: str | None,
     folder = out_dir / name
     if folder.exists():
         shutil.rmtree(folder)
-    app = folder / "app"
+
+    # Where the payload and the bundled Python go. On macOS both live inside
+    # the .app, so the person sees one application and not a folder of parts.
+    if target == "macos":
+        bundle = folder / f"{APP_NAME}.app"
+        resources = bundle / "Contents" / "Resources"
+        macos_dir = bundle / "Contents" / "MacOS"
+        macos_dir.mkdir(parents=True)
+        app = resources / "app"
+        py_dir = resources / "python"
+    else:
+        program = folder / "program"
+        app = program / "app"
+        py_dir = program / "python"
     app.mkdir(parents=True)
 
     log(f"assembling {folder}")
@@ -213,7 +268,6 @@ def build(target: str, out_dir: Path, python_url: str | None,
             shutil.copy2(ROOT / item, app / item)
     (app / "run.py").write_text(RUN_PY, encoding="utf-8")
 
-    py_dir = folder / "python"
     if python_dir:
         log(f"  using the Python at {python_dir}")
         shutil.copytree(python_dir, py_dir)
@@ -223,13 +277,18 @@ def build(target: str, out_dir: Path, python_url: str | None,
         macos_python(py_dir, python_url or macos_python_url())
 
     if target == "macos":
-        launcher = folder / "Start.command"
-        launcher.write_text(START_COMMAND, encoding="utf-8")
+        (bundle / "Contents" / "Info.plist").write_text(
+            INFO_PLIST.format(name=APP_NAME), encoding="utf-8")
+        launcher = macos_dir / APP_NAME
+        launcher.write_text(APP_LAUNCHER, encoding="utf-8")
         launcher.chmod(launcher.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
-        readme = READ_ME_TXT.format(launcher="Start.command", gatekeeper=GATEKEEPER_NOTE)
+        # The bundled interpreter must stay executable through the copy.
+        for path in (py_dir / "bin").glob("python*"):
+            path.chmod(path.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+        readme = READ_ME_TXT.format(launcher=f"{APP_NAME}", gatekeeper=GATEKEEPER_NOTE)
     else:
-        (folder / "Start.bat").write_text(START_BAT, encoding="utf-8")
-        readme = READ_ME_TXT.format(launcher="Start.bat", gatekeeper="")
+        (folder / f"{APP_NAME}.bat").write_text(START_BAT, encoding="utf-8")
+        readme = READ_ME_TXT.format(launcher=f"{APP_NAME}.bat", gatekeeper="")
     (folder / "README.txt").write_text(readme, encoding="utf-8")
 
     size = sum(f.stat().st_size for f in folder.rglob("*") if f.is_file())
@@ -266,9 +325,10 @@ def main(argv=None) -> int:
     out_dir.mkdir(parents=True, exist_ok=True)
     folder = build(args.target, out_dir, args.python_url, args.python_dir, not args.no_zip)
 
-    launcher = "Start.command" if args.target == "macos" else "Start.bat"
+    launcher = APP_NAME if args.target == "macos" else f"{APP_NAME}.bat"
     print()
-    print(f"Done. Try it: open {folder} and double-click {launcher}")
+    print(f"Done. Open {folder} and double-click {launcher}.")
+    print("The .zip beside it is what you send to other people.")
     return 0
 
 
