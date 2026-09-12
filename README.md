@@ -1,40 +1,9 @@
 # stig-ai-pipeline
 
-Turn a Department of Defense security checklist (a STIG) into a plain-English plan, then check your own computer against it. Free. No account. Nothing is uploaded.
+**Apply Department of Defense security checklists to your own systems without a compliance specialist.**
+An open-source, AI-enabled toolkit consisting of AI skills and scripts that turns any DISA STIG into a plain-English plan, explains every rule, and checks a machine against it — with a human approving every check before it runs. Free, MIT licence, no account, no API key.
 
-## How to run this
-
-No technical skill needed. You do not need the command line.
-
-1. On this page click **Code → Download ZIP**. Unzip the folder.
-2. Open the unzipped folder until you see `STIG Checker.bat` and `stigui` in the **same** place. (Windows sometimes creates a folder inside a folder.)
-3. **Windows:** double-click `STIG Checker.bat`.
-   **Mac:** right-click `STIG Checker.command` → **Open** → **Open**.
-4. Windows may say “Windows protected your PC”. Click **More info**, then **Run anyway**. Once.
-5. If a box asks to download Python, click **Yes**. That is a private copy from python.org (~11 MB on Windows). It is not installed system-wide and needs no administrator password.
-6. A page opens in your browser. Pick **MacBook** or **Windows PC** and follow the page.
-
-Keep the `.bat` / `.command` file inside the unzipped folder. Do not drag it to the Desktop by itself.
-
-The same steps are in `Double-click this.txt` next to those files.
-
-A later **Releases** zip (`STIG-Checker-Windows.zip` / `STIG-Checker-macOS.zip`) will carry Python inside so step 5 never appears. That file is not published yet. Until then, use the ZIP from the Code button.
-
-### If you prefer the command line
-
-```bash
-git clone https://github.com/himanshusaxenagithub/stig-ai-pipeline.git
-cd stig-ai-pipeline
-python3 -m stigui --app
-```
-
-On Windows use `py -m stigui --app` or `python -m stigui --app`.
-
-The page is served on your own computer (`127.0.0.1`). Nothing is uploaded. It never approves a check for you and never runs one you have not approved.
-
-Command-line modules (`stigprep`, `stigscan`) for servers and other guides are documented below.
-
-**New here?** Two-page overview: [docs/overview.pdf](docs/overview.pdf).
+**New here?** Read the two-page overview with a worked example: [docs/overview.pdf](docs/overview.pdf).
 
 ## Why this exists
 
@@ -76,39 +45,47 @@ or any other STIG that DISA publishes.
 
 ## Quick start
 
-Requires Python 3.9+ if you are using the command line rather than the double-click path above. No third-party packages needed.
+No technical skill needed. You do not need the command line.
+
+1. On this page click **Code → Download ZIP**. Unzip the folder.
+2. Open the unzipped folder until you see `STIG Checker.bat` and `stigui` in the **same** place. (Windows sometimes creates a folder inside a folder.)
+3. **Windows:** double-click `STIG Checker.bat`.
+   **Mac:** right-click `STIG Checker.command` → **Open** → **Open**.
+4. Windows may say “Windows protected your PC”. Click **More info**, then **Run anyway**. Once.
+5. If a box asks to download Python, click **Yes**. That is a private copy from python.org (~11 MB on Windows). It is not installed system-wide and needs no administrator password.
+6. A page opens in your browser. Pick **MacBook** or **Windows PC** and follow the page.
+
+Keep the `.bat` / `.command` file inside the unzipped folder. Do not drag it to the Desktop by itself.
+
+The same steps are in `Double-click this.txt` next to those files.
+
+The page is served on your own computer (`127.0.0.1`). Nothing is uploaded. It never approves a check for you and never runs one you have not approved.
+
+### Command line
 
 ```bash
-# 1. Get the official STIG for your OS (auto-detects macOS 15 vs 26)
-./scripts/download_stig.sh
+git clone https://github.com/himanshusaxenagithub/stig-ai-pipeline.git
+cd stig-ai-pipeline
+python3 -m stigui --app
+```
 
-# 2. Generate the checklist
+On Windows use `py -m stigui --app` or `python -m stigui --app`.
+
+```bash
+# Get the official STIG for your OS, then build a checklist
+./scripts/download_stig.sh
 python3 -m stigprep parse U_Apple_macOS_15_V1R7_STIG.zip
 
-# Outputs land in ./out/:
-#   *_checklist.md    — human-friendly checklist, grouped by severity
-#   *_checklist.json  — structured data for the downstream modules
-#   *_checklist.csv   — track your progress in a spreadsheet
-```
-
-Don't have the STIG handy? Try it on the bundled 6-rule sample first:
-
-```bash
+# Or try the bundled 6-rule sample
 python3 -m stigprep parse samples/sample_macos15_stig.xml
+
+python3 -m stigprep fetch --list
+python3 -m stigprep fetch windows-11
 ```
 
-From the command line the download is a command of its own, so `parse` never
-touches the network on its own:
+Outputs land in `./out/` (`*_checklist.md`, `*_checklist.json`, `*_checklist.csv`).
 
-    python3 -m stigprep fetch --list
-    python3 -m stigprep fetch windows-11
-
-What comes back is checked before it is used: against a pinned SHA-256 where one
-is recorded, and always against the rule count this project validated. The
-release validated here is tried first, because the explanations and check packs
-shipped in this repository were built against it. If the network blocks
-`dl.dod.cyber.mil` — school and corporate filters often do — it prints the page
-to use instead rather than failing with a stack trace.
+What `fetch` returns is checked before it is used: against a pinned SHA-256 where one is recorded, and always against the rule count this project validated. If the network blocks `dl.dod.cyber.mil`, it prints the page to use instead rather than failing with a stack trace.
 
 ## Plain-English explanations
 
