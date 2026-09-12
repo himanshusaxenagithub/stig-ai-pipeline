@@ -3,7 +3,8 @@ its hidden helper run-hidden.vbs (Windows). These are for someone who
 already has Python and downloaded the plain source ZIP rather than a
 release build from packaging/build_portable.py — a different, lighter
 path than the bundled STIG Checker.app/.bat in dist/, so they are checked
-straight into the repository rather than generated."""
+straight into the repository rather than generated.
+"""
 
 import unittest
 from pathlib import Path
@@ -36,6 +37,13 @@ class TestStartScripts(unittest.TestCase):
         win = (ROOT / "run-hidden.vbs").read_text(encoding="utf-8")
         self.assertIn("Python 3 is not installed", mac)
         self.assertIn("needs Python 3.9", win)
+
+    def test_named_aliases_point_at_the_real_launchers(self):
+        bat = (ROOT / "STIG Checker.bat").read_text(encoding="utf-8")
+        mac = (ROOT / "STIG Checker.command").read_text(encoding="utf-8")
+        self.assertIn("Start.bat", bat)
+        self.assertIn("Start.command", mac)
+        self.assertTrue((ROOT / "Double-click this.txt").is_file())
 
 
 if __name__ == "__main__":
