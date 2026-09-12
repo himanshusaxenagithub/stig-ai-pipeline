@@ -1,0 +1,26 @@
+STIG Checker — unzip this folder, then double-click. No terminal.
+
+Windows
+-------
+Double-click "STIG Checker.bat" (or Start.bat — same program).
+The first time, Windows may say "Windows protected your PC".
+Click More info, then Run anyway.
+A page opens in your browser.
+
+If nothing happens, install Python from https://www.python.org/downloads/
+and tick "Add python.exe to PATH". Then double-click again.
+
+Mac
+---
+Double-click "STIG Checker.command" (or Start.command — same program).
+The first time, macOS will block it.
+macOS 15 or newer: click Done, then System Settings → Privacy & Security
+→ Open Anyway.
+Older macOS: right-click → Open.
+A page opens in your browser.
+
+If nothing happens, install Python from https://www.python.org/downloads/
+and double-click again.
+
+You never need the command line. Approve checks under your own name;
+nothing runs until you do.
