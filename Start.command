@@ -13,18 +13,29 @@ find_python() {
   for c in python3 python /usr/bin/python3 /usr/local/bin/python3 /opt/homebrew/bin/python3; do
     command -v "$c" >/dev/null 2>&1 && { echo "$c"; return 0; }
   done
+  local bundled="$HOME/Library/Application Support/STIG Checker/runtime/bin/python3"
+  [ -x "$bundled" ] && { echo "$bundled"; return 0; }
   return 1
 }
 
 if ! PY="$(find_python)"; then
-  echo "Python 3 is not installed."
-  echo "Get it from https://www.python.org/downloads/ then double-click this file again."
-  osascript -e 'display dialog "STIG Checker needs Python 3.9 or newer, once.\n\n1. Install it from the page that is about to open.\n2. Double-click Start.command again." buttons {"OK"} default button 1 with title "STIG Checker" with icon caution' >/dev/null 2>&1
-  command -v open >/dev/null 2>&1 && open "https://www.python.org/downloads/"
-  read -r -p "Press return to close."
-  exit 1
+  osascript >/dev/null 2>&1 <<'APPLESCRIPT' || true
+display dialog "This Mac does not have Python.
+
+STIG Checker can download a private copy (~25 MB). It is not installed system-wide and needs no administrator password." buttons {"Download", "Cancel"} default button 1 with title "STIG Checker" with icon note
+if button returned of result is "Cancel" then error number -128
+APPLESCRIPT
+  if [ $? -ne 0 ]; then exit 1; fi
+  echo "Downloading a private Python…"
+  if ! PY="$(bash scripts/ensure-python.sh)"; then
+    osascript -e 'display dialog "Could not download Python. Install it from python.org, then double-click again." buttons {"OK"} default button 1 with title "STIG Checker" with icon caution' >/dev/null 2>&1
+    open "https://www.python.org/downloads/" 2>/dev/null || true
+    read -r -p "Press return to close."
+    exit 1
+  fi
 fi
 
 echo "Opening in your browser…"
 echo "Leave this window open while you use the page; closing it stops the program."
+export PYTHONPATH="$(pwd)"
 exec "$PY" -m stigui --app
