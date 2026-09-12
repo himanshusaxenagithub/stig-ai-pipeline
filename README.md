@@ -43,10 +43,72 @@ Everything is STIG-agnostic: the tools parse standard XCCDF, so the same
 code works for Windows 11, Windows Server, RHEL, Ubuntu, macOS, SQL Server,
 or any other STIG that DISA publishes.
 
+## Start here — no terminal required
+
+**The easiest way: download the folder for your computer** from the
+[releases page](https://github.com/himanshusaxenagithub/stig-ai-pipeline/releases),
+unzip it, and double-click `Start.command` (Mac) or `Start.bat` (Windows).
+It carries its own Python, so there is nothing to install, nothing to set up
+and no administrator rights needed. Delete the folder to remove it.
+
+**Working from a clone or the source ZIP instead?** Double-click `Start.bat`
+(Windows) or `Start.command` (macOS) in the project folder. That path needs
+Python on the machine already.
+
+A page opens in your browser and walks you through the whole method. It asks one
+question — **MacBook or Windows PC** — and downloads the official Department of
+Defense guide for whichever you pick. You do not have to find it, download it or
+unzip it. On a Mac it works out whether you are on macOS 26 or 15 for you.
+
+The page covers those two machines and nothing else, on purpose. Windows Server,
+Red Hat, Ubuntu and SQL Server are real work for someone who administers systems
+for a living, and that person is better served by the command line than by a
+wizard. They are all in `stigprep fetch`. Then: read every
+rule in plain English, read the exact command each check would run, approve the
+ones you accept under your own name, scan, and read the report.
+
+    python3 -m stigui        # the same page, started by hand
+
+From the command line the download is a command of its own, so `parse` never
+touches the network on its own:
+
+    python3 -m stigprep fetch --list
+    python3 -m stigprep fetch windows-11
+
+What comes back is checked before it is used: against a pinned SHA-256 where one
+is recorded, and always against the rule count this project validated. The
+release validated here is tried first, because the explanations and check packs
+shipped in this repository were built against it. If the network blocks
+`dl.dod.cyber.mil` — school and corporate filters often do — it prints the page
+to use instead rather than failing with a stack trace.
+
+The page is served from your own machine on `127.0.0.1` and nothing is uploaded
+anywhere. It requires the one-time token printed when it starts, so no other page
+or program on the computer can drive it. It never approves a check for you and
+never runs one that has not been approved.
+
+If double-clicking does nothing, you do not have Python yet — see below.
+
+### On Windows, first time
+
+1. Install Python from [python.org](https://www.python.org/downloads/) and tick
+   **"Add python.exe to PATH"** on the first screen of the installer. The Microsoft
+   Store build works too, but the installer from python.org also gives you the `py`
+   launcher.
+2. Open a **new** PowerShell window afterwards. A window that was already open will
+   not see the new PATH.
+3. If you downloaded this project as a ZIP, Windows often unpacks it into a folder
+   *inside* a folder of the same name. Make sure the folder you are in contains
+   `stigprep`, `stigscan`, `stigui`, `annotations` and `checkpacks`.
+
+Use `python` or `py` in place of `python3` in every command below.
+
 ## Quick start
 
 Requires Python 3.9+ (already on your Mac if you have Xcode command line
 tools: `xcode-select --install`). No third-party packages needed.
+
+Prefer clicking to typing? See **Start here** above.
 
 ```bash
 # 1. Get the official STIG for your OS (auto-detects macOS 15 vs 26)

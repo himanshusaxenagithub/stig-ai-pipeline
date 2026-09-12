@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>stig-ai-pipeline</title>
+<style>
+  :root{
+    --ink:#1b2733; --muted:#5e6e7f; --line:#d9e1e9; --mist:#eef2f6;
+    --navy:#16243b; --red:#c0392b; --redbg:#fbecea; --green:#1e7a54; --greenbg:#eaf3ee;
+    --gold:#a8761f; --goldbg:#fdf5e6; --paper:#fff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+       color:var(--ink);background:#f6f8fa}
+  header{background:var(--navy);color:#fff;padding:18px 24px}
+  header h1{margin:0;font-size:18px;font-weight:600;letter-spacing:.2px}
+  header p{margin:4px 0 0;color:#9fb6d0;font-size:13px}
+  main{max-width:1100px;margin:0 auto;padding:0 20px 80px}
+  nav{display:flex;gap:4px;margin:20px 0 0;flex-wrap:wrap}
+  nav button{border:1px solid var(--line);background:var(--paper);padding:9px 16px;border-radius:8px;
+             cursor:pointer;font:inherit;font-size:14px;color:var(--muted)}
+  nav button[aria-selected=true]{background:var(--navy);border-color:var(--navy);color:#fff}
+  nav button:disabled{opacity:.45;cursor:not-allowed}
+  section{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:22px;margin-top:16px}
+  section[hidden]{display:none}
+  h2{margin:0 0 6px;font-size:18px}
+  .sub{margin:0 0 18px;color:var(--muted);font-size:14px}
+  .drop{border:2px dashed var(--line);border-radius:10px;padding:28px;text-align:center;background:var(--mist)}
+  .drop.over{border-color:var(--navy);background:#e6edf4}
+  button.go{background:var(--navy);color:#fff;border:0;border-radius:8px;padding:10px 18px;
+            font:inherit;cursor:pointer}
+  button.go:disabled{opacity:.5;cursor:not-allowed}
+  button.ghost{background:var(--paper);color:var(--ink);border:1px solid var(--line);
+               border-radius:8px;padding:8px 14px;font:inherit;cursor:pointer}
+  input[type=text],input[type=search],select{font:inherit;padding:8px 10px;border:1px solid var(--line);
+       border-radius:8px;background:var(--paper);color:var(--ink)}
+  .stats{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}
+  .stat{flex:1 1 130px;border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--mist)}
+  .stat b{display:block;font-size:26px;line-height:1.1}
+  .stat span{font-size:12px;color:var(--muted)}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-size:12px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);font-weight:600}
+  .wrap{overflow-x:auto}
+  .chip{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;white-space:nowrap}
+  .c-high{background:var(--redbg);color:var(--red)} .c-medium{background:var(--goldbg);color:var(--gold)}
+  .c-low{background:var(--mist);color:var(--muted)}
+  .t-quick-win{background:var(--greenbg);color:var(--green)}
+  .t-config-profile{background:#e8eef7;color:#2b4a78}
+  .t-needs-judgment{background:var(--goldbg);color:var(--gold)}
+  .t-risky-change{background:var(--redbg);color:var(--red)}
+  .s-approved{background:var(--greenbg);color:var(--green)}
+  .s-unreviewed{background:var(--mist);color:var(--muted)}
+  .s-rejected{background:var(--redbg);color:var(--red)}
+  .s-pass{background:var(--greenbg);color:var(--green)}
+  .s-fail{background:var(--redbg);color:var(--red)}
+  .s-error,.s-manual,.s-skipped{background:var(--mist);color:var(--muted)}
+  pre{background:var(--navy);color:#d6e2f0;padding:10px 12px;border-radius:8px;overflow-x:auto;
+      font:12px/1.45 ui-monospace,"SF Mono",Consolas,monospace;margin:6px 0 0;white-space:pre-wrap}
+  .warn{background:var(--redbg);color:var(--red);border-radius:6px;padding:6px 9px;font-size:13px;margin-top:6px}
+  .note{background:var(--mist);border-radius:8px;padding:12px 14px;font-size:13.5px;color:var(--muted);margin-top:14px}
+  .coverage{background:var(--navy);color:#e4ecf5;border-radius:10px;padding:16px 18px;font-size:15px;line-height:1.55}
+  .bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:14px 0}
+  .muted{color:var(--muted)}
+  .err{background:var(--redbg);color:var(--red);border-radius:8px;padding:10px 12px;margin-top:14px}
+  details summary{cursor:pointer;color:var(--muted);font-size:13px}
+  .picks{display:flex;gap:12px;flex-wrap:wrap;margin:0 0 14px}
+  .pick{flex:1 1 260px;text-align:left;border:1px solid var(--line);border-radius:12px;
+        padding:16px 18px;background:var(--paper);cursor:pointer;font:inherit;color:var(--ink)}
+  .pick:hover{border-color:var(--navy)}
+  .pick[data-mine=true]{border-color:var(--navy);background:var(--navy);color:#fff}
+  .pick[data-mine=true] small{color:#9fb6d0}
+  .pick b{display:block;font-size:17px;margin-bottom:3px}
+  .pick small{color:var(--muted);font-size:13px}
+  .pick:disabled{opacity:.55;cursor:wait}
+  @media (max-width:640px){ .stat{flex-basis:calc(50% - 10px)} }
+</style>
+</head>
+<body>
+<header>
+  <h1>stig-ai-pipeline</h1>
+  <p>Apply Department of Defense security checklists to a MacBook or a Windows PC. Nothing leaves this machine.</p>
+</header>
+
+<main>
+  <nav>
+    <button id="tab-guide" aria-selected="true">1 · Guide</button>
+    <button id="tab-rules" disabled>2 · Rules</button>
+    <button id="tab-checks">3 · Checks</button>
+    <button id="tab-scan" disabled>4 · Scan</button>
+  </nav>
+
+  <!-- 1 ---------------------------------------------------------------- -->
+  <section id="s-guide">
+    <h2>Choose the guide for this computer</h2>
+    <p class="sub">This computer looks like <b id="platform">…</b>. Pick what you are securing and
+      the official Department of Defense guide is downloaded for you.</p>
+    <div id="catalog" class="picks"></div>
+    <p class="muted" id="cli-note" style="margin:0 0 14px"></p>
+    <p class="muted" id="fetch-note" style="margin:0 0 14px"></p>
+    <details style="margin-bottom:14px"><summary>I already have the file</summary></details>
+    <div class="drop" id="drop">
+      <p style="margin:0 0 12px">Drop the STIG file here</p>
+      <input type="file" id="file" accept=".zip,.xml">
+    </div>
+    <div class="bar">
+      <label><input type="checkbox" id="want-explain" checked> Attach the plain-English explanations</label>
+      <button class="go" id="go-parse" disabled>Read the guide</button>
+      <span class="muted" id="parse-status"></span>
+    </div>
+    <div id="guide-out"></div>
+  </section>
+
+  <!-- 2 ---------------------------------------------------------------- -->
+  <section id="s-rules" hidden>
+    <h2 id="rules-title">Every rule, in plain English</h2>
+    <p class="sub" id="rules-sub"></p>
+    <div class="bar">
+      <input type="search" id="rules-find" placeholder="Search rules…" style="flex:1 1 240px">
+      <select id="rules-cat">
+        <option value="">All severities</option><option value="high">CAT I only</option>
+        <option value="medium">CAT II only</option><option value="low">CAT III only</option>
+      </select>
+      <select id="rules-triage">
+        <option value="">All kinds</option><option value="quick-win">Quick win</option>
+        <option value="config-profile">Needs a profile pushed out</option>
+        <option value="needs-judgment">Needs a decision</option>
+        <option value="risky-change">Can break things</option>
+      </select>
+      <span class="muted" id="rules-count"></span>
+    </div>
+    <div class="wrap"><table id="rules-table"><thead><tr>
+      <th>Rule</th><th>Severity</th><th>What it asks of you</th><th>Kind</th><th>Watch out for</th>
+    </tr></thead><tbody></tbody></table></div>
+  </section>
+
+  <!-- 3 ---------------------------------------------------------------- -->
+  <section id="s-checks">
+    <h2>Read every command before anything runs</h2>
+    <p class="sub">A check is a read-only command. Nothing executes until you have read it and approved
+      it under your own name. Approval freezes a fingerprint of the exact command; if it is edited
+      afterwards the check is refused.</p>
+    <div class="bar">
+      <select id="pack-pick" style="flex:1 1 320px"><option value="">Loading…</option></select>
+      <button class="ghost" id="go-load">Open this pack</button>
+      <button class="ghost" id="go-author" disabled title="Derive checks from the guide you just read">
+        Derive from the guide</button>
+    </div>
+    <div id="pack-out"></div>
+  </section>
+
+  <!-- 4 ---------------------------------------------------------------- -->
+  <section id="s-scan" hidden>
+    <h2>Scan this computer</h2>
+    <p class="sub">Only approved, unmodified checks run. The report says first how many rules were
+      actually evaluated.</p>
+    <div class="bar">
+      <button class="go" id="go-scan">Run the approved checks</button>
+      <label><input type="checkbox" id="incl"> also run unreviewed checks, marked untrusted</label>
+      <span class="muted" id="scan-status"></span>
+    </div>
+    <div id="scan-out"></div>
+  </section>
+</main>
+
+<script>
+const TOKEN = "__TOKEN__";
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let state = {file:null, rules:[], pack:null, parsed:false};
+
+async function api(path, opts={}) {
+  const r = await fetch(path, {...opts, headers:{...(opts.headers||{}), "X-Stig-Token":TOKEN}});
+  const data = await r.json().catch(() => ({error:"bad response"}));
+  if (!r.ok || data.error) throw new Error(data.error || ("HTTP " + r.status));
+  return data;
+}
+function showError(where, e) {
+  $(where).insertAdjacentHTML("afterbegin", `<div class="err">${esc(e.message)}</div>`);
+}
+function tab(name) {
+  for (const n of ["guide","rules","checks","scan"]) {
+    $("#tab-"+n).setAttribute("aria-selected", String(n === name));
+    $("#s-"+n).hidden = (n !== name);
+  }
+}
+for (const n of ["guide","rules","checks","scan"]) $("#tab-"+n).onclick = () => tab(n);
+
+// ---- 1. guide --------------------------------------------------------
+async function getGuide(key, label, btn) {
+  document.querySelectorAll("#catalog button").forEach(b => b.disabled = true);
+  $("#fetch-note").textContent = "asking public.cyber.mil for " + label + "…";
+  try {
+    const got = await api("/api/fetch", {method:"POST",
+      headers:{"Content-Type":"application/json"}, body: JSON.stringify({key})});
+    $("#fetch-note").innerHTML = got.notes.map(esc).join("<br>");
+    $("#parse-status").textContent = "reading the guide…";
+    const res = await api("/api/parse", {method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({path: got.path, explain: $("#want-explain").checked})});
+    renderGuide(res);
+    $("#parse-status").textContent = "done";
+  } catch (e) {
+    $("#fetch-note").innerHTML = `<span class="err" style="display:block">${esc(e.message)}</span>`;
+    $("#parse-status").textContent = "";
+  }
+  document.querySelectorAll("#catalog button").forEach(b => b.disabled = false);
+}
+
+const drop = $("#drop");
+["dragenter","dragover"].forEach(ev => drop.addEventListener(ev, e => {
+  e.preventDefault(); drop.classList.add("over");
+}));
+["dragleave","drop"].forEach(ev => drop.addEventListener(ev, e => {
+  e.preventDefault(); drop.classList.remove("over");
+}));
+drop.addEventListener("drop", e => { if (e.dataTransfer.files[0]) pick(e.dataTransfer.files[0]); });
+$("#file").onchange = e => { if (e.target.files[0]) pick(e.target.files[0]); };
+
+function pick(f) {
+  state.file = f;
+  $("#parse-status").textContent = f.name + " — ready";
+  $("#go-parse").disabled = false;
+}
+
+$("#go-parse").onclick = async () => {
+  $("#go-parse").disabled = true;
+  $("#parse-status").textContent = "uploading…";
+  try {
+    const up = await api("/api/upload?name=" + encodeURIComponent(state.file.name),
+                         {method:"POST", body: state.file});
+    $("#parse-status").textContent = "reading the guide…";
+    const res = await api("/api/parse", {method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({path: up.path, explain: $("#want-explain").checked})});
+    renderGuide(res);
+    $("#parse-status").textContent = "done";
+  } catch (e) { showError("#guide-out", e); $("#parse-status").textContent = ""; }
+  $("#go-parse").disabled = false;
+};
+
+function renderGuide(r) {
+  state.rules = r.rules; state.parsed = true;
+  $("#tab-rules").disabled = false; $("#go-author").disabled = false;
+  const links = Object.entries(r.files).map(([k,v]) =>
+    `<a href="/api/download?file=${encodeURIComponent(v)}&t=${TOKEN}" download>${k.toUpperCase()}</a>`).join(" · ");
+  const tri = Object.entries(r.triage).sort((a,b)=>b[1]-a[1])
+    .map(([k,v]) => `<span class="chip t-${esc(k)}">${esc(k.replace(/-/g," "))} ${v}</span>`).join(" ");
+  $("#guide-out").innerHTML = `
+    <div class="stats">
+      <div class="stat"><b>${r.total}</b><span>rules in this guide</span></div>
+      <div class="stat"><b>${r.high}</b><span>CAT I — most serious</span></div>
+      <div class="stat"><b>${r.medium}</b><span>CAT II</span></div>
+      <div class="stat"><b>${r.annotated}</b><span>explained in plain English</span></div>
+    </div>
+    <p><b>${esc(r.title)}</b><br><span class="muted">${esc(r.version||"")} ${esc(r.release||"")}</span></p>
+    <p>${tri}</p>
+    <p class="muted">Download the checklist: ${links}</p>
+    ${r.annotated < r.total ? `<div class="note">${r.total - r.annotated} rules have no filed
+      explanation yet. Run the stig-explain skill on this checklist to produce them.</div>` : ""}`;
+  renderRules();
+  $("#rules-title").textContent = r.title;
+  $("#rules-sub").textContent =
+    `${r.annotated} of ${r.total} rules carry a plain-English explanation, a rating, and a caution.`;
+  tab("rules");
+}
+
+// ---- 2. rules --------------------------------------------------------
+["rules-find","rules-cat","rules-triage"].forEach(id => $("#"+id).oninput = renderRules);
+
+function renderRules() {
+  const q = $("#rules-find").value.toLowerCase();
+  const cat = $("#rules-cat").value, tri = $("#rules-triage").value;
+  const rows = state.rules.filter(r =>
+    (!cat || r.severity === cat) && (!tri || r.triage === tri) &&
+    (!q || (r.stig_id + " " + r.title + " " + r.summary).toLowerCase().includes(q)));
+  $("#rules-count").textContent = rows.length + " of " + state.rules.length;
+  $("#rules-table tbody").innerHTML = rows.slice(0, 400).map(r => `
+    <tr>
+      <td><code>${esc(r.stig_id)}</code></td>
+      <td><span class="chip c-${esc(r.severity)}">${esc(r.cat)}</span></td>
+      <td><b>${esc(r.title)}</b>${r.summary ? "<br>" + esc(r.summary) : ""}</td>
+      <td>${r.triage ? `<span class="chip t-${esc(r.triage)}">${esc(r.triage.replace(/-/g," "))}</span>` : ""}
+          ${r.automation ? `<br><span class="muted">${esc(r.automation)}</span>` : ""}</td>
+      <td class="muted">${esc(r.caution)}</td>
+    </tr>`).join("");
+}
+
+// ---- 3. checks -------------------------------------------------------
+$("#go-load").onclick = async () => {
+  const path = $("#pack-pick").value;
+  if (!path) return;
+  try { renderPack(await api("/api/pack/load", {method:"POST",
+    headers:{"Content-Type":"application/json"}, body: JSON.stringify({path})})); }
+  catch (e) { showError("#pack-out", e); }
+};
+$("#go-author").onclick = async () => {
+  try { renderPack(await api("/api/pack/author", {method:"POST",
+    headers:{"Content-Type":"application/json"}, body: JSON.stringify({})})); }
+  catch (e) { showError("#pack-out", e); }
+};
+
+function renderPack(p) {
+  state.pack = p;
+  if (!p.loaded) { $("#pack-out").innerHTML = ""; return; }
+  const s = p.summary;
+  $("#tab-scan").disabled = false;
+  $("#pack-out").innerHTML = `
+    <div class="stats">
+      <div class="stat"><b>${s.total}</b><span>checks in this pack</span></div>
+      <div class="stat"><b>${s.approved}</b><span>approved by a person</span></div>
+      <div class="stat"><b>${s.unreviewed}</b><span>not yet read</span></div>
+      <div class="stat"><b>${s.runnable}</b><span>will actually run</span></div>
+    </div>
+    <div class="bar">
+      <input type="text" id="by" placeholder="Your name — recorded with every approval"
+             style="flex:1 1 280px" value="${esc(localStorage.getItem("stig-by") || "")}">
+      <button class="go" id="go-approve">Approve selected</button>
+      <button class="ghost" id="go-reject">Reject selected</button>
+      <span class="muted" id="sel-count">0 selected</span>
+    </div>
+    <div class="wrap"><table><thead><tr>
+      <th><input type="checkbox" id="all"></th><th>Rule</th><th>Severity</th>
+      <th>What would run</th><th>Status</th></tr></thead><tbody>
+      ${p.checks.map(c => `
+      <tr>
+        <td><input type="checkbox" class="pickme" value="${esc(c.stig_id)}"
+             ${c.mode === "shell" ? "" : "disabled"}></td>
+        <td><code>${esc(c.stig_id)}</code><br><span class="muted">conf ${esc(c.confidence)}</span></td>
+        <td><span class="chip c-${esc(c.severity)}">${esc(c.cat)}</span></td>
+        <td><b>${esc(c.title)}</b>
+          ${c.mode === "shell"
+            ? `<pre>${esc(c.command)}</pre>
+               <div class="muted">expects <b>${esc(c.comparator)} ${esc(c.expected)}</b>
+               ${c.requires_root ? " · needs administrator rights" : ""}</div>
+               ${c.expected_source ? `<details><summary>why that is the expected answer</summary>
+                 <div class="muted">${esc(c.expected_source)}</div></details>` : ""}
+               ${c.objections.length ? `<div class="warn">safety gate: ${esc(c.objections.join("; "))}</div>` : ""}`
+            : `<span class="muted">${esc(c.note || "no command — this one needs a human")}</span>`}
+        </td>
+        <td><span class="chip s-${esc(c.status)}">${esc(c.status)}</span>
+          ${c.reviewed_by ? `<br><span class="muted">${esc(c.reviewed_by)}</span>` : ""}
+          ${c.drifted ? `<div class="warn">edited after approval</div>` : ""}</td>
+      </tr>`).join("")}
+    </tbody></table></div>`;
+
+  const picks = () => [...document.querySelectorAll(".pickme:checked")].map(i => i.value);
+  const count = () => $("#sel-count").textContent = picks().length + " selected";
+  document.querySelectorAll(".pickme").forEach(i => i.onchange = count);
+  $("#all").onchange = e => {
+    document.querySelectorAll(".pickme:not(:disabled)").forEach(i => i.checked = e.target.checked);
+    count();
+  };
+  const decide = async approve => {
+    const by = $("#by").value.trim();
+    if (!by) { alert("Type your name first. Approval records who accepted the command."); return; }
+    localStorage.setItem("stig-by", by);
+    const ids = picks();
+    if (!ids.length) { alert("Select at least one check."); return; }
+    try { renderPack(await api("/api/pack/decide", {method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ids, by, approve})})); }
+    catch (e) { showError("#pack-out", e); }
+  };
+  $("#go-approve").onclick = () => decide(true);
+  $("#go-reject").onclick = () => decide(false);
+}
+
+// ---- 4. scan ---------------------------------------------------------
+$("#go-scan").onclick = async () => {
+  $("#go-scan").disabled = true; $("#scan-status").textContent = "running…";
+  try {
+    const r = await api("/api/scan", {method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({include_unreviewed: $("#incl").checked})});
+    const c = r.counts;
+    $("#scan-out").innerHTML = `
+      <div class="coverage">${esc(r.coverage)}</div>
+      <div class="stats">
+        <div class="stat"><b>${c.pass}</b><span>met the requirement</span></div>
+        <div class="stat"><b>${c.fail}</b><span>did not</span></div>
+        <div class="stat"><b>${c.error}</b><span>could not be judged</span></div>
+        <div class="stat"><b>${c.skipped}</b><span>not run</span></div>
+      </div>
+      <p class="muted">Evidence recorded in <code>${esc(r.evidence)}</code> ·
+        ${r.files.map(f => `<a href="/api/download?file=${encodeURIComponent(f)}&t=${TOKEN}"
+          download>${esc(f)}</a>`).join(" · ")}</p>
+      <div class="wrap"><table><thead><tr><th>Status</th><th>Rule</th><th>Severity</th>
+        <th>Requirement</th><th>Detail</th></tr></thead><tbody>
+        ${r.results.map(x => `<tr>
+          <td><span class="chip s-${esc(x.status)}">${esc(x.status)}</span></td>
+          <td><code>${esc(x.stig_id)}</code></td><td>${esc(x.cat)}</td>
+          <td>${esc(x.title)}</td><td class="muted">${esc(x.detail)}</td></tr>`).join("")}
+      </tbody></table></div>`;
+    $("#scan-status").textContent = "done";
+  } catch (e) { showError("#scan-out", e); $("#scan-status").textContent = ""; }
+  $("#go-scan").disabled = false;
+};
+
+// ---- boot ------------------------------------------------------------
+(async () => {
+  try {
+    const s = await api("/api/state");
+    $("#platform").textContent = {macos:"a MacBook", windows:"a Windows PC",
+                                  linux:"Linux"}[s.platform] || s.platform;
+    const mac = s.recommended && s.recommended.startsWith("macos") ? s.recommended : "macos-26";
+    const macLabel = (s.catalog.find(g => g.key === mac) || {}).label || "MacBook";
+    $("#catalog").innerHTML = `
+      <button class="pick" data-k="${esc(mac)}" data-l="${esc(macLabel)}"
+              data-mine="${s.platform === "macos"}">
+        <b>MacBook</b><small>${esc(macLabel.replace("MacBook — ", ""))} · 160 rules</small></button>
+      <button class="pick" data-k="windows-11" data-l="Windows 11"
+              data-mine="${s.platform === "windows"}">
+        <b>Windows PC</b><small>Windows 11 · 257 rules</small></button>
+      `;
+    $("#cli-note").innerHTML = s.cli_only.length
+      ? `Running a server, Linux or a database? Those are handled from the command line:
+         <code>python3 -m stigprep fetch --list</code>`
+      : "";
+    document.querySelectorAll("#catalog button").forEach(b =>
+      b.onclick = () => getGuide(b.dataset.k, b.dataset.l, b));
+    $("#pack-pick").innerHTML = s.packs.length
+      ? s.packs.map(p => `<option value="${esc(p.path)}">${esc(p.pack_id)} — ${p.checks} checks</option>`).join("")
+      : `<option value="">no packs shipped for ${esc(s.platform)}</option>`;
+    if (s.pack && s.pack.loaded) renderPack(s.pack);
+  } catch (e) { showError("#guide-out", e); }
+})();
+</script>
+</body>
+</html>

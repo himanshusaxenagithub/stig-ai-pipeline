@@ -1,5 +1,50 @@
 # Changelog
 
+## v0.5.0 — 2026-09-11
+
+### Added — a page instead of a terminal
+
+- `stigui`: a local web interface covering the whole method — choose a guide,
+  read the rules in plain English, read and approve each check under your own
+  name, scan, read the report, download the outputs. Standard library only.
+  Served on `127.0.0.1`, guarded by a one-time token and a loopback-only Host
+  check, so no other page or process on the machine can drive it.
+- `Start.command` (macOS) and `Start.bat` (Windows): double-click to open it.
+- `packaging/build_portable.py`: assembles a folder that carries its own
+  Python, so someone with no Python and no administrator rights can unzip it
+  and double-click. Run once per platform. Nothing is packed or compiled —
+  the code ships as the same .py files that are on GitHub, which keeps the
+  "read exactly what this runs" argument intact and avoids the antivirus
+  false positives that packers attract. No source change was needed: the
+  folder has the same shape as a checkout, so annotations, check packs and
+  the page are found the same way.
+- `stigprep fetch`: download the official DISA package by name, so nobody has to
+  find it on public.cyber.mil and unzip it. The page leads with the two machines
+  this is for — MacBook and Windows PC — and picks the right macOS release from
+  the version actually running, so nobody has to know whether they are on Tahoe
+  or Sequoia. The page offers those two machines only, and refuses a request for
+  any other guide with the command to use instead — servers, Linux and databases
+  are for someone who administers systems for a living, and the command line
+  serves that person better than a wizard does. Verified against a pinned digest where one is
+  recorded and always against the validated rule count; the validated release is
+  tried first so the filed explanations attach; a blocked network prints the
+  download page rather than a stack trace.
+- A shipped check pack is copied into the work folder the first time it is
+  opened, so a person's approvals survive `git pull` and the packs published
+  here stay unreviewed as documented.
+- README: a Windows first-run section covering the PATH checkbox, the need for
+  a fresh shell, and the nested folder that Windows creates when unpacking a ZIP.
+
+### Fixed
+
+- `--explain` found no filed explanations when it was handed a DISA `.zip`
+  rather than the XCCDF inside it, because filed sets are named after the XCCDF.
+  The lookup now tries the source name, then each XCCDF member of the archive,
+  and finally the filed set sharing the most rule identifiers with the
+  benchmark — so a renamed release still finds its explanations. The command
+  documented in the README (`parse <stig>.zip --explain`) works as written.
+
+
 ## v0.4.0 — 2026-09-09
 
 ### Added — Windows scanning
