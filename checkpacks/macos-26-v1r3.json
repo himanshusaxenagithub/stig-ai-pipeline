@@ -1,6 +1,7 @@
 {
   "pack_format": 1,
   "pack_id": "macos-26-v1r3",
+  "platform": "macos",
   "stig_title": "Apple macOS 26 (Tahoe) Security Technical Implementation Guide",
   "stig_version": "V1R3",
   "created": "2026-08-20",

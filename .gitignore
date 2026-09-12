@@ -18,3 +18,6 @@ evidence/
 # committed annotation caches are the published artifact
 !annotations/*.ai-cache.json
 .stage/
+
+# portable builds (bundled Python, ~60 MB) — built per machine, never committed
+dist/

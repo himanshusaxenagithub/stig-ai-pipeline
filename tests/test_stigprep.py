@@ -115,7 +115,7 @@ class TestExplain(unittest.TestCase):
             repo.parent.mkdir()
             self._write(repo, {b.rules[0].stig_id: {"summary": "From the repo.",
                                "triage": "config-profile", "automation": "manual", "caution": ""}})
-            with mock.patch.object(explain_mod, "_repo_annotations_path", return_value=repo):
+            with mock.patch.object(explain_mod, "_annotations_dir", return_value=repo.parent):
                 n = explain_mod.explain(b, src, progress=False)
         self.assertEqual(n, 1)
         self.assertEqual(b.rules[0].ai["summary"], "From the repo.")
