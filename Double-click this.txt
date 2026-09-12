@@ -5,10 +5,10 @@ Windows
 Double-click "STIG Checker.bat" (or Start.bat — same program).
 The first time, Windows may say "Windows protected your PC".
 Click More info, then Run anyway.
-A page opens in your browser.
 
-If nothing happens, install Python from https://www.python.org/downloads/
-and tick "Add python.exe to PATH". Then double-click again.
+If this PC does not have Python, a box asks to download a private copy
+from python.org (~11 MB). That is not a system install. No admin prompt.
+A page then opens in your browser.
 
 Mac
 ---
@@ -17,10 +17,9 @@ The first time, macOS will block it.
 macOS 15 or newer: click Done, then System Settings → Privacy & Security
 → Open Anyway.
 Older macOS: right-click → Open.
-A page opens in your browser.
 
-If nothing happens, install Python from https://www.python.org/downloads/
-and double-click again.
+If this Mac does not have Python, a box asks to download a private copy
+(~25 MB). That is not a system install.
 
 You never need the command line. Approve checks under your own name;
 nothing runs until you do.
