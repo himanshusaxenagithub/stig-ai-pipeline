@@ -58,9 +58,10 @@ Windows click More info → Run anyway. Once. The `Read me.txt` beside the progr
 has the same steps.
 
 **Working from a clone or the source ZIP instead?** Double-click `Start.command`
-(macOS) or `Start.bat` (Windows) in the project folder — that path needs Python on
-the machine already — or, to produce the program above yourself, `Build.command`
-/ `Build.bat`.
+(macOS) or `Start.bat` (Windows) in the project folder. That path uses whatever
+Python is already on the machine — if there is none, a dialog box says so and opens
+python.org rather than leaving you to read a terminal. To produce the fully
+self-contained program above instead, double-click `Build.command` / `Build.bat`.
 
 A page opens in your browser and walks you through the whole method. It asks one
 question — **MacBook or Windows PC** — and downloads the official Department of

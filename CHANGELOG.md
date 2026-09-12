@@ -10,6 +10,19 @@
   Served on `127.0.0.1`, guarded by a one-time token and a loopback-only Host
   check, so no other page or process on the machine can drive it.
 - `Start.command` (macOS) and `Start.bat` (Windows): double-click to open it.
+- `Start.command` / `Start.bat` (for a plain source checkout, using whatever
+  Python is already on the machine) now start in the same app mode as the
+  packaged program: Quit button, single running instance, files in the
+  per-user application folder. Windows gets `run-hidden.vbs`, so no black
+  console window flashes on screen; missing Python is a dialog box on both
+  platforms, pointing at python.org, not text in a terminal someone might
+  not read.
+- `.github/workflows/release-portable.yml`: builds and attaches
+  STIG-Checker-macOS.zip / STIG-Checker-Windows.zip to a GitHub Release
+  automatically, so a release does not depend on running Build.command by
+  hand on two different computers. Reviewed against the actual build
+  script's flags and syntax-checked; not yet exercised by an actual
+  release — the first real release should be watched.
 - **STIG Checker**, the double-click program: on a Mac a real application bundle
   with its own icon, on Windows `STIG Checker.bat` beside a `program` folder.
   Started from the desktop it runs in *app mode* — files in the per-user
