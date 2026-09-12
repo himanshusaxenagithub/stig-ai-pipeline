@@ -45,15 +45,22 @@ or any other STIG that DISA publishes.
 
 ## Start here — no terminal required
 
-**The easiest way: download the folder for your computer** from the
-[releases page](https://github.com/himanshusaxenagithub/stig-ai-pipeline/releases),
-unzip it, and double-click `Start.command` (Mac) or `Start.bat` (Windows).
-It carries its own Python, so there is nothing to install, nothing to set up
-and no administrator rights needed. Delete the folder to remove it.
+**The easiest way: download STIG Checker** from the
+[releases page](https://github.com/himanshusaxenagithub/stig-ai-pipeline/releases) —
+`STIG-Checker-macOS.zip` or `STIG-Checker-Windows.zip`. Unzip it and double-click
+**STIG Checker**. It carries its own Python, so there is nothing to install, no
+set-up and no administrator rights. Drag it to the Trash to remove it.
 
-**Working from a clone or the source ZIP instead?** Double-click `Start.bat`
-(Windows) or `Start.command` (macOS) in the project folder. That path needs
-Python on the machine already.
+The first time, your computer will object, because the program is not signed with
+a developer certificate: on macOS 15 or newer click Done, then in System Settings →
+Privacy & Security click **Open Anyway**; on older macOS right-click → Open; on
+Windows click More info → Run anyway. Once. The `Read me.txt` beside the program
+has the same steps.
+
+**Working from a clone or the source ZIP instead?** Double-click `Start.command`
+(macOS) or `Start.bat` (Windows) in the project folder — that path needs Python on
+the machine already — or, to produce the program above yourself, `Build.command`
+/ `Build.bat`.
 
 A page opens in your browser and walks you through the whole method. It asks one
 question — **MacBook or Windows PC** — and downloads the official Department of

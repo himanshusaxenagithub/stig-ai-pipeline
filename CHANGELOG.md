@@ -10,6 +10,16 @@
   Served on `127.0.0.1`, guarded by a one-time token and a loopback-only Host
   check, so no other page or process on the machine can drive it.
 - `Start.command` (macOS) and `Start.bat` (Windows): double-click to open it.
+- **STIG Checker**, the double-click program: on a Mac a real application bundle
+  with its own icon, on Windows `STIG Checker.bat` beside a `program` folder.
+  Started from the desktop it runs in *app mode* — files in the per-user
+  application folder, a second double-click reopens the page instead of starting
+  a second copy, a Quit button and a Show files button on the page, and it stops
+  itself once nobody has had the page open for ten minutes. The command line is
+  unchanged. `Build.command` / `Build.bat` produce it, and `Read me.txt` beside it
+  gives the exact first-open steps for an unsigned program on macOS 15+, older
+  macOS and Windows. `--sign` / `--notarize` are there for when there is an
+  Apple Developer ID, and are marked as not yet exercised.
 - `packaging/build_portable.py`: assembles a folder that carries its own
   Python, so someone with no Python and no administrator rights can unzip it
   and double-click. Run once per platform. Nothing is packed or compiled —
