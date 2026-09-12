@@ -60,6 +60,12 @@
 
 ### Fixed
 
+- The Checks screen no longer labels GUI and interview rules as
+  "unreviewed" with a disabled checkbox. Those rules have no command, so
+  they cannot be approved or executed — on Windows 11 that is 103 of 257.
+  They now read "needs a person" or "no command", with a note and a button
+  that takes you to scan the checks that will actually run.
+
 - Scan progress is now visible while a scan is running. The page used to sit
   on "running…" until every check had finished, which on Windows — where the
   PowerShell window is hidden and a STIG has a couple of hundred checks —

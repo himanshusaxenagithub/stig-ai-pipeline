@@ -161,7 +161,8 @@
     <h2>Read every command before anything runs</h2>
     <p class="sub">A check is a read-only command. Nothing executes until you have read it and approved
       it under your own name. Approval freezes a fingerprint of the exact command; if it is edited
-      afterwards the check is refused.</p>
+      afterwards the check is refused. Rows without a checkbox have no command — DISA asked for a
+      GUI or an interview, or the text did not map to PowerShell. Those cannot be approved or scanned.</p>
     <div class="bar">
       <select id="pack-pick" style="flex:1 1 320px"><option value="">Loading…</option></select>
       <button class="ghost" id="go-load">Open this pack</button>
@@ -190,6 +191,8 @@ const TOKEN = "__TOKEN__";
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 let state = {file:null, rules:[], pack:null, parsed:false};
+let packFilter = "";
+let packFind = "";
 
 async function api(path, opts={}) {
   const r = await fetch(path, {...opts, headers:{...(opts.headers||{}), "X-Stig-Token":TOKEN}});
@@ -348,36 +351,22 @@ $("#go-author").onclick = async () => {
   catch (e) { showError("#pack-out", e); }
 };
 
-function renderPack(p) {
-  state.pack = p;
-  if (!p.loaded) { $("#pack-out").innerHTML = ""; return; }
-  const s = p.summary;
-  $("#tab-scan").disabled = false;
-  $("#pack-out").innerHTML = `
-    <div class="stats">
-      <div class="stat"><b>${s.total}</b><span>checks in this pack</span></div>
-      <div class="stat"><b>${s.approved}</b><span>approved by a person</span></div>
-      <div class="stat"><b>${s.unreviewed}</b><span>not yet read</span></div>
-      <div class="stat"><b>${s.runnable}</b><span>will actually run</span></div>
-    </div>
-    <div class="bar">
-      <input type="text" id="by" placeholder="Your name — recorded with every approval"
-             style="flex:1 1 280px" value="${esc(localStorage.getItem("stig-by") || "")}">
-      <button class="go" id="go-approve">Approve selected</button>
-      <button class="ghost" id="go-reject">Reject selected</button>
-      <span class="muted" id="sel-count">0 selected</span>
-    </div>
-    <div class="wrap"><table><thead><tr>
-      <th><input type="checkbox" id="all"></th><th>Rule</th><th>Severity</th>
-      <th>What would run</th><th>Status</th></tr></thead><tbody>
-      ${p.checks.map(c => `
-      <tr>
-        <td><input type="checkbox" class="pickme" value="${esc(c.stig_id)}"
-             ${c.mode === "shell" ? "" : "disabled"}></td>
+function checkStatus(c) {
+  if (c.mode === "manual") return {label: "needs a person", cls: "s-manual"};
+  if (c.mode === "unsupported") return {label: "no command", cls: "s-manual"};
+  return {label: c.status, cls: "s-" + c.status};
+}
+function checkRow(c) {
+  const st = checkStatus(c);
+  const runnable = c.mode === "shell";
+  return `<tr>
+        <td>${runnable
+          ? `<input type="checkbox" class="pickme" value="${esc(c.stig_id)}">`
+          : `<span class="muted" title="No command to approve — DISA wrote a GUI, an interview, or the text did not map to PowerShell">—</span>`}</td>
         <td><code>${esc(c.stig_id)}</code><br><span class="muted">conf ${esc(c.confidence)}</span></td>
         <td><span class="chip c-${esc(c.severity)}">${esc(c.cat)}</span></td>
         <td><b>${esc(c.title)}</b>
-          ${c.mode === "shell"
+          ${runnable
             ? `<pre>${esc(c.command)}</pre>
                <div class="muted">expects <b>${esc(c.comparator)} ${esc(c.expected)}</b>
                ${c.requires_root ? " · needs administrator rights" : ""}</div>
@@ -386,25 +375,96 @@ function renderPack(p) {
                ${c.objections.length ? `<div class="warn">safety gate: ${esc(c.objections.join("; "))}</div>` : ""}`
             : `<span class="muted">${esc(c.note || "no command — this one needs a human")}</span>`}
         </td>
-        <td><span class="chip s-${esc(c.status)}">${esc(c.status)}</span>
+        <td><span class="chip ${st.cls}">${esc(st.label)}</span>
           ${c.reviewed_by ? `<br><span class="muted">${esc(c.reviewed_by)}</span>` : ""}
           ${c.drifted ? `<div class="warn">edited after approval</div>` : ""}</td>
-      </tr>`).join("")}
+      </tr>`;
+}
+function checkVisible(c) {
+  if (packFilter === "shell" && c.mode !== "shell") return false;
+  if (packFilter === "person" && c.mode === "shell") return false;
+  if (packFilter === "unreviewed" && !(c.mode === "shell" && c.status === "unreviewed")) return false;
+  const q = packFind.toLowerCase();
+  if (!q) return true;
+  return (c.stig_id + " " + c.title + " " + (c.command || "") + " " + (c.note || "")).toLowerCase().includes(q);
+}
+function paintCheckRows() {
+  if (!state.pack || !state.pack.checks) return;
+  const rows = state.pack.checks.filter(checkVisible);
+  const body = $("#pack-rows");
+  if (!body) return;
+  body.innerHTML = rows.map(checkRow).join("");
+  $("#pack-shown").textContent = rows.length + " of " + state.pack.checks.length;
+  const picks = () => [...document.querySelectorAll(".pickme:checked")].map(i => i.value);
+  const count = () => { const n = $("#sel-count"); if (n) n.textContent = picks().length + " selected"; };
+  document.querySelectorAll(".pickme").forEach(i => i.onchange = count);
+  count();
+}
+
+function renderPack(p) {
+  state.pack = p;
+  if (!p.loaded) { $("#pack-out").innerHTML = ""; return; }
+  const s = p.summary;
+  const unreadCmd = p.checks.filter(c => c.mode === "shell" && c.status === "unreviewed").length;
+  const needPerson = p.checks.filter(c => c.mode !== "shell").length;
+  $("#tab-scan").disabled = false;
+  const next = s.runnable
+    ? `You can scan the ${s.runnable} approved checks now.`
+    : (unreadCmd
+        ? `Read and approve the ${unreadCmd} command${unreadCmd === 1 ? "" : "s"} that have a checkbox, then scan.`
+        : "");
+  $("#pack-out").innerHTML = `
+    <div class="stats">
+      <div class="stat"><b>${s.total}</b><span>checks in this pack</span></div>
+      <div class="stat"><b>${s.approved}</b><span>approved by a person</span></div>
+      <div class="stat"><b>${unreadCmd}</b><span>commands still to read</span></div>
+      <div class="stat"><b>${s.runnable}</b><span>will actually run</span></div>
+    </div>
+    ${needPerson ? `<div class="note">${needPerson} of these have no command to run — DISA wrote a
+      GUI or interview procedure, or the check text did not map to PowerShell. They have no
+      checkbox because there is nothing to approve, and the scanner cannot evaluate them.
+      ${esc(next)}</div>` : (next ? `<div class="note">${esc(next)}</div>` : "")}
+    <div class="bar">
+      <input type="text" id="by" placeholder="Your name — recorded with every approval"
+             style="flex:1 1 280px" value="${esc(localStorage.getItem("stig-by") || "")}">
+      <button class="go" id="go-approve">Approve selected</button>
+      <button class="ghost" id="go-reject">Reject selected</button>
+      <button class="go" id="go-scan-now" ${s.runnable ? "" : "disabled"}>
+        Scan ${s.runnable} approved checks</button>
+      <span class="muted" id="sel-count">0 selected</span>
+    </div>
+    <div class="bar">
+      <input type="search" id="pack-find" placeholder="Search checks…" style="flex:1 1 220px"
+             value="${esc(packFind)}">
+      <select id="pack-filter">
+        <option value="">All</option>
+        <option value="shell">Commands only</option>
+        <option value="person">Needs a person</option>
+        <option value="unreviewed">Unread commands</option>
+      </select>
+      <span class="muted" id="pack-shown"></span>
+    </div>
+    <div class="wrap"><table><thead><tr>
+      <th><input type="checkbox" id="all" title="Selects only checks that have a command"></th>
+      <th>Rule</th><th>Severity</th>
+      <th>What would run</th><th>Status</th></tr></thead><tbody id="pack-rows">
     </tbody></table></div>`;
 
-  const picks = () => [...document.querySelectorAll(".pickme:checked")].map(i => i.value);
-  const count = () => $("#sel-count").textContent = picks().length + " selected";
-  document.querySelectorAll(".pickme").forEach(i => i.onchange = count);
+  $("#pack-filter").value = packFilter;
+  $("#pack-filter").onchange = () => { packFilter = $("#pack-filter").value; paintCheckRows(); };
+  $("#pack-find").oninput = () => { packFind = $("#pack-find").value; paintCheckRows(); };
   $("#all").onchange = e => {
-    document.querySelectorAll(".pickme:not(:disabled)").forEach(i => i.checked = e.target.checked);
-    count();
+    document.querySelectorAll(".pickme").forEach(i => i.checked = e.target.checked);
+    const n = $("#sel-count");
+    if (n) n.textContent = document.querySelectorAll(".pickme:checked").length + " selected";
   };
+  $("#go-scan-now").onclick = () => tab("scan");
   const decide = async approve => {
     const by = $("#by").value.trim();
     if (!by) { alert("Type your name first. Approval records who accepted the command."); return; }
     localStorage.setItem("stig-by", by);
-    const ids = picks();
-    if (!ids.length) { alert("Select at least one check."); return; }
+    const ids = [...document.querySelectorAll(".pickme:checked")].map(i => i.value);
+    if (!ids.length) { alert("Select at least one check that has a command."); return; }
     try { renderPack(await api("/api/pack/decide", {method:"POST",
       headers:{"Content-Type":"application/json"},
       body: JSON.stringify({ids, by, approve})})); }
@@ -412,6 +472,7 @@ function renderPack(p) {
   };
   $("#go-approve").onclick = () => decide(true);
   $("#go-reject").onclick = () => decide(false);
+  paintCheckRows();
 }
 
 // ---- 4. scan ---------------------------------------------------------

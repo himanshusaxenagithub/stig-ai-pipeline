@@ -81,6 +81,24 @@ class TestShippedPacks(unittest.TestCase):
             self.assertTrue(shipped_packs(name),
                             f"nothing would appear in the Checks list on {name}")
 
+    def test_windows_pack_has_commands_and_human_checks(self):
+        """The Checks screen looked broken on Windows because 103 of 257
+        rules have no PowerShell command — they were shown as unreviewed
+        with a disabled checkbox. The split is the product, not a bug."""
+        pack = json.loads((ROOT / "checkpacks" / "windows-11-v2r9.json").read_text())
+        modes = {}
+        for c in pack["checks"]:
+            modes[c["mode"]] = modes.get(c["mode"], 0) + 1
+        self.assertEqual(modes.get("shell"), 154)
+        self.assertEqual(modes.get("manual", 0) + modes.get("unsupported", 0), 103)
+
+    def test_page_does_not_call_a_non_command_unreviewed(self):
+        html = (Path(ui.__file__).resolve().parent / "app.html").read_text(encoding="utf-8")
+        self.assertIn("needs a person", html)
+        self.assertIn("no command", html)
+        self.assertIn("go-scan-now", html)
+        self.assertIn("nothing to approve", html)
+
 
 class TestAppMode(unittest.TestCase):
     """The double-click program: files in the user's folder, one instance,
