@@ -1,25 +1,18 @@
-STIG Checker — unzip this folder, then double-click. No terminal.
+How to run STIG Checker — no technical skill needed
 
-Windows
--------
-Double-click "STIG Checker.bat" (or Start.bat — same program).
-The first time, Windows may say "Windows protected your PC".
-Click More info, then Run anyway.
+1. Unzip this folder. Keep these files together; do not move one file to the Desktop.
 
-If this PC does not have Python, a box asks to download a private copy
-from python.org (~11 MB). That is not a system install. No admin prompt.
-A page then opens in your browser.
+2. Windows: double-click "STIG Checker.bat"
+   Mac: right-click "STIG Checker.command" → Open → Open
 
-Mac
----
-Double-click "STIG Checker.command" (or Start.command — same program).
-The first time, macOS will block it.
-macOS 15 or newer: click Done, then System Settings → Privacy & Security
-→ Open Anyway.
-Older macOS: right-click → Open.
+3. Windows may say "Windows protected your PC".
+   Click More info, then Run anyway. Once.
 
-If this Mac does not have Python, a box asks to download a private copy
-(~25 MB). That is not a system install.
+4. If a box asks to download Python, click Yes.
+   That is a private copy from python.org. It is not a system install
+   and does not need an administrator password.
 
-You never need the command line. Approve checks under your own name;
-nothing runs until you do.
+5. A page opens in your browser. Pick MacBook or Windows PC and follow the page.
+
+You do not need the command line.
+Approve checks under your own name. Nothing runs until you do.

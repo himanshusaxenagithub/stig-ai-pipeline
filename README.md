@@ -1,9 +1,40 @@
 # stig-ai-pipeline
 
-**Apply Department of Defense security checklists to your own systems without a compliance specialist.**
-An open-source, AI-enabled toolkit consisting of AI skills and scripts that turns any DISA STIG into a plain-English plan, explains every rule, and checks a machine against it — with a human approving every check before it runs. Free, MIT licence, no account, no API key.
+Turn a Department of Defense security checklist (a STIG) into a plain-English plan, then check your own computer against it. Free. No account. Nothing is uploaded.
 
-**New here?** Read the two-page overview with a worked example: [docs/overview.pdf](docs/overview.pdf).
+## How to run this
+
+No technical skill needed. You do not need the command line.
+
+1. On this page click **Code → Download ZIP**. Unzip the folder.
+2. Open the unzipped folder until you see `STIG Checker.bat` and `stigui` in the **same** place. (Windows sometimes creates a folder inside a folder.)
+3. **Windows:** double-click `STIG Checker.bat`.
+   **Mac:** right-click `STIG Checker.command` → **Open** → **Open**.
+4. Windows may say “Windows protected your PC”. Click **More info**, then **Run anyway**. Once.
+5. If a box asks to download Python, click **Yes**. That is a private copy from python.org (~11 MB on Windows). It is not installed system-wide and needs no administrator password.
+6. A page opens in your browser. Pick **MacBook** or **Windows PC** and follow the page.
+
+Keep the `.bat` / `.command` file inside the unzipped folder. Do not drag it to the Desktop by itself.
+
+The same steps are in `Double-click this.txt` next to those files.
+
+A later **Releases** zip (`STIG-Checker-Windows.zip` / `STIG-Checker-macOS.zip`) will carry Python inside so step 5 never appears. That file is not published yet. Until then, use the ZIP from the Code button.
+
+### If you prefer the command line
+
+```bash
+git clone https://github.com/himanshusaxenagithub/stig-ai-pipeline.git
+cd stig-ai-pipeline
+python3 -m stigui --app
+```
+
+On Windows use `py -m stigui --app` or `python -m stigui --app`.
+
+The page is served on your own computer (`127.0.0.1`). Nothing is uploaded. It never approves a check for you and never runs one you have not approved.
+
+Command-line modules (`stigprep`, `stigscan`) for servers and other guides are documented below.
+
+**New here?** Two-page overview: [docs/overview.pdf](docs/overview.pdf).
 
 ## Why this exists
 
@@ -17,7 +48,7 @@ This toolkit does the interpreting. Scanners like OpenSCAP can already tell you 
 
 | If you are… | This gives you… |
 |---|---|
-| **An IT generalist** at a school district, clinic, small bank, municipal agency, or any organisation without a security team | A ranked, plain-English plan for securing each system, in one command, and a way to check your work |
+| **An IT generalist** at a school district, clinic, small bank, municipal agency, or any organisation without a security team | A ranked, plain-English plan for securing each system, and a way to check your work |
 | **A managed service provider** looking after many small clients | One repeatable method across Windows, Linux, macOS and SQL Server, with a dated report per client per scan |
 | **A sysadmin at a DoD contractor or federal agency** where STIG compliance is mandatory | The translation from guide to tracker done for you, and evidence for the accreditation package that says exactly what was and was not evaluated |
 | **A security engineer** who already knows STIGs | A parser that reads any XCCDF as DISA ships it, explanation sets you can reuse, and a scanner whose safety model you can audit line by line |
@@ -25,10 +56,10 @@ This toolkit does the interpreting. Scanners like OpenSCAP can already tell you 
 
 ## What you get
 
-- **A week of specialist work in one command.** `parse` turns a 300-page guide into a tracker: one row per rule, severity ranked, full check and fix text, as Excel, CSV, JSON or Markdown.
+- **A week of specialist work in a few minutes.** `parse` turns a 300-page guide into a tracker: one row per rule, severity ranked, full check and fix text, as Excel, CSV, JSON or Markdown.
 - **Every rule explained.** What it makes you do and why, a rating (quick win / needs a policy pushed out / needs a decision / can break things), whether it can be scripted, and what could go wrong. Seven STIGs and 1,440 rules are explained already and shipped in this repository; the `stig-explain` skill produces more with the AI assistant you already have.
 - **A scan you can trust.** `stig-scan` checks a machine against its guide. Every check is unreviewed until a named person reads and approves it; approval freezes a fingerprint of the exact command; a safety gate refuses anything that could change the system; and the report says first how many rules were actually evaluated. AI may help write a check. It never runs one.
-- **Nothing to buy and nothing to sign up for.** Python 3.9+, no dependencies, no API key, no vendor. Works with any AI assistant that supports skills, or with none.
+- **Nothing to buy and nothing to sign up for.** No dependencies, no API key, no vendor. Works with any AI assistant that supports skills, or with none.
 
 ## Roadmap
 
@@ -43,80 +74,9 @@ Everything is STIG-agnostic: the tools parse standard XCCDF, so the same
 code works for Windows 11, Windows Server, RHEL, Ubuntu, macOS, SQL Server,
 or any other STIG that DISA publishes.
 
-## Start here — no terminal required
-
-**The easiest way: download STIG Checker** from the
-[releases page](https://github.com/himanshusaxenagithub/stig-ai-pipeline/releases) —
-`STIG-Checker-macOS.zip` or `STIG-Checker-Windows.zip`. Unzip it and double-click
-**STIG Checker**. It carries its own Python, so there is nothing to install, no
-set-up and no administrator rights. Drag it to the Trash to remove it.
-
-The first time, your computer will object, because the program is not signed with
-a developer certificate: on macOS 15 or newer click Done, then in System Settings →
-Privacy & Security click **Open Anyway**; on older macOS right-click → Open; on
-Windows click More info → Run anyway. Once. The `Read me.txt` beside the program
-has the same steps.
-
-**Working from a clone or the source ZIP instead?** Double-click `Start.command`
-(macOS) or `Start.bat` (Windows) in the project folder. That path uses whatever
-Python is already on the machine — if there is none, a dialog box says so and opens
-python.org rather than leaving you to read a terminal. To produce the fully
-self-contained program above instead, double-click `Build.command` / `Build.bat`.
-
-A page opens in your browser and walks you through the whole method. It asks one
-question — **MacBook or Windows PC** — and downloads the official Department of
-Defense guide for whichever you pick. You do not have to find it, download it or
-unzip it. On a Mac it works out whether you are on macOS 26 or 15 for you.
-
-The page covers those two machines and nothing else, on purpose. Windows Server,
-Red Hat, Ubuntu and SQL Server are real work for someone who administers systems
-for a living, and that person is better served by the command line than by a
-wizard. They are all in `stigprep fetch`. Then: read every
-rule in plain English, read the exact command each check would run, approve the
-ones you accept under your own name, scan, and read the report.
-
-    python3 -m stigui        # the same page, started by hand
-
-From the command line the download is a command of its own, so `parse` never
-touches the network on its own:
-
-    python3 -m stigprep fetch --list
-    python3 -m stigprep fetch windows-11
-
-What comes back is checked before it is used: against a pinned SHA-256 where one
-is recorded, and always against the rule count this project validated. The
-release validated here is tried first, because the explanations and check packs
-shipped in this repository were built against it. If the network blocks
-`dl.dod.cyber.mil` — school and corporate filters often do — it prints the page
-to use instead rather than failing with a stack trace.
-
-The page is served from your own machine on `127.0.0.1` and nothing is uploaded
-anywhere. It requires the one-time token printed when it starts, so no other page
-or program on the computer can drive it. It never approves a check for you and
-never runs one that has not been approved.
-
-If double-clicking does nothing, you do not have Python yet — see below.
-
-### On Windows, first time
-
-1. Install Python from [python.org](https://www.python.org/downloads/) and tick
-   **"Add python.exe to PATH"** on the first screen of the installer. The Microsoft
-   Store build works too, but the installer from python.org also gives you the `py`
-   launcher.
-2. Open a **new** PowerShell window afterwards. A window that was already open will
-   not see the new PATH.
-3. If you downloaded this project as a ZIP, Windows often unpacks it into a folder
-   *inside* a folder of the same name. Make sure the folder you are in contains
-   `stigprep`, `stigscan`, `stigui`, `annotations` and `checkpacks`.
-
-Use `python` or `py` in place of `python3` in every command below.
-
 ## Quick start
 
-Requires Python 3.9+ (already on your Mac if you have Xcode command line
-tools: `xcode-select --install`). No third-party packages needed.
-
-Prefer clicking to typing? See **Start here** above.
+Requires Python 3.9+ if you are using the command line rather than the double-click path above. No third-party packages needed.
 
 ```bash
 # 1. Get the official STIG for your OS (auto-detects macOS 15 vs 26)
@@ -136,6 +96,19 @@ Don't have the STIG handy? Try it on the bundled 6-rule sample first:
 ```bash
 python3 -m stigprep parse samples/sample_macos15_stig.xml
 ```
+
+From the command line the download is a command of its own, so `parse` never
+touches the network on its own:
+
+    python3 -m stigprep fetch --list
+    python3 -m stigprep fetch windows-11
+
+What comes back is checked before it is used: against a pinned SHA-256 where one
+is recorded, and always against the rule count this project validated. The
+release validated here is tried first, because the explanations and check packs
+shipped in this repository were built against it. If the network blocks
+`dl.dod.cyber.mil` — school and corporate filters often do — it prints the page
+to use instead rather than failing with a stack trace.
 
 ## Plain-English explanations
 
@@ -189,7 +162,7 @@ one module per operating system: the read-only allowlist, the forbidden
 mutating forms, the shell, and how the extractor reads DISA's check text.
 
 | Profile | Scan | Extractor | Packs shipped |
-|---|---|---|---|
+|---|---|---|
 | `macos` | ✅ | ✅ shell snippet + acceptance sentence | `macos-26-v1r3` (160 rules, 153 reducible) |
 | `linux` | ✅ | ✅ prompt lines + mapped sentence shapes | `ubuntu-24.04-v1r6` (194, 72 reducible), `rhel-9-v2r9` (445, 156 reducible) |
 | `windows` | ✅ PowerShell | ✅ registry / auditpol / secedit / quoted cmdlet shapes | `windows-11-v2r9` (257, 154 reducible), `windows-server-2019-v3r8` (282, 160 reducible) |
