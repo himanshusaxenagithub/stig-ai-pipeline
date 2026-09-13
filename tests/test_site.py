@@ -436,10 +436,28 @@ class TestGoatCounter(unittest.TestCase):
         self.assertIn("gc.zgo.at/count.js", js)
         self.assertIn("data-goatcounter", js)
         self.assertIn("goatcounter.com/count", js)
-        self.assertIn("goatcounter.com/counter/TOTAL.json", js)
+        self.assertIn("/counter/TOTAL.html", js)
+        self.assertIn("gcvc-views", js)
+        self.assertIn("parseGcvcViews", js)
+        self.assertIn("/counter/TOTAL.json", js)
+        self.assertIn("/reviews.html", js)
+        self.assertIn("/demo.html", js)
+        self.assertIn("n > 0", js)
         self.assertIn("YOUR_GOATCOUNTER_CODE", js)
+        order = js.split("async function publicGoatTotal", 1)[1]
+        self.assertLess(order.find("totalFromWidgetHtml"), order.find("totalFromTotalJson"))
+        self.assertLess(order.find("totalFromTotalJson"), order.find("totalFromKnownPaths"))
         self.assertNotIn("countapi", js.lower())
         self.assertNotIn("api.countapi", js.lower())
+        snippet = '<span id="gcvc-views">13</span>'
+        import re
+        match = re.search(r'id=["\']gcvc-views["\'][^>]*>([^<]*)', snippet)
+        self.assertEqual(match.group(1).strip(), "13")
+
+    def test_landing_labels_one_goatcounter_visitor_total(self):
+        html = (ROOT / "docs" / "index.html").read_text(encoding="utf-8")
+        self.assertIn("same total, not a second metric", html)
+        self.assertIn("GoatCounter’s public visitor total", html)
 
     def test_docs_pages_include_the_shared_goatcounter_config(self):
         for name in CONTACT_PAGES:

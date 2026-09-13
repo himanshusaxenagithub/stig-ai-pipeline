@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.7.4 — 2026-09-13
+
+### Fixed — Site activity no longer trusts stale TOTAL.json
+
+- Landing totals prefer GoatCounter’s public widget: parse `#gcvc-views`
+  from `/counter/TOTAL.html` (the figure the dashboard widget shows).
+- `TOTAL.json` is only a fallback, and a `0` there is treated as unusable
+  (that file has been CDN-stale while the widget showed real views).
+- Last resort: sum public per-path JSON counters for the known Pages
+  paths. Opens and users share that one visitor total; they are not two
+  invented metrics.
+
 ## v0.7.3 — 2026-09-13
 
 ### Changed — GoatCounter site code
