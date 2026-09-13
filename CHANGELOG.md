@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.6.3 — 2026-09-13
+
+### Added — plain-language scan results
+
+- After a local scan, stigui shows a remaining-risk headline (Low /
+  Moderate / High / Critical, or Incomplete when nothing was judged),
+  SVG charts for pass/fail, fails-by-severity, and coverage, and a
+  callout that points at the failing rules. Coverage is still stated
+  first: this is not a fake “percent secure.”
+- PDF and Markdown reports add a short “What this means” section with
+  ASCII bars so the downloaded file matches the friendlier story.
+  Existing coverage-first tests stay green.
+
 ## v0.6.2 — 2026-09-13
 
 ### Fixed

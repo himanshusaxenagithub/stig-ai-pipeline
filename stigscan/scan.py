@@ -62,6 +62,8 @@ class ScanReport:
     def to_dict(self) -> dict[str, Any]:
         d = asdict(self)
         d["counts"] = self.counts()
+        from .summary import summarize_report
+        d["summary"] = summarize_report(self).to_dict()
         return d
 
 
@@ -116,6 +118,8 @@ def run_scan(pack: CheckPack, runner, *, include_unreviewed: bool = False,
                 "status": result.status,
                 "detail": result.detail,
                 "cat": SEVERITY_LABEL.get(result.severity, result.severity),
+                "severity": result.severity,
+                "trusted": result.trusted,
             })
         return result
 

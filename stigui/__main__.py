@@ -52,6 +52,7 @@ from stigscan.report import to_json as report_json, to_markdown as report_markdo
 from stigscan.runner import ShellRunner
 from stigscan.safety import audit
 from stigscan.scan import run_scan, SEVERITY_LABEL
+from stigscan.summary import summarize_report
 from stigscan.selection import (
     SelectionError, apply_selection, find_selection, load_selection,
 )
@@ -344,17 +345,14 @@ class Session:
         counts = report.counts()
         evaluated = counts["pass"] + counts["fail"]
         total = sum(counts.values())
+        story = summarize_report(report)
         return {
             "host": report.host,
             "counts": counts,
             "evaluated": evaluated,
             "total": total,
-            "coverage": (
-                f"{evaluated} of {total} rules "
-                f"({(evaluated / total * 100 if total else 0):.1f}%) were actually evaluated on "
-                "this host. The rest produced no compliance evidence and must not be counted as "
-                "either compliant or non-compliant."
-            ),
+            "coverage": story.coverage_line,
+            "summary": story.to_dict(),
             "evidence": str(record),
             "files": [f"{self.pack.pack_id}_scan.json", f"{self.pack.pack_id}_scan.md",
                       f"{self.pack.pack_id}_scan.pdf"],
@@ -362,9 +360,11 @@ class Session:
                 {
                     "stig_id": r.stig_id,
                     "cat": SEVERITY_LABEL.get(r.severity, r.severity),
+                    "severity": r.severity,
                     "title": r.title,
                     "status": r.status,
                     "detail": getattr(r, "detail", ""),
+                    "trusted": getattr(r, "trusted", True),
                 }
                 for r in report.results
             ],

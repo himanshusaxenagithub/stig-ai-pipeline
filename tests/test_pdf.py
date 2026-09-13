@@ -47,6 +47,12 @@ class TestPdfReport(unittest.TestCase):
         self.assertIn("WARNING", text)
         self.assertIn("unreviewed", text.lower())
 
+    def test_plain_language_section_does_not_replace_coverage(self):
+        text = to_pdf(_report()).decode("latin-1", "replace")
+        self.assertIn("What this means", text)
+        self.assertIn("remaining risk", text)
+        self.assertLess(text.find("were actually evaluated"), text.find("What this means"))
+
     def test_escapes_parentheses_in_titles(self):
         r = _report()
         r.results[0].title = "Limit SSH (FIPS) ciphers"
