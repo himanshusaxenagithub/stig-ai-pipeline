@@ -32,6 +32,22 @@
   batch that would mark an item complete or invent a command.
 - Tests and fixtures under `tests/fixtures/assess/`.
 
+## v0.6.9 — 2026-09-13
+
+### Added — evidence and transparency pages
+
+- `docs/evidence.html` is a dated public record: MIT licence, no API key,
+  human approval before any check runs, macOS / Linux / Windows, how to
+  reproduce a CAT I scan, and links to the start-page demo (and to
+  `demo.html` / `articles/` when those files are on the site).
+- A “what we do not claim” section states there is no DoD or DISA
+  endorsement, that stars are not adoption, and that sample demo data is
+  labeled. No usage metrics are invented.
+- `docs/used.html` invites an optional public note via
+  `mailto:1992.hsaxena@gmail.com` or a GitHub issue template. No
+  testimonials are written on the page.
+- The start-page footer adds a quiet **For reviewers / transparency** link.
+
 ## v0.6.8 — 2026-09-13
 
 ### Added — example run on the product site
