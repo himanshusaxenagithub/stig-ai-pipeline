@@ -22,6 +22,7 @@ The local scanner still downloads the official zip when a person asks it to.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import sys
 import zipfile
@@ -181,11 +182,6 @@ def export(out_dir: Path) -> None:
     (data / "checkpacks").mkdir(parents=True, exist_ok=True)
     (out_dir / "packages").mkdir(parents=True, exist_ok=True)
 
-    catalog = catalog_payload()
-    (data / "catalog.json").write_text(
-        json.dumps(catalog, indent=2) + "\n", encoding="utf-8")
-    log(f"  wrote {data / 'catalog.json'}  ({len(catalog['guides'])} desktop guides)")
-
     for g in desktop_guides():
         if not g.checkpack:
             continue
@@ -199,7 +195,17 @@ def export(out_dir: Path) -> None:
         log(f"  wrote {dest}")
 
     src_zip = write_scanner_src(out_dir / "packages" / "scanner-src.zip")
-    log(f"  wrote {src_zip}  ({src_zip.stat().st_size:,} bytes, stored)")
+    digest = hashlib.sha256(src_zip.read_bytes()).hexdigest()
+    catalog = catalog_payload()
+    catalog["payload"] = {
+        "file": "packages/scanner-src.zip",
+        "sha256": digest,
+        "bytes": src_zip.stat().st_size,
+    }
+    (data / "catalog.json").write_text(
+        json.dumps(catalog, indent=2) + "\n", encoding="utf-8")
+    log(f"  wrote {src_zip}  ({src_zip.stat().st_size:,} bytes, stored, sha256 {digest[:12]}…)")
+    log(f"  wrote {data / 'catalog.json'}  ({len(catalog['guides'])} desktop guides)")
 
 
 def main(argv=None) -> int:

@@ -37,6 +37,12 @@ class TestSiteExport(unittest.TestCase):
         self.assertEqual(mac["rules"], 160)
         self.assertEqual(mac["checkpack"], "macos-26-v1r3")
         self.assertTrue(mac["url"].startswith("https://dl.dod.cyber.mil/"))
+        self.assertTrue(data.get("payload", {}).get("sha256"))
+        self.assertEqual(data["payload"]["file"], "packages/scanner-src.zip")
+        archive = self.out / "packages" / "scanner-src.zip"
+        import hashlib
+        self.assertEqual(data["payload"]["sha256"],
+                         hashlib.sha256(archive.read_bytes()).hexdigest())
 
     def test_guide_json_carries_filed_explanations(self):
         data = json.loads((self.out / "data" / "guides" / "macos-26.json").read_text())
@@ -85,6 +91,23 @@ class TestWebsitePage(unittest.TestCase):
         self.assertIn("unreviewed", js)
         self.assertIn("pack.checks", js)
         self.assertNotIn("/api/scan", js)
+
+    def test_rules_page_starts_with_no_stigs_selected(self):
+        js = (ROOT / "docs" / "site.js").read_text(encoding="utf-8")
+        self.assertIn("selected = new Set();", js)
+        self.assertNotIn(
+            "selected = new Set(guide.items.filter(r => r.mode === \"shell\")",
+            js)
+        self.assertIn('alert("Select at least one rule to put in the scanner.")', js)
+
+    def test_scanner_src_fetch_is_cache_busted(self):
+        js = (ROOT / "docs" / "site.js").read_text(encoding="utf-8")
+        self.assertIn("payloadUrl(\"packages/scanner-src.zip\")", js)
+        self.assertIn("catalog.payload", js)
+        self.assertIn('cache: "no-store"', js)
+        html = (ROOT / "docs" / "index.html").read_text(encoding="utf-8")
+        self.assertIn("Delete the previous unzipped scanner folder", html)
+        self.assertIn("site.js?v=", html)
 
 
 if __name__ == "__main__":

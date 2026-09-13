@@ -1,5 +1,5 @@
 {
-  "generated": "2026-09-13T00:53:08Z",
+  "generated": "2026-09-13T01:18:02Z",
   "download_page": "https://public.cyber.mil/stigs/downloads/",
   "base": "https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip",
   "note": "GitHub Pages cannot download from dl.dod.cyber.mil: browsers block the request (CORS) and many networks block the host. This site ships the filed explanations and check metadata this project validated (release and rule count below; SHA-256 when pinned). The local scanner still fetches the official zip, verifies it, and refuses a file that does not match.",
@@ -71,5 +71,10 @@
       "label": "Microsoft SQL Server 2022",
       "platform": "database"
     }
-  ]
+  ],
+  "payload": {
+    "file": "packages/scanner-src.zip",
+    "sha256": "9a44a8655d9b54c818671152026ca3299f921aea7258712d7004d7544833a08b",
+    "bytes": 397598
+  }
 }

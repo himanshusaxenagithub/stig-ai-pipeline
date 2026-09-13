@@ -21,9 +21,16 @@ let platform = null;
 let selected = new Set();
 
 async function loadJSON(url) {
-  const r = await fetch(url);
+  const r = await fetch(url, {cache: "no-store"});
   if (!r.ok) throw new Error("could not load " + url + " (" + r.status + ")");
   return r.json();
+}
+
+function payloadUrl(path) {
+  const v = catalog && catalog.payload && catalog.payload.sha256
+    || (catalog && catalog.generated) || "";
+  if (!v) return path;
+  return path + (path.includes("?") ? "&" : "?") + "v=" + encodeURIComponent(String(v).slice(0, 16));
 }
 
 function show(step) {
@@ -67,7 +74,7 @@ async function chooseOS(os) {
       ? await loadJSON("data/checkpacks/" + guide.checkpack + ".json")
       : null;
     pack = checks;
-    selected = new Set(guide.items.filter(r => r.mode === "shell").map(r => r.stig_id));
+    selected = new Set();
     renderGuideMeta(cat);
     renderRules();
     $("#tab-rules").disabled = false;
@@ -203,6 +210,9 @@ $("#go-download").onclick = () => {
       on your own ${esc(meta.label)}, read each command, and approve it under
       your own name. Every shipped check is unreviewed. After the scan, a PDF
       report is written next to the JSON and Markdown reports.
+      Delete the old unzipped <code>STIG-Scanner-Windows</code> (or macOS)
+      folder before unzipping this one, so a previous download is not what
+      you double-click.
     </div>`;
   show("download");
 };
@@ -243,7 +253,7 @@ function filterPack(raw, ids, packId) {
 
 async function downloadScanner() {
   const meta = OS[platform];
-  const srcResp = await fetch("packages/scanner-src.zip");
+  const srcResp = await fetch(payloadUrl("packages/scanner-src.zip"), {cache: "no-store"});
   if (!srcResp.ok) {
     throw new Error(
       "could not load the scanner payload (" + srcResp.status + "). "

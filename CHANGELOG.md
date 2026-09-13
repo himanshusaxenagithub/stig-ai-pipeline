@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.6.2 — 2026-09-13
+
+### Fixed
+
+- The rules page no longer pre-ticks every machine check. Selection starts
+  empty; Select shown / CAT I / machine-check still fill it explicitly, and
+  download still requires at least one rule.
+- The site fetches `packages/scanner-src.zip?v=<payload sha256>` with
+  `cache: "no-store"` so a browser that cached the pre-`Dim args` zip cannot
+  keep serving it after a Pages deploy. Delete the old unzipped folder before
+  unpacking a new download.
+
 ## v0.6.1 — 2026-09-13
 
 ### Fixed
