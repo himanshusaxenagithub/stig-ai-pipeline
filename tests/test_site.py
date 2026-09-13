@@ -97,6 +97,9 @@ class TestWebsitePage(unittest.TestCase):
         self.assertIn("img/process-flow.svg", html)
         self.assertTrue((ROOT / "docs" / "img" / "stig-idea.svg").is_file())
         self.assertTrue((ROOT / "docs" / "img" / "process-flow.svg").is_file())
+        import xml.etree.ElementTree as ET
+        for name in ("stig-idea.svg", "process-flow.svg"):
+            ET.parse(ROOT / "docs" / "img" / name)
         landing = html.split('id="s-landing"', 1)[1].split('id="s-rules"', 1)[0]
         self.assertIn("Technical notes", landing)
         self.assertLess(landing.find("<details"), landing.find("dl.dod.cyber.mil"))
@@ -105,6 +108,10 @@ class TestWebsitePage(unittest.TestCase):
         self.assertNotIn("dl.dod.cyber.mil", hero)
         self.assertNotIn("CORS", hero)
         self.assertNotIn("SHA-256", hero)
+        self.assertNotIn("1. Hundreds of settings", html)
+        self.assertNotIn("How it works, start to finish", html)
+        self.assertEqual(landing.count("img/stig-idea.svg"), 1)
+        self.assertEqual(landing.count("Hundreds of settings"), 0)
 
     def test_site_js_builds_a_selection_not_a_remote_scan(self):
         js = (ROOT / "docs" / "site.js").read_text(encoding="utf-8")
