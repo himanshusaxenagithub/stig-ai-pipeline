@@ -83,7 +83,7 @@ class TestWebsitePage(unittest.TestCase):
         html = (ROOT / "docs" / "index.html").read_text(encoding="utf-8")
         self.assertIn("does not scan your machine", html)
         self.assertIn("GitHub Pages", html)
-        self.assertIn("himanshusaxenagithub.github.io/stig-ai-pipeline", html)
+        self.assertIn("https://stig.hsaxena.com", html)
 
     def test_site_js_builds_a_selection_not_a_remote_scan(self):
         js = (ROOT / "docs" / "site.js").read_text(encoding="utf-8")
