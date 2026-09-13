@@ -360,6 +360,47 @@ class TestDraftHooks(unittest.TestCase):
                 session.draft_assessment()
             self.assertIn("scan", str(ctx.exception).lower())
 
+    def test_http_draft_endpoints_write_files_and_refuse_apply(self):
+        from shutil import copyfile
+        with TemporaryDirectory() as tmp:
+            scan = Path(tmp) / "out" / "fixture-windows_scan.json"
+            Path(tmp, "out").mkdir(parents=True, exist_ok=True)
+            copyfile(ROOT / "tests" / "fixtures" / "harden" / "scan_windows.json", scan)
+            port = ui._free_port()
+            th, done = TestAppMode()._start(tmp, port)
+            try:
+                import urllib.error
+                import urllib.request
+                # Point the running session at the written scan via the workdir glob.
+                refused = urllib.request.Request(
+                    f"http://127.0.0.1:{port}/api/harden", method="POST",
+                    headers={"X-Stig-Token": TOKEN, "Content-Type": "application/json",
+                             "Host": "127.0.0.1"},
+                    data=json.dumps({"apply": True}).encode())
+                try:
+                    urllib.request.urlopen(refused, timeout=5)
+                    self.fail("apply flag must be refused")
+                except urllib.error.HTTPError as e:
+                    body = json.loads(e.read())
+                    self.assertIn("will not apply", body["error"])
+
+                req = urllib.request.Request(
+                    f"http://127.0.0.1:{port}/api/harden", method="POST",
+                    headers={"X-Stig-Token": TOKEN, "Content-Type": "application/json",
+                             "Host": "127.0.0.1"},
+                    data=b"{}")
+                with urllib.request.urlopen(req, timeout=10) as r:
+                    data = json.loads(r.read())
+                self.assertEqual(data["kind"], "harden")
+                self.assertEqual(data["applied"], 0)
+                self.assertTrue(data["remediations"])
+            finally:
+                try:
+                    TestAppMode()._api(port, "/api/quit", "POST")
+                except Exception:
+                    pass
+                th.join(timeout=10)
+
 
 if __name__ == "__main__":
     unittest.main()
