@@ -1,0 +1,49 @@
+{
+  "title": "Fixture STIG for assess tests",
+  "version": "V1R0",
+  "source_file": "fixture-xccdf.xml",
+  "rule_count": 3,
+  "rules": [
+    {
+      "stig_id": "APPL-26-005001",
+      "group_id": "V-277165",
+      "severity": "high",
+      "title": "SIP must be enabled.",
+      "check_text": "Verify SIP with /usr/bin/csrutil status.",
+      "fix_text": "Boot into Recovery and run /usr/bin/csrutil enable. Enabling SIP can change how some developer tools behave.",
+      "ai": {
+        "summary": "System Integrity Protection must stay on so macOS can refuse unsigned kernel changes.",
+        "triage": "risky-change",
+        "automation": "manual",
+        "caution": "csrutil enable requires Recovery OS and a reboot."
+      }
+    },
+    {
+      "stig_id": "APPL-26-002064",
+      "group_id": "V-277120",
+      "severity": "medium",
+      "title": "The macOS system must disable the NFS daemon.",
+      "check_text": "Check launchctl for nfsd.",
+      "fix_text": "Unload the NFS daemon if it is not required.",
+      "ai": {
+        "summary": "Turn the NFS service off unless the organisation actually shares files this way.",
+        "triage": "quick-win",
+        "automation": "automatable",
+        "caution": "Disabling NFS will break hosts that still export shares."
+      }
+    },
+    {
+      "stig_id": "APPL-26-000001",
+      "severity": "medium",
+      "title": "The ISSO must be interviewed about this control.",
+      "check_text": "Interview the ISSO.",
+      "fix_text": "Document the decision with the ISSO.",
+      "ai": {
+        "summary": "A person has to ask the ISSO; there is no machine check.",
+        "triage": "needs-judgment",
+        "automation": "manual",
+        "caution": ""
+      }
+    }
+  ]
+}

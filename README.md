@@ -36,7 +36,7 @@ This toolkit does the interpreting. Scanners like OpenSCAP can already tell you 
 |---|---|---|
 | **1. stig-prep** | ✅ this release | Parse any DISA STIG (XCCDF) into engineer-friendly checklists (Markdown / JSON / CSV) with optional AI triage & plain-English explanations |
 | **2. stig-scan** | ✅ v0.2 (macOS), v0.3 (Linux), v0.4 (Windows) | Run human-approved, content-frozen STIG checks against the local system and record pass/fail with an explicit evidence-coverage statement. Platform profiles: macOS, Linux, Windows |
-| 3. stig-assess | planned | AI-assisted assessment: interpret scan results, draft POA&M entries |
+| **3. stig-assess** | ✅ this release | AI-assisted assessment: interpret scan results, draft POA&M entries (drafts only; a named person approves wording and is the only one who can close an item) |
 | 4. stig-harden | planned | Generate remediation scripts for findings, with human-review gates |
 
 Everything is STIG-agnostic: the tools parse standard XCCDF, so the same
@@ -282,6 +282,62 @@ Module 2 end to end — author, verify, walk the user through review, then scan
 and explain the report. The assistant never approves a check and never runs
 an unreviewed one; those lines are in the skill text and enforced by the
 scanner. `skills/stig-scan-windows/` drives it on Windows through PowerShell.
+
+## Module 3: stig-assess
+
+`stig-scan` tells you where the machine stands. `stig-assess` turns the
+failures into Plan of Action and Milestones drafts a person can accept,
+reject, or close — without ever closing a finding on its own.
+
+The same design rule as the scanner applies to *status*: **AI is allowed
+in the authoring loop and never in the closure loop**.
+
+```
+scan JSON  ──draft──▶  POA&M wording  ──human approve──▶  open item  ──human close──▶  closed
+             (offline)     (UNREVIEWED)      (you; digest)              (you; note)
+```
+
+Approving a draft freezes a SHA-256 digest over the wording a person
+read and moves the item from `draft` to `open`. It does **not** mark the
+finding complete. Closing is a separate command that requires a name, a
+kind (`remediated`, `risk_accepted`, or `not_applicable`), and a note.
+A later passing scan does not close anything.
+
+```bash
+# 1. Draft from a scan. Default: failures only. Passes are refused.
+python3 -m stigassess draft out/macos-26-v1r3_scan.json -o out/macos-26-v1r3-poam.json \
+    --checklist out/*_checklist.json
+
+# 2. Read the drafts, CAT I first
+python3 -m stigassess review out/macos-26-v1r3-poam.json --severity high --show
+
+# 3. Accept the wording under your own name (item becomes open, not closed)
+python3 -m stigassess approve out/macos-26-v1r3-poam.json \
+    --by "Your Name" --id APPL-26-005001
+
+# 4. Later, you close it — the only path that can
+python3 -m stigassess close out/macos-26-v1r3-poam.json \
+    --by "Your Name" --id APPL-26-005001 \
+    --kind remediated --note "SIP enabled in Recovery; re-scan pass"
+
+python3 -m stigassess render out/macos-26-v1r3-poam.json -o out/
+python3 -m stigassess verify out/macos-26-v1r3-poam.json
+```
+
+`--include fail,error,manual` also drafts evaluation gaps and GUI /
+interview items. Those rows are labelled as gaps, not findings, and must
+not be counted as pass or fail. Untrusted scan results (checks forced
+with `--include-unreviewed`) stay in the pack and are flagged; they are
+not accreditation evidence.
+
+## AI skill: assess a scan
+
+`skills/stig-assess/` lets an assistant draft and refine POA&M wording
+from a scan report, ten items at a time. A helper script hands it the
+next batch and validates the answers — rejecting the whole batch if it
+tries to close an item, set a review state, or invent a command that is
+not already on the finding. The assistant never runs `approve` or
+`close`; those lines are in the skill text and enforced by the module.
 
 ## AI skill: one-command tracker
 

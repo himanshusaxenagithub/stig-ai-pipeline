@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.7.0 — 2026-09-13
+
+### Added — stig-assess (module 3)
+
+- `python3 -m stigassess`: draft POA&M-style entries from a stig-scan
+  JSON report. Default input is scan failures only; passing results are
+  refused. Evaluation gaps and manual inspections are opt-in and are
+  labelled as gaps, not findings.
+- Approval freezes a SHA-256 digest over the wording a named person
+  read and moves the item from draft to open. It does not close the
+  finding. `close` is a separate command that requires a name, a kind
+  (`remediated`, `risk_accepted`, `not_applicable`), and a note.
+- `skills/stig-assess/` drives the same flow. The helper rejects any
+  batch that would mark an item complete or invent a command.
+- Tests and fixtures under `tests/fixtures/assess/`.
+
 ## v0.6.7 — 2026-09-13
 
 ### Changed — DoD-plain landing wording
