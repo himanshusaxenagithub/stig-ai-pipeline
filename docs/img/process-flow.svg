@@ -21,7 +21,7 @@
     <text class="sub" x="16" y="82">at stig.hsaxena.com</text>
     <text class="sub" x="16" y="100">Pick Mac or Windows</text>
   </g>
-  <polygon class="chev" points="186,84 204,74 204,94"/>
+  <polygon class="chev" points="186,74 204,84 186,94"/>
 
   <g transform="translate(212,18)">
     <rect class="box" width="168" height="132" rx="12"/>
@@ -32,7 +32,7 @@
     <text class="sub" x="16" y="82">English. Tick the ones</text>
     <text class="sub" x="16" y="100">you want to scan.</text>
   </g>
-  <polygon class="chev" points="390,84 408,74 408,94"/>
+  <polygon class="chev" points="390,74 408,84 390,94"/>
 
   <g transform="translate(416,18)">
     <rect class="box" width="168" height="132" rx="12"/>
@@ -43,7 +43,7 @@
     <text class="sub" x="16" y="82">your selection. This</text>
     <text class="sub" x="16" y="100">page never scans.</text>
   </g>
-  <polygon class="chev" points="594,84 612,74 612,94"/>
+  <polygon class="chev" points="594,74 612,84 594,94"/>
 
   <g transform="translate(620,18)">
     <rect class="box" width="168" height="132" rx="12"/>
@@ -54,7 +54,7 @@
     <text class="sub" x="16" y="82">your computer. Type</text>
     <text class="sub" x="16" y="100">your name to approve.</text>
   </g>
-  <polygon class="chev" points="798,84 816,74 816,94"/>
+  <polygon class="chev" points="798,74 816,84 798,94"/>
 
   <g transform="translate(824,18)">
     <rect class="box" width="148" height="132" rx="12"/>
