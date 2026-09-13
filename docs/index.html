@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>STIG Checker — DoD security checklists in plain English</title>
-<meta name="description" content="The US Department of Defense publishes free security checklists most organisations never use. This site explains them in plain English and builds a scanner that runs on your Mac or Windows PC. https://stig.hsaxena.com">
+<meta name="description" content="The US Department of Defense publishes free STIG checklists. This site explains them in plain English and builds a scanner that checks your Mac or Windows PC and lists configuration gaps. https://stig.hsaxena.com">
 <link rel="icon" href="data:,">
 <style>
   :root{
@@ -96,6 +96,18 @@
   .flow-fallback li{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:8px}
   .flow-fallback strong{display:block}
   .os-block{margin-top:8px;padding-top:8px;scroll-margin-top:18px}
+  a.ghost-link{color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:10px 18px;
+               text-decoration:none;display:inline-block;background:var(--paper)}
+  .demo{margin:18px 0 10px;border:1px solid #e8d9b3;background:var(--goldbg);border-radius:12px;
+        padding:18px 20px;scroll-margin-top:18px}
+  .demo h2{margin:0 0 8px}
+  .demo p{margin:0 0 10px;max-width:46rem}
+  .demo .picks{margin:12px 0 4px}
+  .demo .pick{background:var(--paper)}
+  .demo-hint{margin:8px 0 0;font-size:13px;color:#5a3f0b}
+  .demo-banner{background:var(--goldbg);border:1px solid #e8d9b3;border-radius:10px;
+               padding:12px 14px;margin:0 0 16px}
+  .demo-banner p{margin:0 0 10px}
   details.tech{margin-top:22px;border-top:1px solid var(--line);padding-top:12px;color:var(--muted);font-size:13.5px}
   details.tech summary{cursor:pointer;color:var(--ink);font-weight:600}
   details.tech .note{margin-top:10px}
@@ -133,11 +145,31 @@
 
   <section id="s-landing">
     <div class="hero">
-      <h2>The Pentagon publishes free security checklists. Most people never apply them. This site helps you start.</h2>
+      <h2>The Department of Defense publishes free STIG checklists. This site helps you start.</h2>
       <p class="lead">If you look after computers at a school, clinic, small office, or home lab — and you do not have a security team — you can still use the same baselines the US Department of Defense writes. This page explains them, then builds a scanner that runs only on your machine.</p>
       <div class="hero-actions">
-        <a class="go-link" href="#os-pick">Choose your computer</a>
-        <span class="muted">MacBook or Windows PC · no account · nothing uploaded</span>
+        <a class="go-link" href="#demo">Try a simple first scan</a>
+        <a class="ghost-link" href="#os-pick">Or load the full checklist</a>
+        <span class="muted">No account · nothing uploaded</span>
+      </div>
+    </div>
+
+    <div class="demo" id="demo">
+      <h2>Demo — try a simple first scan</h2>
+      <p>The US Department of Defense publishes free <b>STIG</b> checklists — ranked settings that lock down a common system. Anyone may download them.</p>
+      <p>This tool checks your Mac or Windows PC against the matching checklist and lists <b>configuration gaps</b> in plain English: settings that do not yet match the checklist.</p>
+      <p>Today the tool <b>finds</b> misses and writes a report (including a PDF). It does not walk you through guided <b>fixes</b> — that may come later.</p>
+      <p>For a first demo, use <b>CAT I only</b>. Those are the most serious items, and the list is short.</p>
+      <p class="demo-hint">Pick the computer you will scan. The next page shows only CAT I rules. Nothing downloads until you ask.</p>
+      <div class="picks">
+        <button class="pick" data-os="macos" data-demo="cati" type="button">
+          <b>MacBook · CAT I demo</b>
+          <small>Most serious macOS rules · short list</small>
+        </button>
+        <button class="pick" data-os="windows" data-demo="cati" type="button">
+          <b>Windows PC · CAT I demo</b>
+          <small>Most serious Windows 11 rules · short list</small>
+        </button>
       </div>
     </div>
 
@@ -236,6 +268,13 @@
   </section>
 
   <section id="s-rules" hidden>
+    <div class="demo-banner" id="demo-rules-banner" hidden>
+      <p><b>First demo — CAT I only.</b> These are the most serious checklist items. Review the short list, then click <b>Select CAT I for demo</b>. Download only when you are ready — this page does not start a download by itself.</p>
+      <div class="bar" style="margin:0">
+        <button class="go" id="sel-cati-demo" type="button">Select CAT I for demo</button>
+        <span class="muted">Then use "Download a scanner for this selection" below.</span>
+      </div>
+    </div>
     <h2 id="rules-title">Every rule, in plain English</h2>
     <p class="sub" id="rules-sub"></p>
     <div id="guide-out"></div>
@@ -297,7 +336,7 @@
   · <a href="#tech-notes">Technical notes</a>
 </footer>
 
-<script src="zip.js?v=0.6.4"></script>
-<script src="site.js?v=0.6.4"></script>
+<script src="zip.js?v=0.6.6"></script>
+<script src="site.js?v=0.6.6"></script>
 </body>
 </html>

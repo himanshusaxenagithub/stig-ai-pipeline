@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.6.6 — 2026-09-13
+
+### Added — beginner demo on the start page
+
+- The GitHub Pages start step now has a **Demo — try a simple first scan**
+  block: DoD publishes free STIG checklists; this tool lists configuration
+  gaps on your Mac or Windows PC; today it finds misses (report/PDF), and
+  guided fixes may come later. First demo: CAT I only.
+- Mac / Windows demo buttons open the rules list with the CAT I filter on
+  and a one-click **Select CAT I for demo**. Nothing downloads until the
+  person asks. Technical DISA/CORS notes stay collapsed.
+
 ## v0.6.5 — 2026-09-13
 
 ### Changed — less repetition on the start page

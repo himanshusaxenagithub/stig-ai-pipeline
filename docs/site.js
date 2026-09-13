@@ -19,6 +19,7 @@ let guide = null;
 let pack = null;
 let platform = null;
 let selected = new Set();
+let demoMode = false;
 
 async function loadJSON(url) {
   const r = await fetch(url, {cache: "no-store"});
@@ -63,13 +64,31 @@ function setStatus(id, text, isErr) {
 })();
 
 $$(".pick").forEach(btn => {
-  btn.onclick = () => chooseOS(btn.dataset.os);
+  btn.onclick = () => chooseOS(btn.dataset.os, {demo: btn.dataset.demo === "cati"});
 });
 
-async function chooseOS(os) {
+function resetRuleFilters(forDemo) {
+  $("#rules-cat").value = forDemo ? "high" : "";
+  $("#rules-find").value = "";
+  $("#rules-triage").value = "";
+  $("#rules-mode").value = "";
+}
+
+function applyDemoChrome(on) {
+  const banner = $("#demo-rules-banner");
+  if (banner) banner.hidden = !on;
+}
+
+async function chooseOS(os, opts = {}) {
   platform = os;
+  demoMode = !!opts.demo;
   const meta = OS[os];
-  $$(".pick").forEach(b => b.setAttribute("data-mine", String(b.dataset.os === os)));
+  $$(".pick").forEach(b => {
+    const sameOs = b.dataset.os === os;
+    const sameKind = demoMode ? b.dataset.demo === "cati" : !b.dataset.demo;
+    b.setAttribute("data-mine", String(sameOs && sameKind));
+  });
+  applyDemoChrome(demoMode);
   $("#rules-status").textContent = "loading the filed " + meta.label + " guide…";
   show("rules");
   try {
@@ -80,6 +99,7 @@ async function chooseOS(os) {
       : null;
     pack = checks;
     selected = new Set();
+    resetRuleFilters(demoMode);
     renderGuideMeta(cat);
     renderRules();
     $("#tab-rules").disabled = false;
@@ -157,6 +177,16 @@ $("#sel-cati").onclick = () => {
   });
   renderRules();
 };
+const selCatiDemo = $("#sel-cati-demo");
+if (selCatiDemo) {
+  selCatiDemo.onclick = () => {
+    if (!guide) return;
+    selected = new Set(
+      guide.items.filter(r => r.severity === "high").map(r => r.stig_id));
+    $("#rules-cat").value = "high";
+    renderRules();
+  };
+}
 
 function visibleRules() {
   if (!guide) return [];
@@ -177,9 +207,11 @@ function renderRules() {
   $("#rules-count").textContent = rows.length + " of " + guide.items.length + " shown · "
     + selected.size + " selected for the scan";
   $("#rules-title").textContent = guide.title;
-  $("#rules-sub").textContent =
-    `${guide.annotated} of ${guide.rules} rules carry a plain-English explanation. `
-    + `Tick the ones to put in the ${OS[platform].label} scanner.`;
+  $("#rules-sub").textContent = demoMode
+    ? `First demo: CAT I only — the most serious checklist items, and a short list. `
+      + `Tick them, or use Select CAT I for demo, then download when you are ready.`
+    : `${guide.annotated} of ${guide.rules} rules carry a plain-English explanation. `
+      + `Tick the ones to put in the ${OS[platform].label} scanner.`;
   $("#rules-table tbody").innerHTML = rows.slice(0, 500).map(r => `
     <tr>
       <td><input type="checkbox" class="pickme" value="${esc(r.stig_id)}"
