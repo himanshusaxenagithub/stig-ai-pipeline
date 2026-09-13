@@ -110,7 +110,7 @@ The start page **Site activity** block shows one number, labeled **Site visitors
 Set the site code in **one** place: `docs/site-config.js` → `goatcounterCode`. The committed code is `stig-hsaxena` (https://stig-hsaxena.goatcounter.com). `docs/site-chrome.js` then:
 
 1. Injects `https://gc.zgo.at/count.js` with `data-goatcounter="https://stig-hsaxena.goatcounter.com/count"` on every page that includes the two scripts.
-2. Fills that one **Site visitors** figure from GoatCounter’s public site widget: parse `#gcvc-views` on `https://stig-hsaxena.goatcounter.com/counter/TOTAL.html`. `TOTAL.json` is a fallback, but that file can stay at 0 while the widget is correct. If both fail or JSON is 0, the page sums the public per-path JSON counters for `/`, `/index.html`, `/reviews.html`, `/demo.html`, `/evidence.html`, `/used.html`, and `/review-thanks.html`. If nothing works, the number stays `—`. Nothing is invented.
+2. Fills that one **Site visitors** figure from CORS-safe `https://stig-hsaxena.goatcounter.com/counter/TOTAL.json` when `count` is greater than 0. If that is 0 or missing, the page sums the public per-path JSON counters for `/`, `/index.html`, `/reviews.html`, `/demo.html`, `/evidence.html`, `/used.html`, and `/review-thanks.html` (HTTP 404 counts as 0 and does not abort the sum). `TOTAL.html` `#gcvc-views` is last: browsers often cannot read it (no CORS). If nothing works, the number stays `—`. Nothing is invented.
 
 In GoatCounter settings, enable **Allow adding visitor counts on your website** (defaults to off). Making the dashboard public is optional; the JSON counter needs that visitor-counter flag.
 

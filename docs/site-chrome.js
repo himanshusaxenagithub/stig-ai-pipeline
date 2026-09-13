@@ -40,7 +40,7 @@
     }
   }
 
-  /* GoatCounter’s official site widget. TOTAL.json is often CDN-stale (0). */
+  /* GoatCounter’s official site widget. TOTAL.html has no CORS in the browser. */
   function parseGcvcViews(html) {
     if (!html) return null;
     const tagged = String(html).match(/id=["']gcvc-views["'][^>]*>([^<]*)/i);
@@ -68,11 +68,6 @@
     return resp;
   }
 
-  async function totalFromWidgetHtml() {
-    const resp = await fetchGoat(goatBase() + "/counter/TOTAL.html");
-    return parseGcvcViews(await resp.text());
-  }
-
   async function totalFromTotalJson() {
     const resp = await fetchGoat(goatBase() + "/counter/TOTAL.json");
     const data = await resp.json();
@@ -82,8 +77,11 @@
   async function totalFromKnownPaths() {
     const counts = await Promise.all(GOAT_PATHS.map(async function (path) {
       try {
-        const resp = await fetchGoat(
-          goatBase() + "/counter/" + encodeURIComponent(path) + ".json");
+        const resp = await fetch(
+          goatBase() + "/counter/" + encodeURIComponent(path) + ".json",
+          {cache: "no-store"});
+        if (resp.status === 404) return 0;
+        if (!resp.ok) return 0;
         const data = await resp.json();
         return parseGoatNumber(data.count) || 0;
       } catch (e) {
@@ -94,11 +92,12 @@
     return sum > 0 ? sum : null;
   }
 
+  async function totalFromWidgetHtml() {
+    const resp = await fetchGoat(goatBase() + "/counter/TOTAL.html");
+    return parseGcvcViews(await resp.text());
+  }
+
   async function publicGoatTotal() {
-    try {
-      const n = await totalFromWidgetHtml();
-      if (n != null && n > 0) return {n: n, source: "html"};
-    } catch (e) {}
     try {
       const n = await totalFromTotalJson();
       if (n != null && n > 0) return {n: n, source: "json"};
@@ -106,6 +105,10 @@
     try {
       const n = await totalFromKnownPaths();
       if (n != null && n > 0) return {n: n, source: "paths"};
+    } catch (e) {}
+    try {
+      const n = await totalFromWidgetHtml();
+      if (n != null && n > 0) return {n: n, source: "html"};
     } catch (e) {}
     return null;
   }
@@ -132,8 +135,11 @@
 
     try {
       const got = await publicGoatTotal();
-      if (!got) throw new Error("no public total");
-      if (visitorsEl) visitorsEl.textContent = formatCount(got.n);
+      if (got && got.n > 0) {
+        if (visitorsEl) visitorsEl.textContent = formatCount(got.n);
+        return;
+      }
+      throw new Error("no public total");
     } catch (e) {
       dash();
       if (noteEl) {

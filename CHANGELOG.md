@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.7.7 — 2026-09-13
+
+### Fixed — Site visitors no longer stuck on —
+
+- Public totals try CORS-safe `TOTAL.json` first (when `count` > 0),
+  then a per-path JSON sum, then `TOTAL.html` last. The HTML widget has
+  no `Access-Control-Allow-Origin`, so a browser fetch of it must not
+  block the JSON figure.
+- Path counters that 404 (evidence, used, review-thanks) count as 0 and
+  do not abort the sum.
+
 ## v0.7.6 — 2026-09-14
 
 ### Fixed — three ways the double-click did not work, found by running it
