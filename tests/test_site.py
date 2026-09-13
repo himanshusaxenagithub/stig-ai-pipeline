@@ -454,10 +454,18 @@ class TestGoatCounter(unittest.TestCase):
         match = re.search(r'id=["\']gcvc-views["\'][^>]*>([^<]*)', snippet)
         self.assertEqual(match.group(1).strip(), "13")
 
-    def test_landing_labels_one_goatcounter_visitor_total(self):
+    def test_landing_shows_one_visitor_total(self):
         html = (ROOT / "docs" / "index.html").read_text(encoding="utf-8")
-        self.assertIn("same total, not a second metric", html)
-        self.assertIn("GoatCounter’s public visitor total", html)
+        landing = html.split('id="site-activity"', 1)[1].split('id="tech-notes"', 1)[0]
+        self.assertIn('data-stat="visitors"', landing)
+        self.assertIn("Visitors", landing)
+        self.assertIn("GoatCounter’s public visitor total", landing)
+        self.assertIn("https://stig-hsaxena.goatcounter.com", landing)
+        self.assertNotIn("data-stat=\"opens\"", landing)
+        self.assertNotIn("data-stat=\"users\"", landing)
+        self.assertNotIn("same total, not a second metric", landing)
+        self.assertNotIn("Opens / pageviews", landing)
+        self.assertNotIn("Users / unique visitors", landing)
 
     def test_docs_pages_include_the_shared_goatcounter_config(self):
         for name in CONTACT_PAGES:
@@ -469,11 +477,9 @@ class TestGoatCounter(unittest.TestCase):
         html = (ROOT / "docs" / "index.html").read_text(encoding="utf-8")
         self.assertIn('id="site-activity"', html)
         self.assertIn("Site activity", html)
-        self.assertIn("data-stat=\"opens\"", html)
-        self.assertIn("data-stat=\"users\"", html)
-        self.assertIn("pageviews", html.lower())
-        self.assertIn("unique visitors", html.lower())
-        self.assertIn("not Department of Defense adoption", html)
+        self.assertIn("data-stat=\"visitors\"", html)
+        self.assertIn("Visitors", html)
+        self.assertIn("Not Department of Defense adoption", html)
         self.assertIn("—", html)
         self.assertNotIn("countapi", html.lower())
 

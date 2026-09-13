@@ -105,12 +105,12 @@ The [Used this?](docs/used.html) page stays as the optional public-note / GitHub
 
 ### GoatCounter (site activity)
 
-The start page **Site activity** block shows approximate public GoatCounter totals: opens / pageviews and users / unique visitors. Those are website visits, not DoD adoption figures.
+The start page **Site activity** block shows one number: GoatCounter’s public visitor total. That is website visits, not DoD adoption or a customer count. The public widget does not separate raw pageviews from unique visitors.
 
 Set the site code in **one** place: `docs/site-config.js` → `goatcounterCode`. The committed code is `stig-hsaxena` (https://stig-hsaxena.goatcounter.com). `docs/site-chrome.js` then:
 
 1. Injects `https://gc.zgo.at/count.js` with `data-goatcounter="https://stig-hsaxena.goatcounter.com/count"` on every page that includes the two scripts.
-2. Fills the landing totals from GoatCounter’s public site widget: parse `#gcvc-views` on `https://stig-hsaxena.goatcounter.com/counter/TOTAL.html`. `TOTAL.json` is a fallback, but that file can stay at 0 while the widget is correct. If both fail or JSON is 0, the page sums the public per-path JSON counters for `/`, `/index.html`, `/reviews.html`, `/demo.html`, `/evidence.html`, `/used.html`, and `/review-thanks.html`. GoatCounter publishes one visitor total — opens and users both show that number. If nothing works, the numbers stay `—`. Nothing is invented.
+2. Fills that one **Visitors** figure from GoatCounter’s public site widget: parse `#gcvc-views` on `https://stig-hsaxena.goatcounter.com/counter/TOTAL.html`. `TOTAL.json` is a fallback, but that file can stay at 0 while the widget is correct. If both fail or JSON is 0, the page sums the public per-path JSON counters for `/`, `/index.html`, `/reviews.html`, `/demo.html`, `/evidence.html`, `/used.html`, and `/review-thanks.html`. If nothing works, the number stays `—`. Nothing is invented.
 
 In GoatCounter settings, enable **Allow adding visitor counts on your website** (defaults to off). Making the dashboard public is optional; the JSON counter needs that visitor-counter flag.
 
