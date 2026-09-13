@@ -114,6 +114,13 @@ class TestWebsitePage(unittest.TestCase):
         self.assertNotIn("How it works, start to finish", html)
         self.assertEqual(landing.count("img/stig-idea.svg"), 1)
         self.assertEqual(landing.count("Hundreds of settings"), 0)
+        self.assertIn(
+            "The US Department of Defense publishes free STIG checklists.", html)
+        self.assertIn(
+            "This site explains them and helps you check your PC.", html)
+        self.assertNotIn("Pentagon", html)
+        self.assertNotIn("Most people never apply them", html)
+        self.assertNotIn("among the most thorough", html)
 
     def test_landing_has_a_beginner_demo(self):
         html = (ROOT / "docs" / "index.html").read_text(encoding="utf-8")

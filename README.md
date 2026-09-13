@@ -7,7 +7,7 @@ An open-source, AI-enabled toolkit consisting of AI skills and scripts that turn
 
 ## Why this exists
 
-The US Department of Defense publishes free cybersecurity checklists called **STIGs** (Security Technical Implementation Guides) for almost every common system — Windows, Linux, macOS, SQL Server and hundreds more. Each one lists a few hundred settings that make the system secure against cyberattacks. They are the most thorough baselines available, and anyone can download them.
+The US Department of Defense publishes free cybersecurity checklists called **STIGs** (Security Technical Implementation Guides) for almost every common system — Windows, Linux, macOS, SQL Server and hundreds more. Each one lists a few hundred settings. Anyone can download them.
 
 Almost nobody outside government uses them. Each guide is a few hundred rules written for a security auditor; applying one means reading every rule, understanding it, ranking it by risk, and translating it into a change on a real machine. That takes a specialist, and most organisations do not have one. So the checklists sit unused, and the systems stay less secure than they could be for free.
 
@@ -63,7 +63,7 @@ The page is served on your own computer (`127.0.0.1`). Nothing is uploaded. It n
 
 ## Public website (GitHub Pages)
 
-A hosted page starts with why STIGs matter and what the tool will do, plus a **Demo — try a simple first scan** path (CAT I only, then a one-click select). It then walks the same first steps — pick MacBook or Windows, read the filed plain-English explanations, tick the rules to scan — then downloads an OS-specific scanner zip **preconfigured for that selection**. The zip is this project’s Python files plus `selection.json`. It is not a remote scanner. Hosting caveats (CORS, official zip fetch) sit under Technical notes, not in the hero.
+A hosted page leads with the fact that the US Department of Defense publishes free STIG checklists, then explains them and helps you check your PC. It includes a **Demo — try a simple first scan** path (CAT I only, then a one-click select), then the same first steps — pick MacBook or Windows, read the filed plain-English explanations, tick the rules to scan — then downloads an OS-specific scanner zip **preconfigured for that selection**. The zip is this project’s Python files plus `selection.json`. It is not a remote scanner. Hosting caveats (CORS, official zip fetch) sit under Technical notes, not in the hero.
 
 **Hosted (this site):** lists the validated STIG, shows explanations from `annotations/`, builds a download. It does not run host checks and does not need an API key.
 

@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.6.7 — 2026-09-13
+
+### Changed — DoD-plain landing wording
+
+- Hero and meta now say the US Department of Defense publishes free STIG
+  checklists, and that this site explains them and helps you check your PC.
+- Dropped “Pentagon”, “most people never apply them”, and unattributed
+  “most thorough” claims. The beginner demo from v0.6.6 stays in place.
+
 ## v0.6.6 — 2026-09-13
 
 ### Added — beginner demo on the start page
