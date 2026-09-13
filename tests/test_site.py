@@ -321,5 +321,110 @@ class TestEvidenceAndTransparency(unittest.TestCase):
         self.assertIn("personal data", template.lower())
 
 
+CONTACT_PAGES = (
+    "index.html",
+    "demo.html",
+    "evidence.html",
+    "used.html",
+    "reviews.html",
+    "review-thanks.html",
+)
+
+
+class TestContactAndReviews(unittest.TestCase):
+    def test_contact_email_is_on_related_docs_pages(self):
+        for name in CONTACT_PAGES:
+            html = (ROOT / "docs" / name).read_text(encoding="utf-8")
+            self.assertIn("mailto:1992.hsaxena@gmail.com", html, name)
+            self.assertIn("1992.hsaxena@gmail.com", html, name)
+            self.assertIn("https://hsaxena.com", html, name)
+            self.assertIn("https://hsaxena.com/writing", html, name)
+            footer = html.split("<footer>", 1)[1]
+            self.assertIn("Contact", footer, name)
+            self.assertNotIn("co-authored-by", html.lower())
+            self.assertNotIn("@stig.", html)
+
+    def test_reviews_page_posts_to_formsubmit_and_hides_email(self):
+        html = (ROOT / "docs" / "reviews.html").read_text(encoding="utf-8")
+        self.assertIn("formsubmit.co/1992.hsaxena@gmail.com", html)
+        self.assertIn('name="_subject"', html)
+        self.assertIn("STIG site review submission", html)
+        self.assertIn("review-thanks.html", html)
+        self.assertIn('name="name"', html)
+        self.assertIn('name="email"', html)
+        self.assertIn('name="organization"', html)
+        self.assertIn('name="review"', html)
+        self.assertIn("required", html)
+        self.assertIn(
+            "Reviews appear only after manual approval. Email addresses are never published.",
+            html)
+        self.assertIn("activation", html.lower())
+        self.assertIn("used.html", html)
+        self.assertNotIn("formspree", html.lower())
+        self.assertNotIn("<blockquote", html)
+
+    def test_approved_reviews_file_starts_empty_and_has_no_email(self):
+        path = ROOT / "docs" / "data" / "reviews.json"
+        data = json.loads(path.read_text(encoding="utf-8"))
+        reviews = data["reviews"] if isinstance(data, dict) else data
+        self.assertEqual(reviews, [])
+        self.assertNotIn("email", data if isinstance(data, dict) else {})
+        for item in reviews:
+            self.assertNotIn("email", item)
+            self.assertFalse(any("@" in str(v) for v in item.values()))
+        self.assertNotIn("@", path.read_text(encoding="utf-8"))
+        js = (ROOT / "docs" / "site-chrome.js").read_text(encoding="utf-8")
+        self.assertIn("data/reviews.json", js)
+        self.assertIn('"email" in r', js)
+        self.assertIn("No approved reviews yet", js)
+
+    def test_landing_links_reviews_and_keeps_used_this(self):
+        html = (ROOT / "docs" / "index.html").read_text(encoding="utf-8")
+        self.assertIn('href="reviews.html"', html)
+        self.assertIn('href="used.html"', html)
+        used = (ROOT / "docs" / "used.html").read_text(encoding="utf-8")
+        self.assertIn("No invented quotes", used)
+        self.assertIn("reviews.html", used)
+        self.assertIn("mailto:1992.hsaxena@gmail.com", used)
+        self.assertIn("issues/new?template=used-this.yml", used)
+
+
+class TestGoatCounter(unittest.TestCase):
+    def test_site_config_has_placeholder_code(self):
+        js = (ROOT / "docs" / "site-config.js").read_text(encoding="utf-8")
+        self.assertIn("YOUR_GOATCOUNTER_CODE", js)
+        self.assertIn("goatcounterCode", js)
+        self.assertIn("1992.hsaxena@gmail.com", js)
+        self.assertNotIn("countapi", js.lower())
+
+    def test_chrome_installs_goatcounter_and_fetches_public_totals(self):
+        js = (ROOT / "docs" / "site-chrome.js").read_text(encoding="utf-8")
+        self.assertIn("gc.zgo.at/count.js", js)
+        self.assertIn("data-goatcounter", js)
+        self.assertIn("goatcounter.com/count", js)
+        self.assertIn("goatcounter.com/counter/TOTAL.json", js)
+        self.assertIn("YOUR_GOATCOUNTER_CODE", js)
+        self.assertNotIn("countapi", js.lower())
+        self.assertNotIn("api.countapi", js.lower())
+
+    def test_docs_pages_include_the_shared_goatcounter_config(self):
+        for name in CONTACT_PAGES:
+            html = (ROOT / "docs" / name).read_text(encoding="utf-8")
+            self.assertIn("site-config.js", html, name)
+            self.assertIn("site-chrome.js", html, name)
+
+    def test_landing_has_honest_site_activity_section(self):
+        html = (ROOT / "docs" / "index.html").read_text(encoding="utf-8")
+        self.assertIn('id="site-activity"', html)
+        self.assertIn("Site activity", html)
+        self.assertIn("data-stat=\"opens\"", html)
+        self.assertIn("data-stat=\"users\"", html)
+        self.assertIn("pageviews", html.lower())
+        self.assertIn("unique visitors", html.lower())
+        self.assertIn("not Department of Defense adoption", html)
+        self.assertIn("—", html)
+        self.assertNotIn("countapi", html.lower())
+
+
 if __name__ == "__main__":
     unittest.main()

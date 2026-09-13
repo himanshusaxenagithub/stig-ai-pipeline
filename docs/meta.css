@@ -44,6 +44,19 @@ code{font:12px/1.4 ui-monospace,"SF Mono",Consolas,monospace}
 .ghost-link{color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:10px 18px;
             text-decoration:none;display:inline-block;background:var(--paper)}
 footer{max-width:760px;margin:0 auto;padding:10px 20px 40px;color:var(--muted);font-size:13px}
+footer .contact{margin:10px 0 0}
+.review-form label{display:block;font-weight:600;margin:14px 0 4px}
+.review-form input[type=text],.review-form input[type=email],.review-form textarea{
+  width:100%;font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:8px;
+  background:var(--paper);color:var(--ink)}
+.review-form textarea{min-height:140px;resize:vertical}
+.review-form .hint{display:block;font-weight:400;color:var(--muted);font-size:13px;margin-top:4px}
+.review-form .req,.review-form .opt{font-weight:400;color:var(--muted);font-size:12px}
+.review-form button{margin-top:12px;cursor:pointer;border:0}
+.review-form .honey{position:absolute;left:-9999px;height:0;width:0;overflow:hidden}
+#reviews-list .review{border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin:0 0 10px;background:var(--mist)}
+#reviews-list .review-who{margin:0 0 6px}
+#reviews-list .review-text{margin:0}
 @media (max-width:640px){
   .paper{padding:20px 16px}
   h1.page{font-size:22px}

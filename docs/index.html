@@ -76,6 +76,8 @@
   a{color:#2b4a78}
   code{font:12px/1.4 ui-monospace,"SF Mono",Consolas,monospace}
   footer{max-width:1100px;margin:0 auto;padding:10px 20px 40px;color:var(--muted);font-size:13px}
+  footer p{margin:10px 0 0}
+  .activity{margin-top:22px;padding-top:8px;scroll-margin-top:18px}
 
   .hero{margin:0 0 8px}
   .hero h2{font-size:26px;line-height:1.25;margin:0 0 12px;max-width:38rem}
@@ -163,6 +165,7 @@
         <a class="ghost-link" href="#os-pick">Or load the full checklist</a>
         <a class="ghost-link" href="demo.html">See an example run</a>
         <a class="ghost-link" href="https://hsaxena.com">Essays on my site</a>
+        <a class="ghost-link" href="reviews.html">Reviews</a>
         <span class="muted">No account · nothing uploaded</span>
       </div>
     </div>
@@ -207,6 +210,10 @@
       <li>
         <b><a href="demo.html">A worked example</a></b>
         <span>Pick OS → CAT I → download → approve → results with a remaining-risk story. Fictional clinic data, clearly marked.</span>
+      </li>
+      <li>
+        <b><a href="reviews.html">Reviews</a></b>
+        <span>Optional. Appear only after manual approval. Email addresses are never published. The list starts empty.</span>
       </li>
     </ul>
 
@@ -269,6 +276,16 @@
         </button>
       </div>
       <p class="muted" id="fetch-note">Loading the catalogue…</p>
+    </div>
+
+    <div class="activity" id="site-activity">
+      <h3>Site activity</h3>
+      <p class="sub">Approximate public GoatCounter stats for this website. These are not Department of Defense adoption figures, customer counts, or organisational use.</p>
+      <div class="stats">
+        <div class="stat"><b data-stat="opens">—</b><span>Opens / pageviews — every visit GoatCounter records</span></div>
+        <div class="stat"><b data-stat="users">—</b><span>Users / unique visitors — per GoatCounter</span></div>
+      </div>
+      <p class="muted" data-stat="note">Loading public stats…</p>
     </div>
 
     <details class="tech" id="tech-notes">
@@ -356,12 +373,22 @@
   on GitHub · free hosting on GitHub Pages ·
   <a href="https://stig.hsaxena.com">https://stig.hsaxena.com</a>
   · <a href="demo.html">Example run</a>
+  · <a href="reviews.html">Reviews</a>
+  · <a href="used.html">Used this?</a>
   · <a href="https://hsaxena.com">Essays on my site</a>
   · <a href="#tech-notes">Technical notes</a>
   · <a href="evidence.html">For reviewers / transparency</a>
+  <p>
+    Contact:
+    <a href="mailto:1992.hsaxena@gmail.com">1992.hsaxena@gmail.com</a>
+    · <a href="https://hsaxena.com">hsaxena.com</a>
+    · <a href="https://hsaxena.com/writing">Writing</a>
+  </p>
 </footer>
 
 <script src="zip.js?v=0.6.6"></script>
 <script src="site.js?v=0.6.6"></script>
+<script src="site-config.js"></script>
+<script src="site-chrome.js"></script>
 </body>
 </html>

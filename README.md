@@ -67,13 +67,42 @@ A hosted page leads with the fact that the US Department of Defense publishes fr
 
 A **[worked example](https://stig.hsaxena.com/demo.html)** (`docs/demo.html`) shows the same path as an article — pick OS, select CAT I, download, approve, read the risk story — with labeled sample data, so a new reader does not have to click through a real scan. Longer background essays live on the personal site, [hsaxena.com](https://hsaxena.com), not on this product Pages site.
 
-**Hosted (this site):** lists the validated STIG, shows explanations from `annotations/`, builds a download. It does not run host checks and does not need an API key. A static [Evidence and transparency](docs/evidence.html) page lists what a reviewer can verify from public files (licence, approval gate, platforms, how to reproduce a CAT I scan) and what this project does not claim. An optional [Used this?](docs/used.html) page is an invitation only — it does not invent testimonials.
+**Hosted (this site):** lists the validated STIG, shows explanations from `annotations/`, builds a download. It does not run host checks and does not need an API key. A static [Evidence and transparency](docs/evidence.html) page lists what a reviewer can verify from public files (licence, approval gate, platforms, how to reproduce a CAT I scan) and what this project does not claim. An optional [Used this?](docs/used.html) page is an invitation only — it does not invent testimonials. [Reviews](docs/reviews.html) are a separate moderated form: they appear only after a person adds them to `docs/data/reviews.json`. Contact on every Pages footer is [1992.hsaxena@gmail.com](mailto:1992.hsaxena@gmail.com).
 
 **Local (the download):** `stigui` on `127.0.0.1`, human approval, content-frozen digests, the read-only allowlist, then a PDF on the machine that was scanned.
 
 Expected URL after Pages is on:
 
 `https://stig.hsaxena.com`
+
+### Contact
+
+The public site footer lists one email: [1992.hsaxena@gmail.com](mailto:1992.hsaxena@gmail.com). Optional personal-site links: [hsaxena.com](https://hsaxena.com) and [hsaxena.com/writing](https://hsaxena.com/writing).
+
+### Moderated reviews
+
+[docs/reviews.html](docs/reviews.html) posts to FormSubmit (`https://formsubmit.co/1992.hsaxena@gmail.com`) with subject `STIG site review submission`. Required fields: full name, email, review text. Organisation or role is optional. Email is for approval only and is never rendered.
+
+**Activate FormSubmit (first use).** Submit the form once from the live site. FormSubmit emails `1992.hsaxena@gmail.com` an activation link. Click it. Until then, later submissions stay queued and the thank-you page (`docs/review-thanks.html`) may not appear.
+
+**Approve a review.** Do not paste the submitter’s email into the public file.
+
+1. Read the FormSubmit email. Keep the address off the site.
+2. Add an object to `docs/data/reviews.json` → `reviews` with `name`, optional `organization`, and `text` only. No `email` field.
+3. Merge that change. The reviews page loads that JSON and shows name (+ optional organisation) and text. An empty list is correct until someone is approved.
+
+The [Used this?](docs/used.html) page stays as the optional public-note / GitHub-issue path. Do not remove it.
+
+### GoatCounter (site activity)
+
+The start page **Site activity** block shows approximate public GoatCounter totals: opens / pageviews and users / unique visitors. Those are website visits, not DoD adoption figures.
+
+Set the site code in **one** place: `docs/site-config.js` → `goatcounterCode`. The committed placeholder is `YOUR_GOATCOUNTER_CODE`. After you create a free site at [goatcounter.com](https://www.goatcounter.com) (a reasonable code is `stig-hsaxena`), paste that code there. `docs/site-chrome.js` then:
+
+1. Injects `https://gc.zgo.at/count.js` with `data-goatcounter="https://<code>.goatcounter.com/count"` on every page that includes the two scripts.
+2. Fetches `https://<code>.goatcounter.com/counter/TOTAL.json` for the landing totals (`count` → opens, `count_unique` or `count` → users). GoatCounter’s public counter currently publishes one visitor figure; if both fields match, the page says so. If the code is still the placeholder or the request fails, the numbers stay `—`. Nothing is invented.
+
+In GoatCounter settings, enable **Allow adding visitor counts on your website** (defaults to off). Making the dashboard public is optional; the JSON counter needs that visitor-counter flag.
 
 ### Why the site does not fetch `dl.dod.cyber.mil`
 
