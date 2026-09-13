@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.6.5 — 2026-09-13
+
+### Changed — less repetition on the start page
+
+- “What is a STIG?” is one short definition plus the three-panel diagram.
+  The extra three cards and the caption that restated the same steps are gone.
+- “What this tool does” is product actions only (pick, select, download,
+  approve, report). The separate “How it works” section is folded into that.
+
 ## v0.6.4 — 2026-09-13
 
 ### Changed — layman-friendly start page

@@ -85,12 +85,6 @@
   .why p{margin:0;color:var(--muted);font-size:14px}
     .diagram{margin:14px 0 6px;border:1px solid var(--line);border-radius:12px;padding:12px;background:#fafcfe}
     .diagram img{display:block;width:100%;height:auto}
-    .diagram figcaption{margin:10px 4px 2px;color:var(--muted);font-size:13px}
-    .idea{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:14px 0 8px;align-items:stretch}
-    .idea article{border:1px solid var(--line);border-radius:12px;padding:16px;background:var(--paper)}
-    .idea h4{margin:10px 0 6px;font-size:15px}
-    .idea p{margin:0;color:var(--muted);font-size:13.5px}
-    .idea-icon{width:100%;height:72px}
   .does{margin:8px 0 0;padding:0;list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:10px}
   .does li{border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--paper);
            display:flex;gap:12px;align-items:flex-start}
@@ -112,8 +106,6 @@
     .hero h2{font-size:22px}
     .flow-wide{display:none}
     .flow-fallback{display:block}
-    .idea{grid-template-columns:1fr}
-    .idea-wide{display:none}
   }
   @media (max-width:640px){ .stat{flex-basis:calc(50% - 10px)} }
 </style>
@@ -160,89 +152,53 @@
       </article>
       <article>
         <h3>This tool does the interpreting</h3>
-        <p>You get a ranked plan in everyday language, a scanner you run locally, and a report you can hand to a board, an insurer, or an auditor — without buying a product or creating an account.</p>
+        <p>No account, nothing to buy. You read the checklist here, then run a scanner on your own computer.</p>
       </article>
     </div>
 
     <h3>What is a STIG?</h3>
-    <p class="sub">A <b>STIG</b> (Security Technical Implementation Guide) is a DoD checklist of settings that lock down a common system. Think of it as a very complete “make this computer harder to break into” list — hundreds of items, ranked by how serious a miss would be.</p>
-    <div class="idea" aria-label="A STIG in three steps">
-      <article>
-        <svg class="idea-icon" viewBox="0 0 200 72" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <rect x="18" y="8" width="164" height="12" rx="3" fill="#eef2f6"/><circle cx="28" cy="14" r="3" fill="#c0392b"/>
-          <rect x="18" y="26" width="140" height="12" rx="3" fill="#eef2f6"/><circle cx="28" cy="32" r="3" fill="#a8761f"/>
-          <rect x="18" y="44" width="152" height="12" rx="3" fill="#eef2f6"/><circle cx="28" cy="50" r="3" fill="#1e7a54"/>
-        </svg>
-        <h4>1. Hundreds of settings</h4>
-        <p>Each STIG is a long official checklist — typically 160 to 257 rules on a Mac or Windows PC.</p>
-      </article>
-      <article>
-        <svg class="idea-icon" viewBox="0 0 200 72" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <rect x="16" y="6" width="168" height="18" rx="4" fill="#fbecea"/><text x="26" y="19" fill="#c0392b" font-size="11" font-family="sans-serif" font-weight="700">CAT I first</text>
-          <rect x="16" y="28" width="168" height="18" rx="4" fill="#fdf5e6"/><text x="26" y="41" fill="#a8761f" font-size="11" font-family="sans-serif" font-weight="700">Then CAT II</text>
-          <rect x="16" y="50" width="168" height="18" rx="4" fill="#eaf3ee"/><text x="26" y="63" fill="#1e7a54" font-size="11" font-family="sans-serif" font-weight="700">Then CAT III</text>
-        </svg>
-        <h4>2. A ranked plan</h4>
-        <p>This site restates each rule in everyday language and puts the most serious items first.</p>
-      </article>
-      <article>
-        <svg class="idea-icon" viewBox="0 0 200 72" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <rect x="62" y="6" width="76" height="48" rx="5" fill="#16243b"/>
-          <rect x="68" y="12" width="64" height="32" rx="2" fill="#eef2f6"/>
-          <circle cx="100" cy="28" r="9" fill="#1e7a54"/>
-          <path d="M95 28 l3 4 8-9" fill="none" stroke="#fff" stroke-width="2"/>
-          <rect x="88" y="54" width="24" height="6" fill="#16243b"/>
-        </svg>
-        <h4>3. Check your machine</h4>
-        <p>You download a local scanner, approve each check, and get a report — nothing is scanned in this browser.</p>
-      </article>
-    </div>
-    <figure class="diagram idea-wide">
-      <img src="img/stig-idea.svg" alt="Three panels: a long list of security settings, then a ranked plan labelled CAT I, CAT II and CAT III, then a computer with a check mark.">
-      <figcaption>Hundreds of settings → a ranked plan in plain English → a check of your own machine.</figcaption>
+    <p class="sub">A <b>STIG</b> (Security Technical Implementation Guide) is a DoD checklist that locks down a common system. Each one has a few hundred settings, ranked by how serious a miss would be: CAT I first, then II, then III.</p>
+    <figure class="diagram">
+      <img src="img/stig-idea.svg" alt="A long checklist of settings becomes a ranked CAT I, II and III plan, then a check of your own computer.">
     </figure>
 
     <h3>What this tool does</h3>
-    <p class="sub">You stay in control. This website never reaches into your computer. The downloaded program will not run a check until you read it and type your name.</p>
+    <p class="sub">This page never scans. You pick a computer, choose rules, download a program, approve each check on that machine, and get a report.</p>
     <ol class="does">
       <li>
         <span class="stepn">1</span>
-        <div><b>Pick MacBook or Windows</b><span>The matching DoD checklist for this project’s validated release is loaded here.</span></div>
+        <div><b>Pick MacBook or Windows</b><span>Load the matching validated checklist.</span></div>
       </li>
       <li>
         <span class="stepn">2</span>
-        <div><b>Read the rules in plain English</b><span>Each item says what it asks of you, how serious it is, and whether a machine can check it.</span></div>
+        <div><b>Read the rules in plain English</b><span>What it asks, how serious, and whether a machine can check it.</span></div>
       </li>
       <li>
         <span class="stepn">3</span>
-        <div><b>Choose what to scan</b><span>Tick the rules you care about — all of them, the serious ones, or a short first pass.</span></div>
+        <div><b>Choose what to scan</b><span>Tick all of them, the serious ones, or a short first pass.</span></div>
       </li>
       <li>
         <span class="stepn">4</span>
-        <div><b>Download a local scanner</b><span>A zip for that computer, already pointed at your selection. Nothing runs in this browser.</span></div>
+        <div><b>Download a local scanner</b><span>A zip for that computer, already pointed at your selection.</span></div>
       </li>
       <li>
         <span class="stepn">5</span>
-        <div><b>Approve every check</b><span>On your machine, read each command and type your name. Unapproved checks stay off.</span></div>
+        <div><b>Approve every check</b><span>On your machine, read each command and type your name.</span></div>
       </li>
       <li>
         <span class="stepn">6</span>
-        <div><b>Get a report and PDF</b><span>Pass, fail, and a remaining-risk story you can keep or hand over.</span></div>
+        <div><b>Get a report and PDF</b><span>Pass, fail, and a remaining-risk story you can hand over.</span></div>
       </li>
     </ol>
-
-    <h3>How it works, start to finish</h3>
-    <p class="sub">The website is only the front door. Selection happens here; approval and scanning happen on the computer you picked.</p>
     <figure class="diagram">
-      <img class="flow-wide" src="img/process-flow.svg" alt="Five steps: this website, select rules, download a scanner, approve and scan on your computer, then read the results.">
+      <img class="flow-wide" src="img/process-flow.svg" alt="Five product steps: this website, select rules, download a scanner, approve and scan on your computer, then read the results.">
       <ol class="flow-fallback">
-        <li><strong>1 · This website</strong> Learn what a STIG is at <a href="https://stig.hsaxena.com">stig.hsaxena.com</a> and pick Mac or Windows.</li>
-        <li><strong>2 · Select</strong> Read the rules in plain English and tick the ones to scan.</li>
-        <li><strong>3 · Download</strong> Save a zip built for that selection. This page never scans.</li>
-        <li><strong>4 · Approve &amp; scan</strong> Open the program on your computer. Type your name to approve each check.</li>
-        <li><strong>5 · Results</strong> A local report and PDF: what passed, what failed, and the remaining risk.</li>
+        <li><strong>1 · This website</strong> Pick Mac or Windows at <a href="https://stig.hsaxena.com">stig.hsaxena.com</a>.</li>
+        <li><strong>2 · Select</strong> Tick the rules to put in the scanner.</li>
+        <li><strong>3 · Download</strong> Save a zip built for that selection.</li>
+        <li><strong>4 · Approve &amp; scan</strong> Open it on your computer and type your name.</li>
+        <li><strong>5 · Results</strong> A local report and PDF.</li>
       </ol>
-      <figcaption>Website → select → download → approve and scan locally → report.</figcaption>
     </figure>
 
     <div class="os-block" id="os-pick">
