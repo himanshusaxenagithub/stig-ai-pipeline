@@ -94,3 +94,15 @@ which is what makes the workflow sustainable across releases.
   rule does not apply is still a misleading result. The scanner reports what
   it measured; deciding what that means for a given system is module 3's job,
   and ultimately a person's.
+
+## POA&M drafts (module 3)
+
+`stig-assess` writes Plan of Action and Milestones wording from a scan
+report. The same freeze applies: approval records a digest over the
+description and recommendation a person read. Editing the wording after
+that is drift; a drifted item cannot be closed until it is re-reviewed.
+
+Approving a draft makes the item **open**. It does not mark the finding
+complete. Closing requires `stigassess close` with a name, a kind
+(`remediated`, `risk_accepted`, or `not_applicable`), and a note. There
+is no path that closes an item because a later scan passed.
