@@ -63,7 +63,7 @@ The page is served on your own computer (`127.0.0.1`). Nothing is uploaded. It n
 
 ## Public website (GitHub Pages)
 
-A hosted page starts with why STIGs matter and what the tool will do, then walks the same first steps — pick MacBook or Windows, read the filed plain-English explanations, tick the rules to scan — then downloads an OS-specific scanner zip **preconfigured for that selection**. The zip is this project’s Python files plus `selection.json`. It is not a remote scanner. Hosting caveats (CORS, official zip fetch) sit under Technical notes, not in the hero.
+A hosted page starts with why STIGs matter and what the tool will do, plus a **Demo — try a simple first scan** path (CAT I only, then a one-click select). It then walks the same first steps — pick MacBook or Windows, read the filed plain-English explanations, tick the rules to scan — then downloads an OS-specific scanner zip **preconfigured for that selection**. The zip is this project’s Python files plus `selection.json`. It is not a remote scanner. Hosting caveats (CORS, official zip fetch) sit under Technical notes, not in the hero.
 
 **Hosted (this site):** lists the validated STIG, shows explanations from `annotations/`, builds a download. It does not run host checks and does not need an API key.
 

@@ -108,10 +108,38 @@ class TestWebsitePage(unittest.TestCase):
         self.assertNotIn("dl.dod.cyber.mil", hero)
         self.assertNotIn("CORS", hero)
         self.assertNotIn("SHA-256", hero)
+        self.assertNotIn("Pentagon", html)
+        self.assertNotIn("Most people never", html)
         self.assertNotIn("1. Hundreds of settings", html)
         self.assertNotIn("How it works, start to finish", html)
         self.assertEqual(landing.count("img/stig-idea.svg"), 1)
         self.assertEqual(landing.count("Hundreds of settings"), 0)
+
+    def test_landing_has_a_beginner_demo(self):
+        html = (ROOT / "docs" / "index.html").read_text(encoding="utf-8")
+        landing = html.split('id="s-landing"', 1)[1].split('id="s-rules"', 1)[0]
+        self.assertIn('id="demo"', landing)
+        self.assertIn("Demo — try a simple first scan", landing)
+        self.assertIn("Try a simple first scan", landing)
+        self.assertIn("Department of Defense", landing)
+        self.assertIn("configuration gaps", landing)
+        self.assertIn("CAT I only", landing)
+        self.assertIn("data-demo=\"cati\"", landing)
+        self.assertIn('data-os="macos"', landing)
+        self.assertIn('data-os="windows"', landing)
+        demo = landing.split('id="demo"', 1)[1].split('id="os-pick"', 1)[0]
+        self.assertIn("find", demo.lower())
+        self.assertIn("PDF", demo)
+        self.assertIn("fixes", demo.lower())
+        self.assertNotIn("Pentagon", demo)
+        self.assertNotIn("most people never", demo.lower())
+        self.assertNotIn("vulnerabilit", demo.lower())
+        self.assertNotIn("exploit", demo.lower())
+        self.assertNotIn("dl.dod.cyber.mil", demo)
+        self.assertNotIn("CORS", demo)
+        self.assertIn("Select CAT I for demo", html)
+        self.assertIn('id="sel-cati-demo"', html)
+        self.assertIn('id="demo-rules-banner"', html)
 
     def test_site_js_builds_a_selection_not_a_remote_scan(self):
         js = (ROOT / "docs" / "site.js").read_text(encoding="utf-8")
@@ -133,6 +161,20 @@ class TestWebsitePage(unittest.TestCase):
             "selected = new Set(guide.items.filter(r => r.mode === \"shell\")",
             js)
         self.assertIn('alert("Select at least one rule to put in the scanner.")', js)
+
+    def test_demo_path_filters_cat_i_and_does_not_auto_download(self):
+        js = (ROOT / "docs" / "site.js").read_text(encoding="utf-8")
+        self.assertIn('dataset.demo === "cati"', js)
+        self.assertIn('resetRuleFilters(demoMode)', js)
+        self.assertIn('value = forDemo ? "high" : ""', js)
+        self.assertIn("sel-cati-demo", js)
+        self.assertIn('severity === "high"', js)
+        choose = js.split("async function chooseOS", 1)[1].split(
+            "function renderGuideMeta", 1)[0]
+        self.assertNotIn("downloadScanner", choose)
+        self.assertNotIn("go-build", choose)
+        self.assertNotIn("a.download", choose)
+        self.assertIn("selected = new Set();", choose)
 
     def test_scanner_src_fetch_is_cache_busted(self):
         js = (ROOT / "docs" / "site.js").read_text(encoding="utf-8")
