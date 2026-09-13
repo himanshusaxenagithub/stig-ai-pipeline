@@ -16,7 +16,7 @@ from stigscan.evaluate import evaluate, EvalError, PASS, FAIL
 from stigscan.extract import build_pack, candidate_from_rule
 from stigscan.runner import FixtureRunner
 from stigscan.scan import run_scan
-from stigscan.report import to_markdown, to_json
+from stigscan.report import to_markdown, to_json, to_pdf
 
 FIXTURES = Path(__file__).parent / "fixtures" / "macos26-unmanaged-synthetic"
 
@@ -313,6 +313,11 @@ class TestReport(unittest.TestCase):
         data = json.loads(to_json(self._report(True)))
         self.assertIn("counts", data)
         self.assertEqual(sum(data["counts"].values()), len(data["results"]))
+
+    def test_pdf_is_emitted_with_the_same_coverage_line(self):
+        pdf = to_pdf(self._report(True))
+        self.assertTrue(pdf.startswith(b"%PDF-1.4"))
+        self.assertIn(b"were actually evaluated", pdf)
 
     def test_nothing_runs_when_nothing_is_approved(self):
         rep = self._report(include_unreviewed=False)

@@ -98,6 +98,8 @@ class TestShippedPacks(unittest.TestCase):
         self.assertIn("no command", html)
         self.assertIn("go-scan-now", html)
         self.assertIn("nothing to approve", html)
+        self.assertIn("from-site", html)
+        self.assertIn("unreviewed", html)
 
 
 class TestAppMode(unittest.TestCase):
@@ -251,6 +253,31 @@ class TestLiveScanProgress(unittest.TestCase):
                     except Exception:
                         pass
                     th.join(timeout=10)
+
+
+class TestWebsiteSelection(unittest.TestCase):
+    def test_loads_a_selection_and_leaves_checks_unreviewed(self):
+        from stigscan.selection import make_selection, write_selection
+        from stigscan.pack import CheckPack, UNREVIEWED
+        pack = CheckPack.load(ROOT / "checkpacks" / "macos-26-v1r3.json")
+        ids = [c.stig_id for c in pack.checks[:4]]
+        with TemporaryDirectory() as tmp:
+            work = Path(tmp) / "work"
+            folder = Path(tmp) / "zip"
+            (folder / "checkpacks").mkdir(parents=True)
+            pack.subset(ids, pack_id="macos-26-v1r3-selected").save(
+                folder / "checkpacks" / "macos-26-v1r3-selected.json")
+            sel = make_selection(platform="macos", guide_key="macos-26",
+                                 source_pack="macos-26-v1r3", rule_ids=ids)
+            write_selection(folder / "selection.json", sel)
+            session = ui.Session(work)
+            state = session.apply_website_selection(folder / "selection.json")
+            self.assertTrue(state["loaded"])
+            self.assertEqual(state["summary"]["total"], 4)
+            self.assertEqual(state["summary"]["approved"], 0)
+            self.assertTrue(all(c["status"] == UNREVIEWED for c in state["checks"]))
+            self.assertEqual(len(session.rules_cache), 4)
+            self.assertTrue(any(r.get("summary") for r in session.rules_cache))
 
 
 if __name__ == "__main__":

@@ -11,6 +11,7 @@ class TestStartScripts(unittest.TestCase):
         text = (ROOT / "Start.command").read_text(encoding="utf-8")
         self.assertIn("stigui --app", text)
         self.assertIn("ensure-python.sh", text)
+        self.assertIn("selection.json", text)
 
     def test_start_bat_defers_to_the_hidden_helper_when_present(self):
         text = (ROOT / "Start.bat").read_text(encoding="utf-8")
@@ -22,6 +23,7 @@ class TestStartScripts(unittest.TestCase):
         self.assertIn("stigui --app", text)
         self.assertIn("ensure-python.ps1", text)
         self.assertIn("python.org", text)
+        self.assertIn("selection.json", text)
         self.assertRegex(text, r"sh\.Run\s+py\s+&.*,\s*0,\s*False")
 
     def test_windows_bootstrap_pins_official_embed_build(self):

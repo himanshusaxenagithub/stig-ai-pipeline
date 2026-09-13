@@ -141,3 +141,10 @@ class TestAudienceSplit(unittest.TestCase):
         offered = {g.key for g in catalog.desktop_guides()}
         self.assertIn(catalog.recommended("macos"), offered)
         self.assertIn(catalog.recommended("windows"), offered)
+
+    def test_scannable_guides_are_desktop_guides_with_a_pack(self):
+        keys = {g.key for g in catalog.scannable_guides()}
+        self.assertEqual(keys, {"macos-26", "windows-11"})
+        for g in catalog.scannable_guides():
+            self.assertTrue(g.checkpack)
+            self.assertTrue(g.annotation)

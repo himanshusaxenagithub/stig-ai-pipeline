@@ -61,7 +61,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 APP_NAME = "STIG Checker"
-VERSION = "0.5.0"
+VERSION = "0.6.0"
 BUNDLE_ID = "io.github.himanshusaxenagithub.stigchecker"
 
 # Everything the program needs at runtime, copied verbatim.

@@ -102,6 +102,7 @@
   </div>
 </header>
 <div id="gone" class="gone" hidden>STIG Checker has stopped. Double-click it again to start over, then close this tab.</div>
+<div id="from-site" class="gone" hidden>This scan pack came from the website. Every check is still unreviewed — read each command and approve it under your own name before anything runs. Scanning stays on this computer.</div>
 
 <main>
   <nav>
@@ -621,6 +622,23 @@ $("#go-scan").onclick = async () => {
       ? s.packs.map(p => `<option value="${esc(p.path)}">${esc(p.pack_id)} — ${p.checks} checks</option>`).join("")
       : `<option value="">no packs shipped for ${esc(s.platform)}</option>`;
     if (s.pack && s.pack.loaded) renderPack(s.pack);
+    if (s.selection) {
+      $("#from-site").hidden = false;
+      if (s.rules && s.rules.length) {
+        state.rules = s.rules; state.parsed = true;
+        $("#tab-rules").disabled = false;
+        $("#rules-title").textContent = (s.pack && s.pack.stig_title) || s.selection.guide_key || "Selected rules";
+        $("#rules-sub").textContent = s.selection.note ||
+          (s.rules.length + " rules from the website selection. Approve each command before scanning.");
+        renderRules();
+      }
+      if (s.pack && s.pack.loaded) {
+        $("#tab-scan").disabled = false;
+        tab("checks");
+      } else {
+        tab("rules");
+      }
+    }
   } catch (e) { showError("#guide-out", e); }
 })();
 </script>
