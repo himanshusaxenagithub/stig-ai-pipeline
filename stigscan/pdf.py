@@ -70,7 +70,6 @@ def _layout(report: ScanReport) -> list[tuple]:
 
     story = summarize_report(report)
     out.append(("h1", "What this means"))
-    out.append(("h2", f"{story.risk_label} remaining risk"))
     out.append(("body", story.headline))
     out.append(("body", story.meaning))
     out.append(("body", story.next_step))

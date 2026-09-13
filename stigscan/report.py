@@ -58,7 +58,7 @@ def to_markdown(report: ScanReport) -> str:
     story = summarize_report(report)
     L.append("## What this means")
     L.append("")
-    L.append(f"**{story.risk_label} remaining risk.** {story.headline}")
+    L.append(f"**{story.headline}**")
     L.append("")
     L.append(story.meaning)
     L.append("")

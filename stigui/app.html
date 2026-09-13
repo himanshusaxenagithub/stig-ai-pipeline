@@ -43,6 +43,7 @@
   button.go:disabled{opacity:.5;cursor:not-allowed}
   button.ghost{background:var(--paper);color:var(--ink);border:1px solid var(--line);
                border-radius:8px;padding:8px 14px;font:inherit;cursor:pointer}
+  button.ghost[aria-pressed=true]{background:var(--navy);border-color:var(--navy);color:#fff}
   input[type=text],input[type=search],select{font:inherit;padding:8px 10px;border:1px solid var(--line);
        border-radius:8px;background:var(--paper);color:var(--ink)}
   .stats{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}
@@ -569,14 +570,43 @@ function storyFromScan(r) {
     ? (c.fail ? `${c.fail} of ${evaluated} checks we could judge still fail (${rate.toFixed(1)}%).`
               : `All ${evaluated} checks we could judge met the requirement.`)
     : "No rule produced a pass or fail, so remaining risk cannot be judged.";
+  const gap = notEval
+    ? `We only evaluated ${evaluated} of ${total} rules (${cov.toFixed(1)}%). The other ${notEval} produced no yes-or-no evidence and must not be counted as compliant.`
+    : "Every rule in this pack produced a yes-or-no answer.";
+  let headline = judged, meaning = gap, next_step = "Review the results below.";
+  if (risk === "incomplete") {
+    headline = "We could not judge this computer.";
+    meaning = "None of the STIG rules produced a pass or fail. Skipped, manual, and error results are not evidence that the machine is secure or insecure. Approve read-only checks under your name and scan again.";
+    next_step = "Open Checks, read each command, approve it under your own name, then run the scan.";
+  } else if (risk === "critical") {
+    const n = by.high + " CAT I finding" + (by.high === 1 ? "" : "s");
+    headline = "Critical remaining risk — " + n + " among the rules we could check.";
+    meaning = `Among the ${evaluated} rules we could judge, ${c.fail} did not meet the requirement (${(rate||0).toFixed(1)}%), including ${n}. CAT I is DISA's highest severity: these are the settings most likely to be exploited. ${gap} This is remaining risk among what we checked, not a percentage of how secure the laptop is.`;
+    next_step = "Start with the CAT I failures in the list below, then work through the other failing rules toward STIG compliance.";
+  } else if (risk === "high") {
+    headline = `High remaining risk among what we checked — ${c.fail} of ${evaluated} still fail.`;
+    meaning = `${judged} ${gap} That is not a score of how secure the machine is overall.`;
+    next_step = "Work through the failing rules below, highest severity first, and fix toward STIG compliance.";
+  } else if (risk === "moderate") {
+    headline = `Moderate remaining risk — ${c.fail} of ${evaluated} checks we ran still fail.`;
+    meaning = `Among the ${evaluated} rules we could judge, ${c.fail} did not meet the requirement (${(rate||0).toFixed(1)}%). ${gap}`;
+    next_step = "Review the failing rules below and fix the highest-severity ones first.";
+  } else if (c.fail === 0 && notEval) {
+    headline = `No failures among the ${evaluated} rules we could check.`;
+    meaning = `Every rule that produced a yes-or-no answer met the requirement. That is not a clean bill of health: ${notEval} of ${total} rules were not evaluated, so they must not be counted as compliant.`;
+    next_step = "Approve more checks and scan again to close the coverage gap.";
+  } else if (c.fail === 0) {
+    headline = "No failures on the rules we checked — and we checked every rule in this pack.";
+    meaning = `All ${evaluated} rules met the requirement. Keep the approved checks and re-scan after any system change.`;
+    next_step = "Download the report and keep it with the approved check pack.";
+  } else {
+    headline = `Low remaining risk among what we checked — ${c.fail} lower-severity check${c.fail===1?"":"s"} failed.`;
+    meaning = `Among the ${evaluated} rules we could judge, ${c.fail} did not meet the requirement, and none were CAT I or a large CAT II group. ${gap}`;
+    next_step = "The remaining failures are lower severity. Fix them when you can and re-scan.";
+  }
   return {
     risk, risk_label: labels[risk],
-    headline: judged,
-    meaning: "This is remaining risk among the rules we could check, not a percentage of how secure the machine is.",
-    next_step: risk === "incomplete"
-      ? "Open Checks, read each command, approve it under your own name, then run the scan."
-      : (c.fail ? "Work through the failing rules below, highest severity first."
-                : "Approve more checks and scan again to close the coverage gap."),
+    headline, meaning, next_step,
     coverage_line: r.coverage || `${evaluated} of ${total} rules (${cov.toFixed(1)}%) were actually evaluated on this host.`,
     judged_line: judged,
     evaluated, not_evaluated: notEval, total,
@@ -618,6 +648,11 @@ function filterScanRows(kind) {
     else if (kind === "skip") show = st === "skipped" || st === "manual";
     tr.hidden = !show;
   });
+  document.querySelectorAll("[data-scan-filter]").forEach(btn => {
+    btn.setAttribute("aria-pressed", String((btn.getAttribute("data-scan-filter") || "") === kind));
+  });
+  const see = $("#see-fails");
+  if (see) see.setAttribute("aria-pressed", String(kind === "fail"));
   const table = $("#scan-findings") || $("#scan-table");
   if (table) table.scrollIntoView({behavior: "smooth", block: "start"});
 }
@@ -687,8 +722,8 @@ function renderScanStory(r) {
     <div class="risk ${esc(s.risk)}">
       <div class="risk-kicker">${esc(s.risk_label)} remaining risk</div>
       <h3>${esc(s.headline)}</h3>
+      <p><b>${esc(s.judged_line)}</b></p>
       <p>${esc(s.meaning)}</p>
-      <p><b>${esc(s.judged_line)}</b> ${esc(s.coverage_line)}</p>
     </div>
     ${callout}
     <div class="charts">
