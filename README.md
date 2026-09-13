@@ -110,7 +110,7 @@ The start page **Site activity** block shows approximate public GoatCounter tota
 Set the site code in **one** place: `docs/site-config.js` → `goatcounterCode`. The committed code is `stig-hsaxena` (https://stig-hsaxena.goatcounter.com). `docs/site-chrome.js` then:
 
 1. Injects `https://gc.zgo.at/count.js` with `data-goatcounter="https://stig-hsaxena.goatcounter.com/count"` on every page that includes the two scripts.
-2. Fetches `https://stig-hsaxena.goatcounter.com/counter/TOTAL.json` for the landing totals (`count` → opens, `count_unique` or `count` → users). GoatCounter’s public counter currently publishes one visitor figure; if both fields match, the page says so. If the request fails (visitor-counter setting off, or network), the numbers stay `—`. Nothing is invented.
+2. Fills the landing totals from GoatCounter’s public site widget: parse `#gcvc-views` on `https://stig-hsaxena.goatcounter.com/counter/TOTAL.html`. `TOTAL.json` is a fallback, but that file can stay at 0 while the widget is correct. If both fail or JSON is 0, the page sums the public per-path JSON counters for `/`, `/index.html`, `/reviews.html`, `/demo.html`, `/evidence.html`, `/used.html`, and `/review-thanks.html`. GoatCounter publishes one visitor total — opens and users both show that number. If nothing works, the numbers stay `—`. Nothing is invented.
 
 In GoatCounter settings, enable **Allow adding visitor counts on your website** (defaults to off). Making the dashboard public is optional; the JSON counter needs that visitor-counter flag.
 

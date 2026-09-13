@@ -40,6 +40,76 @@
     }
   }
 
+  /* GoatCounter’s official site widget. TOTAL.json is often CDN-stale (0). */
+  function parseGcvcViews(html) {
+    if (!html) return null;
+    const tagged = String(html).match(/id=["']gcvc-views["'][^>]*>([^<]*)/i);
+    if (tagged) return parseGoatNumber(tagged[1]);
+    try {
+      const doc = new DOMParser().parseFromString(html, "text/html");
+      const el = doc.getElementById("gcvc-views");
+      if (el) return parseGoatNumber(el.textContent);
+    } catch (e) {}
+    return null;
+  }
+
+  const GOAT_PATHS = [
+    "/", "/index.html", "/reviews.html", "/demo.html",
+    "/evidence.html", "/used.html", "/review-thanks.html",
+  ];
+
+  function goatBase() {
+    return "https://" + goatCode() + ".goatcounter.com";
+  }
+
+  async function fetchGoat(url) {
+    const resp = await fetch(url, {cache: "no-store"});
+    if (!resp.ok) throw new Error("HTTP " + resp.status);
+    return resp;
+  }
+
+  async function totalFromWidgetHtml() {
+    const resp = await fetchGoat(goatBase() + "/counter/TOTAL.html");
+    return parseGcvcViews(await resp.text());
+  }
+
+  async function totalFromTotalJson() {
+    const resp = await fetchGoat(goatBase() + "/counter/TOTAL.json");
+    const data = await resp.json();
+    return parseGoatNumber(data.count);
+  }
+
+  async function totalFromKnownPaths() {
+    const counts = await Promise.all(GOAT_PATHS.map(async function (path) {
+      try {
+        const resp = await fetchGoat(
+          goatBase() + "/counter/" + encodeURIComponent(path) + ".json");
+        const data = await resp.json();
+        return parseGoatNumber(data.count) || 0;
+      } catch (e) {
+        return 0;
+      }
+    }));
+    const sum = counts.reduce(function (a, b) { return a + b; }, 0);
+    return sum > 0 ? sum : null;
+  }
+
+  async function publicGoatTotal() {
+    try {
+      const n = await totalFromWidgetHtml();
+      if (n != null && n > 0) return {n: n, source: "html"};
+    } catch (e) {}
+    try {
+      const n = await totalFromTotalJson();
+      if (n != null && n > 0) return {n: n, source: "json"};
+    } catch (e) {}
+    try {
+      const n = await totalFromKnownPaths();
+      if (n != null && n > 0) return {n: n, source: "paths"};
+    } catch (e) {}
+    return null;
+  }
+
   async function fillSiteActivity() {
     const root = document.getElementById("site-activity");
     if (!root) return;
@@ -62,26 +132,22 @@
       return;
     }
 
-    const url = "https://" + goatCode() + ".goatcounter.com/counter/TOTAL.json";
     try {
-      const resp = await fetch(url, {cache: "no-store"});
-      if (!resp.ok) throw new Error("HTTP " + resp.status);
-      const data = await resp.json();
-      const opens = parseGoatNumber(data.count);
-      const users = parseGoatNumber(
-        data.count_unique != null ? data.count_unique : data.count);
-      if (opens == null && users == null) throw new Error("empty totals");
-      if (opensEl) opensEl.textContent = opens == null ? "—" : formatCount(opens);
-      if (usersEl) usersEl.textContent = users == null ? "—" : formatCount(users);
-      const same = opens != null && users != null && opens === users;
+      const got = await publicGoatTotal();
+      if (!got) throw new Error("no public total");
+      const shown = formatCount(got.n);
+      if (opensEl) opensEl.textContent = shown;
+      if (usersEl) usersEl.textContent = shown;
       if (noteEl) {
-        noteEl.textContent = same
-          ? "Approximate public GoatCounter totals (cached up to a few hours). " +
-            "GoatCounter’s public counter currently publishes one visitor figure; " +
-            "opens and users both use that number. Not DoD adoption figures."
-          : "Approximate public GoatCounter totals (cached up to a few hours). " +
-            "Opens = every visit GoatCounter records. Users = unique visitors. " +
-            "Not DoD adoption figures.";
+        const how = got.source === "html"
+          ? "from GoatCounter’s public site widget (#gcvc-views on TOTAL.html)"
+          : got.source === "json"
+            ? "from GoatCounter’s TOTAL.json"
+            : "from a sum of public per-page counters (TOTAL.json was 0 or unavailable)";
+        noteEl.textContent =
+          "Approximate public GoatCounter visitor total (" + how + "). " +
+          "GoatCounter’s widget is one visitor figure — opens and users both show that number, " +
+          "not two different metrics. Not DoD adoption figures.";
       }
     } catch (e) {
       dash();
