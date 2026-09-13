@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.6.1 — 2026-09-13
+
+### Fixed
+
+- `run-hidden.vbs` declared `args` under `Option Explicit`. Without `Dim args`
+  Windows Script Host stopped at line 51 (`800A01F4`) when someone double-clicked
+  the website's STIG-Scanner-Windows zip. Selection.json is still passed through
+  when present.
+
 ## v0.6.0 — 2026-09-13
 
 ### Added — public website and a configured local scanner

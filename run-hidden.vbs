@@ -2,7 +2,7 @@
 ' appears. You do not need to touch this file; double-click Start.bat.
 Option Explicit
 
-Dim fso, sh, root, py, localPy, btn, rc
+Dim fso, sh, root, py, localPy, btn, rc, args
 Set fso = CreateObject("Scripting.FileSystemObject")
 Set sh  = CreateObject("WScript.Shell")
 
