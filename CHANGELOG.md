@@ -1,5 +1,23 @@
 # Changelog
 
+## v0.7.2 — 2026-09-13
+
+### Added — contact, moderated reviews, GoatCounter activity
+
+- Pages footers list Contact: `1992.hsaxena@gmail.com`, plus optional
+  [hsaxena.com](https://hsaxena.com) and [writing](https://hsaxena.com/writing).
+- `docs/reviews.html` is a FormSubmit form (required name, email, review;
+  optional organisation). Subject: `STIG site review submission`. First use
+  needs the FormSubmit activation email. Approved reviews live in
+  `docs/data/reviews.json` (starts empty; no email field). Copy states that
+  reviews appear only after manual approval and emails are never published.
+- `docs/used.html` stays as the optional public-note path and points at Reviews.
+- GoatCounter: `docs/site-config.js` holds `goatcounterCode`
+  (`YOUR_GOATCOUNTER_CODE` until a real site is created). `docs/site-chrome.js`
+  adds the count script and fills the landing **Site activity** block from
+  the public ` /counter/TOTAL.json` endpoint. Placeholder or failed fetch
+  shows `—`, not invented numbers. These are website visits, not DoD adoption.
+
 ## v0.7.1 — 2026-09-13
 
 ### Added — stig-harden (module 4)
