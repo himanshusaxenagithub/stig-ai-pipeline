@@ -113,12 +113,10 @@
   async function fillSiteActivity() {
     const root = document.getElementById("site-activity");
     if (!root) return;
-    const opensEl = root.querySelector("[data-stat=opens]");
-    const usersEl = root.querySelector("[data-stat=users]");
+    const visitorsEl = root.querySelector("[data-stat=visitors]");
     const noteEl = root.querySelector("[data-stat=note]");
     const dash = function () {
-      if (opensEl) opensEl.textContent = "—";
-      if (usersEl) usersEl.textContent = "—";
+      if (visitorsEl) visitorsEl.textContent = "—";
     };
 
     if (!goatConfigured()) {
@@ -135,20 +133,7 @@
     try {
       const got = await publicGoatTotal();
       if (!got) throw new Error("no public total");
-      const shown = formatCount(got.n);
-      if (opensEl) opensEl.textContent = shown;
-      if (usersEl) usersEl.textContent = shown;
-      if (noteEl) {
-        const how = got.source === "html"
-          ? "from GoatCounter’s public site widget (#gcvc-views on TOTAL.html)"
-          : got.source === "json"
-            ? "from GoatCounter’s TOTAL.json"
-            : "from a sum of public per-page counters (TOTAL.json was 0 or unavailable)";
-        noteEl.textContent =
-          "Approximate public GoatCounter visitor total (" + how + "). " +
-          "GoatCounter’s widget is one visitor figure — opens and users both show that number, " +
-          "not two different metrics. Not DoD adoption figures.";
-      }
+      if (visitorsEl) visitorsEl.textContent = formatCount(got.n);
     } catch (e) {
       dash();
       if (noteEl) {
