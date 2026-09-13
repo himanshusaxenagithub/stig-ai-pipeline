@@ -18,10 +18,10 @@
     </style>
   </defs>
   <rect class="flag" x="12" y="10" width="268" height="26" rx="13"/>
-  <text class="flagt" x="146" y="28" text-anchor="middle">EXAMPLE  fictional reviewer name</text>
+  <text class="flagt" x="146" y="28" text-anchor="middle">EXAMPLE - fictional reviewer name</text>
 
   <rect class="card" x="12" y="50" width="876" height="236" rx="12"/>
-  <text class="ttl" x="32" y="80">APPL-26-005020 · Enforce FileVault</text>
+  <text class="ttl" x="32" y="80">APPL-26-005020 - Enforce FileVault</text>
   <rect class="chip" x="320" y="64" width="88" height="20" rx="10"/>
   <text class="chipt" x="364" y="78" text-anchor="middle">unreviewed</text>
   <text class="sub" x="32" y="104">Read-only check. Nothing here changes the Mac. Type a name only after you have read the command.</text>

@@ -17,20 +17,20 @@
     </style>
   </defs>
   <rect class="flag" x="12" y="12" width="196" height="28" rx="14"/>
-  <text class="flagt" x="110" y="31" text-anchor="middle">EXAMPLE  not a live scan</text>
-  <text class="cap" x="450" y="54" text-anchor="middle">Cedar Ridge Family Clinic · one staff MacBook</text>
+  <text class="flagt" x="110" y="31" text-anchor="middle">EXAMPLE - not a live scan</text>
+  <text class="cap" x="450" y="54" text-anchor="middle">Cedar Ridge Family Clinic - one staff MacBook</text>
 
   <g transform="translate(70,78)">
     <rect class="sel" width="350" height="150" rx="12"/>
     <text class="ttl on" x="24" y="42">MacBook</text>
-    <text class="sub onm" x="24" y="68">Apple macOS 26 (Tahoe) V1R3 · 160 rules</text>
+    <text class="sub onm" x="24" y="68">Apple macOS 26 (Tahoe) V1R3 - 160 rules</text>
     <text class="sub onm" x="24" y="96">Selected for this example</text>
     <text class="sub on" x="24" y="126">You would tap this on the start page.</text>
   </g>
   <g transform="translate(480,78)">
     <rect class="card" width="350" height="150" rx="12"/>
     <text class="ttl ink" x="24" y="42">Windows PC</text>
-    <text class="sub muted" x="24" y="68">Microsoft Windows 11 V2R9 · 257 rules</text>
+    <text class="sub muted" x="24" y="68">Microsoft Windows 11 V2R9 - 257 rules</text>
     <text class="sub muted" x="24" y="96">Not chosen in this walk-through</text>
     <text class="sub muted" x="24" y="126">Same later steps, different checklist.</text>
   </g>

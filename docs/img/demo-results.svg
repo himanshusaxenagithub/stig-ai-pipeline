@@ -20,7 +20,7 @@
     </style>
   </defs>
   <rect class="flag" x="12" y="10" width="300" height="26" rx="13"/>
-  <text class="flagt" x="162" y="28" text-anchor="middle">EXAMPLE  invented pass / fail counts</text>
+  <text class="flagt" x="162" y="28" text-anchor="middle">EXAMPLE - invented pass / fail counts</text>
 
   <rect class="risk" x="12" y="48" width="876" height="118" rx="12"/>
   <rect class="kicker" x="28" y="62" width="148" height="18" rx="9"/>
@@ -34,14 +34,14 @@
   <rect class="bar" x="28" y="220" width="248" height="16" rx="8"/>
   <rect class="pass" x="28" y="220" width="174" height="16" rx="8"/>
   <rect class="fail" x="202" y="220" width="74" height="16"/>
-  <text class="sub" x="28" y="256">Met the requirement · 7</text>
-  <text class="sub" x="28" y="278">Did not · 3</text>
+  <text class="sub" x="28" y="256">Met the requirement - 7</text>
+  <text class="sub" x="28" y="278">Did not - 3</text>
   <text class="muted" x="28" y="300">30% still fail among judged rules</text>
 
   <rect class="card" x="308" y="180" width="280" height="144" rx="12"/>
   <text class="muted" x="448" y="204" text-anchor="middle">FAILS BY SEVERITY</text>
   <text class="muted" x="28" y="0"></text>
-  <text class="sub" x="324" y="232">CAT I  most serious</text>
+  <text class="sub" x="324" y="232">CAT I - most serious</text>
   <rect class="bar" x="324" y="240" width="200" height="10" rx="5"/>
   <rect class="fail" x="324" y="240" width="200" height="10" rx="5"/>
   <text class="sub" x="532" y="249">3</text>
@@ -55,7 +55,7 @@
   <rect class="bar" x="620" y="220" width="252" height="16" rx="8"/>
   <rect class="navy" x="620" y="220" width="210" height="16" rx="8"/>
   <rect class="skip" x="830" y="220" width="42" height="16"/>
-  <text class="sub" x="620" y="256">Evaluated · 10</text>
-  <text class="sub" x="620" y="278">Not evaluated · 2</text>
+  <text class="sub" x="620" y="256">Evaluated - 10</text>
+  <text class="sub" x="620" y="278">Not evaluated - 2</text>
   <text class="muted" x="620" y="300">83.3% of this 12-rule pack</text>
 </svg>

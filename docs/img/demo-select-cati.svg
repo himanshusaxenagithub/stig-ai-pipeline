@@ -15,11 +15,11 @@
     </style>
   </defs>
   <rect class="flag" x="12" y="10" width="248" height="26" rx="13"/>
-  <text class="flagt" x="136" y="28" text-anchor="middle">EXAMPLE  fictional clinic selection</text>
+  <text class="flagt" x="136" y="28" text-anchor="middle">EXAMPLE - fictional clinic selection</text>
 
   <rect class="btn" x="12" y="48" width="92" height="28" rx="8"/>
   <text class="btnt" x="58" y="67" text-anchor="middle">CAT I only</text>
-  <text class="muted" x="116" y="67">12 of 160 rules shown · 12 selected for the scan</text>
+  <text class="muted" x="116" y="67">12 of 160 rules shown - 12 selected for the scan</text>
 
   <rect class="card" x="12" y="88" width="876" height="220" rx="12"/>
   <text class="head" x="36" y="112">RULE</text>
@@ -52,7 +52,7 @@
   <rect x="200" y="216" width="56" height="18" rx="9" fill="#fdf5e6"/>
   <text class="chip" x="228" y="229" text-anchor="middle" fill="#a8761f">CAT II</text>
   <text class="row" x="320" y="230">Require a password to dismiss the screen saver</text>
-  <text class="muted" x="320" y="248">Cleared  not in this first pass</text>
+  <text class="muted" x="320" y="248">Cleared - not in this first pass</text>
 
   <text class="muted" x="36" y="288">Sample rows only. Real CAT I IDs come from the Apple macOS 26 (Tahoe) V1R3 STIG that DISA publishes.</text>
 </svg>
