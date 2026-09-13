@@ -1,0 +1,77 @@
+{
+  "pack_id": "fixture-shapes",
+  "stig_title": "Fixture STIG for harden tests",
+  "stig_version": "V1R0",
+  "started": "2026-09-13T00:00:00Z",
+  "finished": "2026-09-13T00:00:02Z",
+  "host": {"hostname": "fixture-host", "system": "Darwin"},
+  "options": {"platform": "macos", "runner": "FixtureRunner"},
+  "counts": {"pass": 1, "fail": 4, "error": 0, "manual": 0, "skipped": 0},
+  "results": [
+    {
+      "stig_id": "APPL-26-DEFAULTS",
+      "group_id": "V-1",
+      "severity": "medium",
+      "title": "The macOS system must disable guest login.",
+      "status": "fail",
+      "detail": "expected equals '0', got '1'",
+      "command": "/usr/bin/defaults read /Library/Preferences/com.apple.loginwindow GuestEnabled",
+      "expected": "0",
+      "comparator": "equals",
+      "actual": "1",
+      "trusted": true
+    },
+    {
+      "stig_id": "APPL-26-005001",
+      "group_id": "V-277165",
+      "severity": "high",
+      "title": "SIP must be enabled.",
+      "status": "fail",
+      "detail": "expected equals '1', got '0'",
+      "command": "/usr/bin/csrutil status | /usr/bin/grep -c enabled",
+      "expected": "1",
+      "comparator": "equals",
+      "actual": "0",
+      "trusted": true
+    },
+    {
+      "stig_id": "APPL-26-NFSD",
+      "group_id": "V-2",
+      "severity": "medium",
+      "title": "The macOS system must disable the NFS daemon.",
+      "status": "fail",
+      "detail": "service loaded",
+      "command": "/bin/launchctl print system/com.apple.nfsd",
+      "expected": "1",
+      "comparator": "equals",
+      "actual": "0",
+      "trusted": true
+    },
+    {
+      "stig_id": "APPL-26-PASS",
+      "group_id": "V-3",
+      "severity": "low",
+      "title": "Already met.",
+      "status": "pass",
+      "detail": "matched",
+      "command": "/usr/bin/defaults read com.apple.foo Bar",
+      "expected": "1",
+      "comparator": "equals",
+      "actual": "1",
+      "trusted": true
+    },
+    {
+      "stig_id": "APPL-26-UNKNOWN",
+      "group_id": "V-4",
+      "severity": "low",
+      "title": "A check with no invertible shape.",
+      "status": "fail",
+      "detail": "expected equals '7', got '1'",
+      "command": "total=0; echo $total",
+      "expected": "7",
+      "comparator": "equals",
+      "actual": "1",
+      "trusted": true
+    }
+  ]
+}

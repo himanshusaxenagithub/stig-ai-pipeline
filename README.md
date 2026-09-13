@@ -37,7 +37,7 @@ This toolkit does the interpreting. Scanners like OpenSCAP can already tell you 
 | **1. stig-prep** | ✅ this release | Parse any DISA STIG (XCCDF) into engineer-friendly checklists (Markdown / JSON / CSV) with optional AI triage & plain-English explanations |
 | **2. stig-scan** | ✅ v0.2 (macOS), v0.3 (Linux), v0.4 (Windows) | Run human-approved, content-frozen STIG checks against the local system and record pass/fail with an explicit evidence-coverage statement. Platform profiles: macOS, Linux, Windows |
 | **3. stig-assess** | ✅ this release | AI-assisted assessment: interpret scan results, draft POA&M entries (drafts only; a named person approves wording and is the only one who can close an item) |
-| 4. stig-harden | planned | Generate remediation scripts for findings, with human-review gates |
+| **4. stig-harden** | ✅ this release | Generate remediation scripts for findings, with human-review gates (dry-run / show-script / approve-before-apply; refused in CI) |
 
 Everything is STIG-agnostic: the tools parse standard XCCDF, so the same
 code works for Windows 11, Windows Server, RHEL, Ubuntu, macOS, SQL Server,
@@ -330,6 +330,43 @@ not be counted as pass or fail. Untrusted scan results (checks forced
 with `--include-unreviewed`) stay in the pack and are flagged; they are
 not accreditation evidence.
 
+## Module 4: stig-harden
+
+`stig-assess` writes what to record. `stig-harden` writes what a person
+might run to fix a finding — and then stops. The same freeze as the
+scanner applies to *execution*:
+
+```
+scan JSON  ──author──▶  candidate script  ──human review──▶  frozen script  ──dry-run──▶  (optional apply)
+             (offline)     (UNREVIEWED)         (you)            (digest)     (default)
+```
+
+Known check shapes invert to a draft: Windows `Get-ItemProperty` →
+`Set-ItemProperty`, `auditpol /get` → `/set`; macOS `defaults read` →
+`defaults write`; Linux `sysctl KEY` → `sysctl -w`. High-risk forms
+(SIP, FileVault, `secedit /configure`) stay manual. Destructive verbs
+and network clients are refused. Passing results are not drafted.
+
+```bash
+python3 -m stigharden author out/macos-26-v1r3_scan.json -o out/macos-26-v1r3-harden.json \
+    --checklist out/*_checklist.json --checkpack checkpacks/macos-26-v1r3.json
+
+python3 -m stigharden review out/macos-26-v1r3-harden.json --show
+python3 -m stigharden approve out/macos-26-v1r3-harden.json \
+    --by "Your Name" --id APPL-26-002064
+
+# Default is dry-run. --apply-for-real is refused when CI=true.
+python3 -m stigharden apply out/macos-26-v1r3-harden.json \
+    --by "Your Name" --id APPL-26-002064 --i-have-reviewed
+
+python3 -m stigharden script out/macos-26-v1r3-harden.json -o out/remediations/
+python3 -m stigharden verify out/macos-26-v1r3-harden.json
+```
+
+The local page offers **Draft POA&M entries** and **Draft fixes** after
+a scan. Those buttons only write drafts. They never close a finding and
+never apply a script.
+
 ## AI skill: assess a scan
 
 `skills/stig-assess/` lets an assistant draft and refine POA&M wording
@@ -338,6 +375,13 @@ next batch and validates the answers — rejecting the whole batch if it
 tries to close an item, set a review state, or invent a command that is
 not already on the finding. The assistant never runs `approve` or
 `close`; those lines are in the skill text and enforced by the module.
+
+## AI skill: draft remediations
+
+`skills/stig-harden/` lets an assistant invert failed checks into
+scripts a person can read. The helper rejects any batch that would mark
+a script applied, file a high-risk form as executable, or fail the
+safety gate. The assistant never runs `approve` or `apply`.
 
 ## AI skill: one-command tracker
 

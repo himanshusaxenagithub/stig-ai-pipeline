@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.7.1 — 2026-09-13
+
+### Added — stig-harden (module 4)
+
+- `python3 -m stigharden`: draft platform-appropriate remediation
+  scripts from scan failures (Windows registry / auditpol, macOS
+  defaults / launchctl, Linux sysctl). High-risk forms stay manual.
+  Approval freezes a digest; it does not apply the script.
+- `apply` is a dry-run unless `--apply-for-real` is passed. That flag
+  is refused in CI and still requires `--by` and `--i-have-reviewed`.
+- `skills/stig-harden/` drives the same flow. The helper rejects
+  batches that set apply state or file a high-risk script.
+- stigui: **Draft POA&M entries** and **Draft fixes** after a scan.
+  The page never closes a finding and never applies a change.
+- Tests and fixtures under `tests/fixtures/harden/`.
+
 ## v0.7.0 — 2026-09-13
 
 ### Added — stig-assess (module 3)

@@ -65,7 +65,8 @@ VERSION = "0.6.0"
 BUNDLE_ID = "io.github.himanshusaxenagithub.stigchecker"
 
 # Everything the program needs at runtime, copied verbatim.
-PAYLOAD = ["stigprep", "stigscan", "stigui", "annotations", "checkpacks", "skills"]
+PAYLOAD = ["stigprep", "stigscan", "stigassess", "stigharden", "stigui",
+           "annotations", "checkpacks", "skills"]
 EXTRA_FILES = ["LICENSE", "README.md", "CHANGELOG.md"]
 
 PY_VERSION = "3.12.7"

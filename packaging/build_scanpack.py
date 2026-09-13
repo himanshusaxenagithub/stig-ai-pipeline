@@ -36,7 +36,7 @@ from stigscan.selection import (  # noqa: E402
 )
 
 APP_NAME = "STIG Checker"
-PAYLOAD_DIRS = ["stigprep", "stigscan", "stigui"]
+PAYLOAD_DIRS = ["stigprep", "stigscan", "stigassess", "stigharden", "stigui"]
 LAUNCHERS = [
     "Start.command", "Start.bat", "STIG Checker.command", "STIG Checker.bat",
     "run-hidden.vbs", "Double-click this.txt", "LICENSE",

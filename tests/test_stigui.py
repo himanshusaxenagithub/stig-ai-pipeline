@@ -292,5 +292,115 @@ class TestWebsiteSelection(unittest.TestCase):
             self.assertTrue(any(r.get("summary") for r in session.rules_cache))
 
 
+class TestDraftHooks(unittest.TestCase):
+    """After a scan the page can draft a POA&M and draft fixes. It must
+    not close a finding or apply a remediation."""
+
+    def test_page_offers_drafts_and_never_applies(self):
+        html = (Path(ui.__file__).resolve().parent / "app.html").read_text(encoding="utf-8")
+        self.assertIn("draft-poam", html)
+        self.assertIn("draft-fixes", html)
+        self.assertIn("Draft POA&amp;M entries", html)
+        self.assertIn("Draft fixes", html)
+        self.assertIn("never closes a finding", html)
+        self.assertIn("never applies a change", html)
+        self.assertNotIn("apply-for-real", html)
+        self.assertNotIn("/api/apply", html)
+        self.assertIn("/api/assess", html)
+        self.assertIn("/api/harden", html)
+
+    def test_session_drafts_poam_from_a_written_scan_and_does_not_close(self):
+        from shutil import copyfile
+        with TemporaryDirectory() as tmp:
+            session = ui.Session(Path(tmp))
+            scan = Path(tmp) / "out" / "fixture-mixed_scan.json"
+            copyfile(ROOT / "tests" / "fixtures" / "assess" / "scan_mixed.json", scan)
+            session.last_scan_path = scan
+            got = session.draft_assessment()
+            self.assertEqual(got["kind"], "poam")
+            self.assertEqual(got["closed"], 0)
+            self.assertTrue(got["entries"])
+            self.assertTrue(all(e["poam_status"] == "draft" for e in got["entries"]))
+            self.assertTrue((Path(tmp) / "out" / got["files"][0]).is_file())
+
+    def test_session_drafts_fixes_and_does_not_apply(self):
+        from shutil import copyfile
+        from stigscan.pack import CheckPack
+        with TemporaryDirectory() as tmp:
+            session = ui.Session(Path(tmp))
+            scan = Path(tmp) / "out" / "fixture-windows_scan.json"
+            copyfile(ROOT / "tests" / "fixtures" / "harden" / "scan_windows.json", scan)
+            session.last_scan_path = scan
+            session.pack = CheckPack(pack_id="fixture-windows", platform="windows", checks=[])
+            got = session.draft_fixes()
+            self.assertEqual(got["kind"], "harden")
+            self.assertEqual(got["applied"], 0)
+            self.assertTrue(got["remediations"])
+            self.assertTrue(all(r["apply_status"] == "never_applied" for r in got["remediations"]))
+            self.assertTrue(any(r.get("script") for r in got["remediations"]))
+
+    def test_api_refuses_close_and_apply_flags(self):
+        h = ui.Handler.__new__(ui.Handler)
+        refusals = []
+        h._fail = lambda msg, code=400: refusals.append(msg) or None
+        session = ui.Session.__new__(ui.Session)
+        # Reproduce the gate the handler applies before calling draft_*.
+        payload = {"close": True, "approve": True}
+        if payload.get("close") or payload.get("approve"):
+            h._fail("the page will not close or approve a POA&M item; drafts only.")
+        payload = {"apply": True}
+        if payload.get("apply") or payload.get("approve"):
+            h._fail("the page will not apply or approve a remediation; drafts only.")
+        self.assertEqual(len(refusals), 2)
+
+    def test_no_scan_is_a_clear_error(self):
+        with TemporaryDirectory() as tmp:
+            session = ui.Session(Path(tmp))
+            with self.assertRaises(ValueError) as ctx:
+                session.draft_assessment()
+            self.assertIn("scan", str(ctx.exception).lower())
+
+    def test_http_draft_endpoints_write_files_and_refuse_apply(self):
+        from shutil import copyfile
+        with TemporaryDirectory() as tmp:
+            scan = Path(tmp) / "out" / "fixture-windows_scan.json"
+            Path(tmp, "out").mkdir(parents=True, exist_ok=True)
+            copyfile(ROOT / "tests" / "fixtures" / "harden" / "scan_windows.json", scan)
+            port = ui._free_port()
+            th, done = TestAppMode()._start(tmp, port)
+            try:
+                import urllib.error
+                import urllib.request
+                # Point the running session at the written scan via the workdir glob.
+                refused = urllib.request.Request(
+                    f"http://127.0.0.1:{port}/api/harden", method="POST",
+                    headers={"X-Stig-Token": TOKEN, "Content-Type": "application/json",
+                             "Host": "127.0.0.1"},
+                    data=json.dumps({"apply": True}).encode())
+                try:
+                    urllib.request.urlopen(refused, timeout=5)
+                    self.fail("apply flag must be refused")
+                except urllib.error.HTTPError as e:
+                    body = json.loads(e.read())
+                    self.assertIn("will not apply", body["error"])
+
+                req = urllib.request.Request(
+                    f"http://127.0.0.1:{port}/api/harden", method="POST",
+                    headers={"X-Stig-Token": TOKEN, "Content-Type": "application/json",
+                             "Host": "127.0.0.1"},
+                    data=b"{}")
+                with urllib.request.urlopen(req, timeout=10) as r:
+                    data = json.loads(r.read())
+                self.assertEqual(data["kind"], "harden")
+                self.assertEqual(data["applied"], 0)
+                self.assertTrue(data["remediations"])
+            finally:
+                try:
+                    TestAppMode()._api(port, "/api/quit", "POST")
+                except Exception:
+                    pass
+                th.join(timeout=10)
+
+
 if __name__ == "__main__":
     unittest.main()

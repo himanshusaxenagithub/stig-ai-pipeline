@@ -138,7 +138,7 @@ def _payload_files() -> list[Path]:
     """Same shape as packaging/build_scanpack.py — kept local so this
     script does not import the PyPI ``packaging`` package by accident."""
     out: list[Path] = []
-    for name in ("stigprep", "stigscan", "stigui"):
+    for name in ("stigprep", "stigscan", "stigassess", "stigharden", "stigui"):
         folder = ROOT / name
         if not folder.is_dir():
             continue

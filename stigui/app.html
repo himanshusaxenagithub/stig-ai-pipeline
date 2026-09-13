@@ -817,6 +817,11 @@ function finishScan(r) {
   if (findings) findings.hidden = false;
   setScanBar(r.total || (r.results || []).length, r.total || (r.results || []).length);
   $("#scan-status").textContent = "done";
+  const drafts = $("#draft-actions");
+  if (drafts) {
+    drafts.hidden = false;
+    bindDraftActions();
+  }
 }
 function handleScanEvent(ev) {
   if (ev.phase === "error") throw new Error(ev.error || "scan failed");
@@ -863,6 +868,49 @@ async function readScanStream(r) {
   if (buf.trim()) consume(buf);
 }
 
+function bindDraftActions() {
+  const poam = $("#draft-poam");
+  const fixes = $("#draft-fixes");
+  if (poam) poam.onclick = () => runDraft("poam");
+  if (fixes) fixes.onclick = () => runDraft("fixes");
+}
+function draftRow(item) {
+  if (item.script) {
+    return `<tr><td><code>${esc(item.stig_id)}</code></td><td>${esc(item.mode)}</td>
+      <td>${esc(item.rationale || "")}</td></tr>
+      <tr><td colspan="3"><pre>${esc(item.script)}</pre></td></tr>`;
+  }
+  return `<tr><td><code>${esc(item.stig_id)}</code></td>
+    <td>${esc(item.kind || item.mode || "")}</td>
+    <td>${esc(item.weakness || item.rationale || item.description || "")}</td></tr>`;
+}
+async function runDraft(kind) {
+  const box = $("#draft-out");
+  const btn = kind === "poam" ? $("#draft-poam") : $("#draft-fixes");
+  btn.disabled = true;
+  box.innerHTML = `<p class="muted">writing drafts…</p>`;
+  try {
+    const path = kind === "poam" ? "/api/assess" : "/api/harden";
+    const data = await api(path, {method:"POST",
+      headers:{"Content-Type":"application/json"}, body: "{}"});
+    const items = data.entries || data.remediations || [];
+    const files = (data.files || []).map(f =>
+      `<a href="/api/download?file=${encodeURIComponent(f)}&t=${TOKEN}" download>${esc(f)}</a>`
+    ).join(" · ");
+    box.innerHTML = `
+      <div class="callout nudge"><b>${esc(data.note || "Drafts only.")}</b>
+        ${data.kind === "poam"
+          ? `${(data.summary && data.summary.findings) || items.length} finding draft(s). Closed: ${data.closed ?? 0}.`
+          : `${(data.summary && data.summary.script) || 0} script draft(s). Applied: ${data.applied ?? 0}.`}
+      </div>
+      <p class="muted">${files}</p>
+      <div class="wrap"><table><thead><tr>
+        <th>STIG ID</th><th>Kind</th><th>Draft</th>
+      </tr></thead><tbody>${items.map(draftRow).join("")}</tbody></table></div>`;
+  } catch (e) { showError("#draft-out", e); }
+  btn.disabled = false;
+}
+
 $("#go-scan").onclick = async () => {
   $("#go-scan").disabled = true; $("#scan-status").textContent = "starting…";
   $("#scan-out").innerHTML = `
@@ -878,7 +926,15 @@ $("#go-scan").onclick = async () => {
     <p class="muted" id="scan-files" hidden></p>
     <div class="wrap" id="scan-findings" hidden><table id="scan-table" hidden><thead><tr>
       <th>Status</th><th>Rule</th><th>Severity</th><th>Requirement</th><th>Detail</th>
-    </tr></thead><tbody></tbody></table></div>`;
+    </tr></thead><tbody></tbody></table></div>
+    <div id="draft-actions" hidden>
+      <div class="bar">
+        <button class="ghost" type="button" id="draft-poam">Draft POA&amp;M entries</button>
+        <button class="ghost" type="button" id="draft-fixes">Draft fixes</button>
+      </div>
+      <p class="muted">Drafts only. This page never closes a finding and never applies a change.</p>
+      <div id="draft-out"></div>
+    </div>`;
   try {
     const r = await fetch("/api/scan", {method:"POST",
       headers:{"Content-Type":"application/json", "Accept":"text/event-stream",

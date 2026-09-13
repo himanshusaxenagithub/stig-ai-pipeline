@@ -1,0 +1,30 @@
+{
+  "title": "Fixture STIG for harden tests",
+  "version": "V1R0",
+  "source_file": "fixture-xccdf.xml",
+  "rules": [
+    {
+      "stig_id": "APPL-26-DEFAULTS",
+      "title": "The macOS system must disable guest login.",
+      "check_text": "defaults read /Library/Preferences/com.apple.loginwindow GuestEnabled",
+      "fix_text": "Run /usr/bin/defaults write /Library/Preferences/com.apple.loginwindow GuestEnabled -int 0 to disable the guest account.",
+      "ai": {
+        "summary": "Guest login must be off.",
+        "triage": "quick-win",
+        "automation": "automatable",
+        "caution": "Guests will no longer be able to log in."
+      }
+    },
+    {
+      "stig_id": "APPL-26-005001",
+      "title": "SIP must be enabled.",
+      "fix_text": "Boot to Recovery and run /usr/bin/csrutil enable.",
+      "ai": {
+        "summary": "Keep SIP on.",
+        "triage": "risky-change",
+        "automation": "manual",
+        "caution": "Requires Recovery OS."
+      }
+    }
+  ]
+}

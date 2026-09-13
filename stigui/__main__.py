@@ -154,6 +154,7 @@ class Session:
         self.pack_path: Path | None = None
         self.selection: dict | None = None
         self.rules_cache: list[dict] = []
+        self.last_scan_path: Path | None = None
         self.lock = threading.Lock()
 
     # -- module 1 ----------------------------------------------------------
@@ -338,9 +339,11 @@ class Session:
                           on_progress=on_progress)
 
         out = self.workdir / "out"
-        (out / f"{self.pack.pack_id}_scan.json").write_text(report_json(report), encoding="utf-8")
+        scan_json = out / f"{self.pack.pack_id}_scan.json"
+        scan_json.write_text(report_json(report), encoding="utf-8")
         (out / f"{self.pack.pack_id}_scan.md").write_text(report_markdown(report), encoding="utf-8")
         (out / f"{self.pack.pack_id}_scan.pdf").write_bytes(to_pdf(report))
+        self.last_scan_path = scan_json
 
         counts = report.counts()
         evaluated = counts["pass"] + counts["fail"]
@@ -367,6 +370,102 @@ class Session:
                     "trusted": getattr(r, "trusted", True),
                 }
                 for r in report.results
+            ],
+        }
+
+    def latest_scan_json(self) -> Path:
+        if self.last_scan_path and self.last_scan_path.is_file():
+            return self.last_scan_path
+        found = sorted(
+            (self.workdir / "out").glob("*_scan.json"),
+            key=lambda p: p.stat().st_mtime,
+        )
+        if not found:
+            raise ValueError("no scan report yet — run a scan first")
+        return found[-1]
+
+    def draft_assessment(self) -> dict:
+        """Write POA&M drafts from the last scan. Never closes an item."""
+        from stigassess.interpret import draft_from_path
+        from stigassess.render import to_csv, to_json as poam_json, to_markdown as poam_md
+
+        scan = self.latest_scan_json()
+        pack = draft_from_path(scan, checklist=self.checklist_path)
+        out = self.workdir / "out"
+        base = pack.pack_id
+        (out / f"{base}.json").write_text(poam_json(pack), encoding="utf-8")
+        (out / f"{base}.md").write_text(poam_md(pack), encoding="utf-8")
+        (out / f"{base}.csv").write_text(to_csv(pack), encoding="utf-8")
+        pack.save(out / f"{base}-pack.json")
+        s = pack.summary()
+        return {
+            "kind": "poam",
+            "closed": 0,
+            "summary": s,
+            "files": [f"{base}.json", f"{base}.md", f"{base}.csv"],
+            "note": (
+                "Drafts only. Nothing is closed. Approve and close on the "
+                "command line under your own name."
+            ),
+            "entries": [
+                {
+                    "stig_id": e.stig_id,
+                    "severity": e.severity,
+                    "kind": e.kind,
+                    "weakness": e.weakness,
+                    "poam_status": e.poam_status,
+                    "review_status": e.review_status,
+                    "trusted": e.trusted,
+                    "description": e.description,
+                    "recommendation": e.recommendation,
+                }
+                for e in pack.entries
+            ],
+        }
+
+    def draft_fixes(self) -> dict:
+        """Write remediation drafts from the last scan. Never applies them."""
+        from stigharden.author import author_from_path
+        from stigharden.render import to_json as rem_json, to_markdown as rem_md, write_scripts
+
+        scan = self.latest_scan_json()
+        platform = self.pack.platform if self.pack else None
+        pack = author_from_path(
+            scan,
+            checklist=self.checklist_path,
+            checkpack=self.pack_path,
+            platform=platform,
+        )
+        out = self.workdir / "out"
+        scripts_dir = out / "remediations"
+        pack.save(out / f"{pack.pack_id}.json")
+        (out / f"{pack.pack_id}.md").write_text(rem_md(pack), encoding="utf-8")
+        (out / f"{pack.pack_id}-report.json").write_text(rem_json(pack), encoding="utf-8")
+        written = write_scripts(pack, scripts_dir)
+        s = pack.summary()
+        return {
+            "kind": "harden",
+            "applied": 0,
+            "summary": s,
+            "files": [f"{pack.pack_id}.json", f"{pack.pack_id}.md"]
+                     + [f"remediations/{p.name}" for p in written],
+            "note": (
+                "Drafts only. Nothing was applied. Read each script, then "
+                "approve and dry-run on the command line under your own name."
+            ),
+            "remediations": [
+                {
+                    "stig_id": r.stig_id,
+                    "severity": r.severity,
+                    "mode": r.mode,
+                    "shape": r.shape,
+                    "script": r.script,
+                    "rationale": r.rationale,
+                    "review_status": r.review_status,
+                    "apply_status": r.apply_status,
+                    "author_note": r.author_note,
+                }
+                for r in pack.remediations
             ],
         }
 
@@ -645,6 +744,20 @@ class Handler(BaseHTTPRequestHandler):
 
                 if url.path == "/api/scan":
                     return self._stream_scan(session, bool(payload.get("include_unreviewed")))
+
+                if url.path == "/api/assess":
+                    if payload.get("close") or payload.get("approve"):
+                        return self._fail(
+                            "the page will not close or approve a POA&M item; "
+                            "drafts only. Use python3 -m stigassess on the command line.")
+                    return self._json(session.draft_assessment())
+
+                if url.path == "/api/harden":
+                    if payload.get("apply") or payload.get("approve"):
+                        return self._fail(
+                            "the page will not apply or approve a remediation; "
+                            "drafts only. Use python3 -m stigharden on the command line.")
+                    return self._json(session.draft_fixes())
 
             return self._fail("not found", 404)
         except (ValueError, KeyError, PackError, SelectionError) as e:

@@ -1,0 +1,24 @@
+{
+  "pack_id": "fixture-linux",
+  "stig_title": "Fixture RHEL STIG",
+  "stig_version": "V2R9",
+  "started": "2026-09-13T00:00:00Z",
+  "finished": "2026-09-13T00:00:01Z",
+  "host": {"hostname": "fixture-box", "system": "Linux"},
+  "options": {"platform": "linux", "runner": "FixtureRunner"},
+  "results": [
+    {
+      "stig_id": "RHEL-09-213010",
+      "group_id": "V-257797",
+      "severity": "medium",
+      "title": "RHEL 9 must restrict access to the kernel message buffer.",
+      "status": "fail",
+      "detail": "not set",
+      "command": "sysctl kernel.dmesg_restrict",
+      "expected": "(?im)^\\s*kernel\\.dmesg_restrict\\s*[=:]?\\s*1\\b",
+      "comparator": "regex",
+      "actual": "kernel.dmesg_restrict = 0",
+      "trusted": true
+    }
+  ]
+}
