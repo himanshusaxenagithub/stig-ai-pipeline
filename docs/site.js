@@ -51,7 +51,12 @@ function setStatus(id, text, isErr) {
 (async () => {
   try {
     catalog = await loadJSON("data/catalog.json");
-    $("#fetch-note").textContent = catalog.note;
+    const ready = (catalog.guides || []).filter(g => g.scannable).length;
+    $("#fetch-note").textContent = ready
+      ? "Guides are ready. Pick MacBook or Windows PC to continue."
+      : "Catalogue loaded.";
+    const tech = $("#tech-catalog-note");
+    if (tech && catalog.note) tech.textContent = catalog.note;
   } catch (e) {
     $("#fetch-note").innerHTML = `<span class="err" style="display:block">${esc(e.message)}</span>`;
   }
@@ -109,18 +114,21 @@ function renderGuideMeta(cat) {
       <span class="muted">${esc(g.version || "")} · validated release ${esc(String(g.release))} ·
       ${esc(g.filename)}</span></p>
     <p>${chips}</p>
-    <div class="note">
-      This page loaded the filed explanations this project ships — the same
-      set <code>stigprep parse --explain</code> attaches. It did not download
-      the official zip from <code>dl.dod.cyber.mil</code> (browsers are
-      blocked from that host). The local scanner still fetches
-      <a href="${esc(g.official_url)}">${esc(g.filename)}</a> when you ask it
-      to, verifies the rule count${cat && cat.sha256 ? " and the pinned digest" : ""},
-      and refuses a file that does not match.
-      If that host is blocked on your network, use
-      <a href="${esc(g.download_page)}">${esc(g.download_page)}</a>.
-      ${sha}
-    </div>`;
+    <details class="tech">
+      <summary>Where these explanations come from</summary>
+      <div class="note">
+        This page loaded the filed explanations this project ships — the same
+        set <code>stigprep parse --explain</code> attaches. It did not download
+        the official zip from <code>dl.dod.cyber.mil</code> (browsers are
+        blocked from that host). The local scanner still fetches
+        <a href="${esc(g.official_url)}">${esc(g.filename)}</a> when you ask it
+        to, verifies the rule count${cat && cat.sha256 ? " and the pinned digest" : ""},
+        and refuses a file that does not match.
+        If that host is blocked on your network, use
+        <a href="${esc(g.download_page)}">${esc(g.download_page)}</a>.
+        ${sha}
+      </div>
+    </details>`;
 }
 
 ["rules-find","rules-cat","rules-triage","rules-mode"].forEach(id => {

@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 268" role="img" aria-labelledby="stig-idea-title stig-idea-desc">
+  <title id="stig-idea-title">What a STIG is, in three pictures</title>
+  <desc id="stig-idea-desc">Hundreds of security settings become a ranked plan in plain English, then a check of your own computer.</desc>
+  <defs>
+    <style>
+      .card { fill: #ffffff; stroke: #d9e1e9; stroke-width: 1.25; }
+      .label { fill: #1b2733; font: 600 14px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+      .hint { fill: #5e6e7f; font: 12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+      .row { fill: #eef2f6; }
+      .dot-h { fill: #c0392b; } .dot-m { fill: #a8761f; } .dot-l { fill: #1e7a54; }
+      .arrow { fill: #9aa8b8; }
+    </style>
+  </defs>
+
+  <!-- 1. Hundreds of settings -->
+  <rect class="card" x="8" y="8" width="260" height="252" rx="12"/>
+  <text class="label" x="138" y="36" text-anchor="middle">Hundreds of settings</text>
+  <text class="hint" x="138" y="54" text-anchor="middle">A STIG is a long checklist</text>
+  <g transform="translate(28,72)">
+    <rect class="row" x="0" y="0" width="204" height="18" rx="4"/><circle class="dot-h" cx="12" cy="9" r="3.5"/><rect x="24" y="6" width="150" height="6" rx="2" fill="#c5d0db"/>
+    <rect class="row" x="0" y="24" width="204" height="18" rx="4"/><circle class="dot-h" cx="12" cy="33" r="3.5"/><rect x="24" y="30" width="128" height="6" rx="2" fill="#c5d0db"/>
+    <rect class="row" x="0" y="48" width="204" height="18" rx="4"/><circle class="dot-m" cx="12" cy="57" r="3.5"/><rect x="24" y="54" width="164" height="6" rx="2" fill="#c5d0db"/>
+    <rect class="row" x="0" y="72" width="204" height="18" rx="4"/><circle class="dot-m" cx="12" cy="81" r="3.5"/><rect x="24" y="78" width="110" height="6" rx="2" fill="#c5d0db"/>
+    <rect class="row" x="0" y="96" width="204" height="18" rx="4"/><circle class="dot-m" cx="12" cy="105" r="3.5"/><rect x="24" y="102" width="142" height="6" rx="2" fill="#c5d0db"/>
+    <rect class="row" x="0" y="120" width="204" height="18" rx="4"/><circle class="dot-l" cx="12" cy="129" r="3.5"/><rect x="24" y="126" width="96" height="6" rx="2" fill="#c5d0db"/>
+    <rect class="row" x="0" y="144" width="204" height="18" rx="4"/><circle class="dot-l" cx="12" cy="153" r="3.5"/><rect x="24" y="150" width="158" height="6" rx="2" fill="#c5d0db"/>
+  </g>
+  <text class="hint" x="138" y="242" text-anchor="middle">160257 rules on a typical PC</text>
+
+  <polygon class="arrow" points="282,134 304,124 304,144"/>
+
+  <!-- 2. Ranked plan -->
+  <rect class="card" x="320" y="8" width="260" height="252" rx="12"/>
+  <text class="label" x="450" y="36" text-anchor="middle">A ranked plan</text>
+  <text class="hint" x="450" y="54" text-anchor="middle">Serious items first, in English</text>
+  <g transform="translate(342,74)">
+    <rect x="0" y="0" width="216" height="48" rx="8" fill="#fbecea" stroke="#f0c9c4"/>
+    <text x="14" y="22" fill="#c0392b" font="600 12px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">CAT I · most serious</text>
+    <text x="14" y="38" fill="#1b2733" font="12px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">Fix these before anything else</text>
+    <rect x="0" y="58" width="216" height="48" rx="8" fill="#fdf5e6" stroke="#ead7a8"/>
+    <text x="14" y="80" fill="#a8761f" font="600 12px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">CAT II · important</text>
+    <text x="14" y="96" fill="#1b2733" font="12px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">The bulk of the checklist</text>
+    <rect x="0" y="116" width="216" height="48" rx="8" fill="#eaf3ee" stroke="#c5ddd0"/>
+    <text x="14" y="138" fill="#1e7a54" font="600 12px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">CAT III · still worth doing</text>
+    <text x="14" y="154" fill="#1b2733" font="12px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">Smaller hardening steps</text>
+  </g>
+
+  <polygon class="arrow" points="594,134 616,124 616,144"/>
+
+  <!-- 3. Check your machine -->
+  <rect class="card" x="632" y="8" width="260" height="252" rx="12"/>
+  <text class="label" x="762" y="36" text-anchor="middle">Check your machine</text>
+  <text class="hint" x="762" y="54" text-anchor="middle">See what already matches</text>
+  <g transform="translate(700,78)">
+    <rect x="8" y="0" width="108" height="72" rx="6" fill="#16243b"/>
+    <rect x="14" y="8" width="96" height="50" rx="3" fill="#eef2f6"/>
+    <rect x="48" y="72" width="28" height="8" fill="#16243b"/>
+    <rect x="32" y="80" width="60" height="5" rx="2" fill="#16243b"/>
+    <circle cx="62" cy="32" r="14" fill="#1e7a54"/>
+    <path d="M54 32 l6 7 12-14" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text class="hint" x="762" y="190" text-anchor="middle">Scan stays on your computer</text>
+  <text class="hint" x="762" y="208" text-anchor="middle">You approve every check</text>
+  <text class="hint" x="762" y="242" text-anchor="middle">Then a report you can hand over</text>
+</svg>
