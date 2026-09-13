@@ -67,6 +67,8 @@ class TestSiteExport(unittest.TestCase):
             self.assertIn("Start.command", names)
             self.assertIn("Start.bat", names)
             self.assertIn("stigscan/pdf.py", names)
+            self.assertIn("stigassess/__main__.py", names)
+            self.assertIn("stigharden/__main__.py", names)
             info = zf.getinfo("Start.command")
             self.assertEqual(info.compress_type, zipfile.ZIP_STORED)
             vbs = zf.read("run-hidden.vbs").decode("utf-8")

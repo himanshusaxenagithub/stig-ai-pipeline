@@ -106,3 +106,14 @@ Approving a draft makes the item **open**. It does not mark the finding
 complete. Closing requires `stigassess close` with a name, a kind
 (`remediated`, `risk_accepted`, or `not_applicable`), and a note. There
 is no path that closes an item because a later scan passed.
+
+## Remediation drafts (module 4)
+
+`stig-harden` writes a candidate script from a known check shape.
+Approval records a digest over the script a person read. Editing it
+afterwards is drift; a drifted script will not apply.
+
+Approval does not apply anything. `apply` without `--apply-for-real`
+is a dry-run. `--apply-for-real` is refused in CI and still needs
+`--i-have-reviewed`. The local page's "Draft fixes" button only
+writes files.

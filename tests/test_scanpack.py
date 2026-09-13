@@ -86,6 +86,8 @@ class TestBuildScanpack(unittest.TestCase):
             )
             self.assertTrue((dest / "selection.json").is_file())
             self.assertTrue((dest / "stigui" / "app.html").is_file())
+            self.assertTrue((dest / "stigassess" / "__main__.py").is_file())
+            self.assertTrue((dest / "stigharden" / "__main__.py").is_file())
             self.assertTrue((dest / "Start.command").is_file())
             loaded = json.loads((dest / "selection.json").read_text())
             self.assertEqual(loaded["rule_ids"], ids)

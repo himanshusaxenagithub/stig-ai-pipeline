@@ -1,0 +1,37 @@
+{
+  "pack_id": "fixture-windows",
+  "stig_title": "Fixture Windows STIG",
+  "stig_version": "V2R9",
+  "started": "2026-09-13T00:00:00Z",
+  "finished": "2026-09-13T00:00:01Z",
+  "host": {"hostname": "fixture-pc", "system": "Windows"},
+  "options": {"platform": "windows", "runner": "FixtureRunner"},
+  "results": [
+    {
+      "stig_id": "WN11-00-000031",
+      "group_id": "V-253260",
+      "severity": "high",
+      "title": "Windows 11 systems must use a BitLocker PIN for pre-boot authentication.",
+      "status": "fail",
+      "detail": "expected equals '1', got ''",
+      "command": "(Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\FVE' -Name 'UseAdvancedStartup' -ErrorAction SilentlyContinue).'UseAdvancedStartup'",
+      "expected": "1",
+      "comparator": "equals",
+      "actual": "",
+      "trusted": true
+    },
+    {
+      "stig_id": "WN11-AU-000001",
+      "group_id": "V-1",
+      "severity": "medium",
+      "title": "Audit credential validation must be enabled.",
+      "status": "fail",
+      "detail": "no success",
+      "command": "auditpol /get /subcategory:\"Credential Validation\" /r",
+      "expected": "Success",
+      "comparator": "regex",
+      "actual": "No Auditing",
+      "trusted": true
+    }
+  ]
+}
