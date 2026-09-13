@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.7.3 — 2026-09-13
+
+### Changed — GoatCounter site code
+
+- `docs/site-config.js` `goatcounterCode` is `stig-hsaxena` (no longer the
+  `YOUR_GOATCOUNTER_CODE` placeholder). Tracking and the landing Site
+  activity block use that one value.
+
 ## v0.7.2 — 2026-09-13
 
 ### Added — contact, moderated reviews, GoatCounter activity
@@ -13,8 +21,8 @@
   title, name, optional organisation, text). Copy states that reviews appear
   only after manual approval and emails are never published.
 - `docs/used.html` stays as the optional public-note path and points at Reviews.
-- GoatCounter: `docs/site-config.js` holds `goatcounterCode`
-  (`YOUR_GOATCOUNTER_CODE` until a real site is created). `docs/site-chrome.js`
+- GoatCounter: `docs/site-config.js` holds `goatcounterCode`.
+  `docs/site-chrome.js`
   adds the count script and fills the landing **Site activity** block from
   the public ` /counter/TOTAL.json` endpoint. Placeholder or failed fetch
   shows `—`, not invented numbers. These are website visits, not DoD adoption.

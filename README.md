@@ -107,10 +107,10 @@ The [Used this?](docs/used.html) page stays as the optional public-note / GitHub
 
 The start page **Site activity** block shows approximate public GoatCounter totals: opens / pageviews and users / unique visitors. Those are website visits, not DoD adoption figures.
 
-Set the site code in **one** place: `docs/site-config.js` → `goatcounterCode`. The committed placeholder is `YOUR_GOATCOUNTER_CODE`. After you create a free site at [goatcounter.com](https://www.goatcounter.com) (a reasonable code is `stig-hsaxena`), paste that code there. `docs/site-chrome.js` then:
+Set the site code in **one** place: `docs/site-config.js` → `goatcounterCode`. The committed code is `stig-hsaxena` (https://stig-hsaxena.goatcounter.com). `docs/site-chrome.js` then:
 
-1. Injects `https://gc.zgo.at/count.js` with `data-goatcounter="https://<code>.goatcounter.com/count"` on every page that includes the two scripts.
-2. Fetches `https://<code>.goatcounter.com/counter/TOTAL.json` for the landing totals (`count` → opens, `count_unique` or `count` → users). GoatCounter’s public counter currently publishes one visitor figure; if both fields match, the page says so. If the code is still the placeholder or the request fails, the numbers stay `—`. Nothing is invented.
+1. Injects `https://gc.zgo.at/count.js` with `data-goatcounter="https://stig-hsaxena.goatcounter.com/count"` on every page that includes the two scripts.
+2. Fetches `https://stig-hsaxena.goatcounter.com/counter/TOTAL.json` for the landing totals (`count` → opens, `count_unique` or `count` → users). GoatCounter’s public counter currently publishes one visitor figure; if both fields match, the page says so. If the request fails (visitor-counter setting off, or network), the numbers stay `—`. Nothing is invented.
 
 In GoatCounter settings, enable **Allow adding visitor counts on your website** (defaults to off). Making the dashboard public is optional; the JSON counter needs that visitor-counter flag.
 
