@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>After the scan: assessment and safe remediation</title>
+<meta name="description" content="What STIG Checker already does (prepare and scan) and what comes next: assessment notes and human-gated remediation. Why automatic fix scripts are not this release, and why they should never skip a name.">
+<meta name="author" content="Himanshu Saxena">
+<link rel="stylesheet" href="../pages.css">
+</head>
+<body>
+<header>
+  <div class="head-row">
+    <div>
+      <h1><a href="../index.html">STIG Checker</a></h1>
+      <p>Free Department of Defense checklists, in plain English, scanned on your own computer.</p>
+    </div>
+    <div class="host-badge">Hosted on GitHub Pages · MIT licence</div>
+  </div>
+</header>
+<p class="crumbs"><a href="../index.html">Start</a> · <a href="index.html">Essays</a> · After the scan</p>
+<main>
+<article class="paper">
+<p class="kicker">Essay 10 of 10</p>
+<h1>After the scan: assessment and safe remediation</h1>
+<p class="byline">Himanshu Saxena · for publication on stig.hsaxena.com or hsaxena.com</p>
+
+<p class="lead">A scan answers “what is true on this machine, among the rules we judged?” It does not write the plan, and it does not apply the fix. Those are later modules. They should stay behind the same human gate.</p>
+
+<p>This project is organised as a short pipeline. <b>stig-prep</b> turns a Defense Information Systems Agency (DISA) STIG (the official XCCDF package) into checklists a person can sort — Markdown, JSON, CSV — and attaches the filed plain-English notes when you ask. <b>stig-scan</b> runs human-approved, content-frozen checks against the local system and writes JSON, Markdown, and a PDF with a coverage line and a remaining-risk story. Both of those modules exist in this release. The website at <a href="https://stig.hsaxena.com">stig.hsaxena.com</a> is a narrow front door onto the same work for a desk Mac or Windows PC: pick, select, download, approve, report.</p>
+
+<p>Two later modules are planned and not shipped as working products. <b>stig-assess</b> is meant to help a person interpret a scan: draft plain-language findings, group them, and sketch the kind of notes a plan of action would need. In federal practice those notes often live in a POA&amp;M — a Plan of Action and Milestones. A school or clinic does not need the acronym to need the object: a dated list of what failed, who owns it, what will be done, and when. <b>stig-harden</b> is meant to draft remediation commands or scripts for findings that can be safely automated, still with a review gate. Until those modules exist, you assess and fix with your existing tools, using the PDF as the input.</p>
+
+<p>The order is a safety choice, not a scheduling accident. Assessment without a scan is opinion. Remediation without assessment is a pile of scripts aimed at the wrong machine. Remediation without a human gate is how a “quick harden” locks a clinic out of its only front-desk PC. The FileVault rule’s caution is typical: escrow the recovery key before you enforce encryption. The SSH rules’ cautions are typical: test from a second session before you disable passwords. A tool that applied those fixes because a scan said fail would be a hazard. A tool that drafts the fix, shows the command, and waits for a name is a helper.</p>
+
+<p>What you can do today, after a first CAT I scan, is already enough to be useful. Read the coverage line. If too little was judged, approve more read-only checks and scan again. Read the CAT I failures first. For each one, decide: fix now on this machine, schedule a profile, or accept a documented exception. Write that decision down next to the identifier. Keep the PDF. Re-scan after the change so you have two dated artifacts instead of a recollection. That loop — judge, decide, change, judge again — is assessment and remediation done by hand. The planned modules should make the writing easier, not skip the loop.</p>
+
+<p>A word about exceptions. Not every DISA requirement will fit every classroom or clinic workflow. An exception that is written down, dated, and owned is part of an adult assessment. An exception that is a silent skip in a dashboard is not. This scanner already refuses to count skips as passes. A future assessor should refuse too. If it drafts POA&amp;M-like rows, every row should be able to say “open,” “mitigated,” or “accepted risk,” and none of those words should be inferred from a missing result. Missing means missing.</p>
+
+<p>A word about automation. Some CAT I items in the filed notes are marked automatable and quick-win. Disabling an unused TFTP service is in that neighbourhood. Some are marked config-profile or risky-change. Those should never be the first candidates for a generated script. A harden module that cannot see the triage field would be unsafe by construction. A harden module that can see it and still offers a one-click “fix all” would be unsafe by product design. The public-interest version is boring: draft one change, show the caution, require a name, record a digest, apply only that change, scan again.</p>
+
+<p>None of this is an official Department of Defense remediation service. DISA publishes the guides and, in many cases, the fix text. This project does not speak for DISA. It also does not claim that a generated script is the same as DISA’s fix text. Any later harden output should quote the identifier, show what it will do, and stay optional. Schools and clinics should keep vendor support and backup plans in the loop. A configuration baseline does not replace a tested restore.</p>
+
+<p>National interest, at this end of the pipeline, is completion without recklessness. The United States already has public baselines. It does not need a wave of unattended scripts hitting education and care networks. It does need a path from “we never looked” to “we looked, we wrote down the CAT I misses, we fixed the ones we could, we accepted or scheduled the rest.” Open source can carry that path if each stage stays separable. You can stop after prep and use the tracker in a spreadsheet. You can stop after scan and never generate a fix. You should be able to stop after a drafted assessment and never apply a script. Forced completion is how tools become unwelcome in small organisations.</p>
+
+<p>The roadmap, then, is short enough to print. Today: explain, select, approve, scan, report. Next: help a person write the story of the findings. Later: help a person apply a reviewed change. Always: a typed name, a frozen fingerprint, a coverage line, and no scan in the browser. The <a href="../demo.html">example run</a> stops at the report on purpose. That is where this release stops. If you want to begin, return to the <a href="../index.html">start page</a>, pick a computer, and keep the first pass small. If you want the policy case, start at <a href="why-free-dod-checklists-matter.html">the checklists already exist</a>. The work in the middle is ordinary configuration hygiene, done in public, with the blanks left visible.</p>
+
+<p class="note">All ten essays: <a href="index.html">essay list</a>. Public site: <a href="https://stig.hsaxena.com">https://stig.hsaxena.com</a>.</p>
+</article>
+</main>
+<footer>
+  <a href="https://github.com/himanshusaxenagithub/stig-ai-pipeline">stig-ai-pipeline</a>
+  · <a href="https://stig.hsaxena.com">stig.hsaxena.com</a>
+  · <a href="../index.html">Start</a> · <a href="../demo.html">Example run</a> · <a href="index.html">Essays</a>
+</footer>
+</body>
+</html>

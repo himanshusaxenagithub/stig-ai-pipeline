@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Silence is not compliance</title>
+<meta name="description" content="Why STIG reports must state how many rules were actually evaluated. Skipped and manual checks are not passes. Remaining risk is among what was judged, not a fake percent-secure score.">
+<meta name="author" content="Himanshu Saxena">
+<link rel="stylesheet" href="../pages.css">
+</head>
+<body>
+<header>
+  <div class="head-row">
+    <div>
+      <h1><a href="../index.html">STIG Checker</a></h1>
+      <p>Free Department of Defense checklists, in plain English, scanned on your own computer.</p>
+    </div>
+    <div class="host-badge">Hosted on GitHub Pages · MIT licence</div>
+  </div>
+</header>
+<p class="crumbs"><a href="../index.html">Start</a> · <a href="index.html">Essays</a> · Coverage honesty</p>
+<main>
+<article class="paper">
+<p class="kicker">Essay 6 of 10</p>
+<h1>Silence is not compliance</h1>
+<p class="byline">Himanshu Saxena · for publication on stig.hsaxena.com or hsaxena.com</p>
+
+<p class="lead">A security report is only as honest as its coverage statement. If a tool checked twelve rules, judged ten, and skipped two, the two skips are not secret passes. They are blanks. This project writes the blanks first.</p>
+
+<p>People who do not live in audits still know when a number is doing too much work. “You are 100 percent secure” cannot be true of a laptop. “You passed 7 of 10” can be true, if the 10 are named and the missing 2 are named too. The Defense Information Systems Agency’s STIGs are long on purpose. A desktop guide in this repository has 160 or 257 rules depending on the product and release. No first evening will judge all of them. A first CAT I pass might judge a dozen. That is useful only if the report refuses to inflate the dozen into a clean bill of health.</p>
+
+<p>This scanner therefore reports a coverage line in ordinary language. In the invented <a href="../demo.html">example run</a>, the line is: 10 of 12 rules (83.3%) were actually evaluated on this host. The remaining 2 produced no compliance evidence and must not be counted as either compliant or non-compliant. That sentence is more important than the red “Critical” kicker that follows. Critical, here, means CAT I failures among the rules that produced a yes or a no. It does not mean “this laptop is 83 percent of the way to safe.” Remaining risk is among what we checked. The product says so on the results page, in the Markdown, and in the PDF.</p>
+
+<p>Outcomes are kept separate on purpose. A check can pass, fail, error, sit as manual, or be skipped. The last three are not folded into fail. They are also not folded into pass. An error means the command did not produce a usable answer. Manual means a person still has to look — DISA wrote a GUI step or an interview. Skipped means the check did not run: unreviewed, drifted, wrong platform, or refused by the safety gate. Each skip has a reason. A reader who only sees a pie chart of green and red has already lost those reasons.</p>
+
+<p>Why do reports hide coverage? Because coverage is embarrassing and percentages sell. A vendor dashboard that shows a rising ring is easier to present to a board than a list of rules nobody ran. The hidden step is usually this: treat “not run” as “not a finding.” That step turns ignorance into a score. It is especially harmful for schools and clinics. Those organisations may have one hour and one laptop. If a tool rewards them for ticking fewer checks, they will tick fewer checks and print a prettier number. If a tool states coverage first, the director can see the trade: we looked at ten serious items; we have not looked at the rest of the guide.</p>
+
+<p>Honesty also protects the people who did the work. A coordinator who approved ten commands and recorded three CAT I failures has done their job. They should not be told, months later, that they “certified the Mac.” They certified ten commands. The PDF should say that. If an insurer or a parent asks what was inspected, the file is the answer. If someone later adds a forced run of unreviewed checks, those results are flagged untrusted. They are not compliance evidence. That flag is another form of coverage: not only how many rules ran, but whether a person had accepted the bytes.</p>
+
+<p>There is a national-interest version of this point. Public baselines only raise the country’s configuration floor if people can trust the paperwork. A flood of unreadably optimistic reports trains everyone to ignore reports. An honest short report — coverage, then findings, then a next step — trains the opposite habit. It also matches how DISA severity is supposed to work. CAT I is not a colour on a marketing meter. It is the agency’s highest rank. If three CAT I items failed among ten judged rules, the remaining-risk headline should be sharp. If nothing could be judged, the headline should be “incomplete,” not a quiet zero. This tool uses Incomplete when no rule produced a pass or a fail. That word is a feature.</p>
+
+<p>Readers sometimes ask for a single score anyway. The honest reply is to give them two numbers and a list. How many rules were in the pack? How many produced a yes or a no? Which identifiers failed, at which severity? The <a href="../demo.html">example run</a> uses invented counts to show the shape: 12 in the pack, 10 judged, 3 CAT I failures, 2 not evaluated. A real machine will have different numbers. The shape should not change. Charts in the local interface exist to make those counts visible, not to replace them with a glow.</p>
+
+<p>Coverage honesty is also why this website does not scan. A remote scan the visitor never approved would produce results they cannot stand behind, on a machine this project never saw, with a coverage story that would be fiction. Static Pages can explain. They cannot inspect. The local program can inspect, but only the approved, unmodified, safe checks. Everything else belongs in the “not evaluated” bucket. If that bucket is large, the report should look unfinished — because it is.</p>
+
+<p>If you keep one sentence, keep this: a blank is not a pass. DISA already wrote the requirements. A small organisation is allowed to start with a subset. It is not allowed, if we are doing this in the public interest, to call the subset a complete result. Write down what you judged. Write down what you did not. Then fix the CAT I failures you actually saw. That is a report a non-specialist can use. It is also a report a specialist can audit. Both readers matter.</p>
+
+<p class="note">Next: <a href="open-source-as-public-infrastructure.html">Open source as public infrastructure</a>.</p>
+</article>
+</main>
+<footer>
+  <a href="https://github.com/himanshusaxenagithub/stig-ai-pipeline">stig-ai-pipeline</a>
+  · <a href="https://stig.hsaxena.com">stig.hsaxena.com</a>
+  · <a href="../index.html">Start</a> · <a href="../demo.html">Example run</a> · <a href="index.html">Essays</a>
+</footer>
+</body>
+</html>

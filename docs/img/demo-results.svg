@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 340" role="img" aria-labelledby="res-title res-desc">
+  <title id="res-title">Example: results with a remaining-risk story</title>
+  <desc id="res-desc">Sample scan story: critical remaining risk, three CAT I failures, coverage stated first. Fictional clinic data.</desc>
+  <defs>
+    <style>
+      .card { fill: #fff; stroke: #d9e1e9; stroke-width: 1.25; }
+      .risk { fill: #fbecea; stroke: #e8b4ae; }
+      .kicker { fill: #c0392b; }
+      .kt { fill: #fff; font: 700 10px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+      .ttl { fill: #1b2733; font: 600 16px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+      .sub { fill: #1b2733; font: 13px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+      .muted { fill: #5e6e7f; font: 12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+      .flag { fill: #fdf5e6; stroke: #e8d9b3; }
+      .flagt { fill: #5a3f0b; font: 600 12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+      .bar { fill: #d9e1e9; }
+      .pass { fill: #1e7a54; }
+      .fail { fill: #c0392b; }
+      .skip { fill: #7b8b9c; }
+      .navy { fill: #16243b; }
+    </style>
+  </defs>
+  <rect class="flag" x="12" y="10" width="300" height="26" rx="13"/>
+  <text class="flagt" x="162" y="28" text-anchor="middle">EXAMPLE  invented pass / fail counts</text>
+
+  <rect class="risk" x="12" y="48" width="876" height="118" rx="12"/>
+  <rect class="kicker" x="28" y="62" width="148" height="18" rx="9"/>
+  <text class="kt" x="102" y="75" text-anchor="middle">CRITICAL REMAINING RISK</text>
+  <text class="ttl" x="28" y="108">3 CAT I findings among the 10 rules we could check.</text>
+  <text class="sub" x="28" y="132">10 of 12 rules (83.3%) were actually evaluated. The other 2 produced no yes-or-no evidence and must not be counted as compliant.</text>
+  <text class="muted" x="28" y="152">This is remaining risk among what we checked, not a score of how secure the laptop is.</text>
+
+  <rect class="card" x="12" y="180" width="280" height="144" rx="12"/>
+  <text class="muted" x="152" y="204" text-anchor="middle">AMONG WHAT WE COULD JUDGE</text>
+  <rect class="bar" x="28" y="220" width="248" height="16" rx="8"/>
+  <rect class="pass" x="28" y="220" width="174" height="16" rx="8"/>
+  <rect class="fail" x="202" y="220" width="74" height="16"/>
+  <text class="sub" x="28" y="256">Met the requirement · 7</text>
+  <text class="sub" x="28" y="278">Did not · 3</text>
+  <text class="muted" x="28" y="300">30% still fail among judged rules</text>
+
+  <rect class="card" x="308" y="180" width="280" height="144" rx="12"/>
+  <text class="muted" x="448" y="204" text-anchor="middle">FAILS BY SEVERITY</text>
+  <text class="muted" x="28" y="0"></text>
+  <text class="sub" x="324" y="232">CAT I  most serious</text>
+  <rect class="bar" x="324" y="240" width="200" height="10" rx="5"/>
+  <rect class="fail" x="324" y="240" width="200" height="10" rx="5"/>
+  <text class="sub" x="532" y="249">3</text>
+  <text class="sub" x="324" y="272">CAT II</text>
+  <rect class="bar" x="324" y="280" width="200" height="10" rx="5"/>
+  <text class="sub" x="532" y="289">0</text>
+  <text class="muted" x="324" y="308">Only rules that ran and failed</text>
+
+  <rect class="card" x="604" y="180" width="284" height="144" rx="12"/>
+  <text class="muted" x="746" y="204" text-anchor="middle">HOW MUCH WE CHECKED</text>
+  <rect class="bar" x="620" y="220" width="252" height="16" rx="8"/>
+  <rect class="navy" x="620" y="220" width="210" height="16" rx="8"/>
+  <rect class="skip" x="830" y="220" width="42" height="16"/>
+  <text class="sub" x="620" y="256">Evaluated · 10</text>
+  <text class="sub" x="620" y="278">Not evaluated · 2</text>
+  <text class="muted" x="620" y="300">83.3% of this 12-rule pack</text>
+</svg>

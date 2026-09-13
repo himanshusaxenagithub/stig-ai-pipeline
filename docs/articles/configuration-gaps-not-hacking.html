@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Settings gaps are not Hollywood hacking</title>
+<meta name="description" content="Most STIG work is configuration hygiene — encryption, login, unused services — not cinematic hacking. A plain-English look at why settings gaps matter on everyday computers.">
+<meta name="author" content="Himanshu Saxena">
+<link rel="stylesheet" href="../pages.css">
+</head>
+<body>
+<header>
+  <div class="head-row">
+    <div>
+      <h1><a href="../index.html">STIG Checker</a></h1>
+      <p>Free Department of Defense checklists, in plain English, scanned on your own computer.</p>
+    </div>
+    <div class="host-badge">Hosted on GitHub Pages · MIT licence</div>
+  </div>
+</header>
+<p class="crumbs"><a href="../index.html">Start</a> · <a href="index.html">Essays</a> · Configuration gaps</p>
+<main>
+<article class="paper">
+<p class="kicker">Essay 4 of 10</p>
+<h1>Settings gaps are not Hollywood hacking</h1>
+<p class="byline">Himanshu Saxena · for publication on stig.hsaxena.com or hsaxena.com</p>
+
+<p class="lead">Popular stories about cyberattacks show a hooded figure and a rain of green text. A STIG is about something less cinematic and more common: a setting that was left on the factory default.</p>
+
+<p>When a laptop is stolen from a back seat, the question that matters first is not whether someone wrote a new exploit overnight. The question is whether the disk is encrypted. If it is not, the thief does not need to “hack” the operating system. They can mount the drive and copy the files. The Apple macOS 26 (Tahoe) STIG that the Defense Information Systems Agency publishes for the Department of Defense includes a CAT I rule that the system must enforce FileVault. The Windows 11 STIG has the equivalent expectation for BitLocker-class encryption. Those rules exist because a lost machine is a foreseeable event, not a rare movie plot.</p>
+
+<p>Automatic login is the same kind of gap. A shared office PC that boots straight to a desktop is convenient at 8:55 a.m. It is also a workstation anyone can use if they can touch the keyboard. DISA’s macOS guide has a CAT I rule to disable unattended or automatic login. No novel technique is required to abuse the opposite setting. Physical access plus a skipped password prompt is enough. The STIG’s job is to make that setting visible and ranked.</p>
+
+<p>Unused services are a third example. Older file-transfer tools were built for a different era. TFTP, the Trivial File Transfer Protocol, moves files without the authentication and encryption people now expect. A workstation does not need it. The macOS 26 guide includes a CAT I rule to disable the built-in TFTP service. Leaving it off is hygiene. Turning it off, if it is on, is still hygiene. It is not a dramatic takedown of a foreign adversary. It is taking a spare door off the hinges.</p>
+
+<p>Vendor support is a fourth. An operating system that no longer receives security fixes will not become safer with more hope. The macOS guide includes a CAT I rule that the system must be a version the vendor still supports. Checking the version in “About This Mac” is not hacking. It is inventory. Upgrading may break an old application. That is why this project’s filed notes mark some rules as needing judgment. A checklist that cannot say “this one can break things” is a checklist that people will ignore.</p>
+
+<p>The myth this essay is pushing against has two sides. One side says every incident is a genius attacker, so ordinary configuration is pointless. The other side says a single “secure my device” toggle is enough, so a long checklist is bureaucracy. Both sides skip the middle, where most of the work is. Attackers use whatever is cheapest. An unencrypted disk, a guessable password over SSH, or an unpatched system is cheaper than a brand-new vulnerability. Defenders who only buy detection tools and never look at settings are preparing for the movie and skipping the homework.</p>
+
+<p>STIGs are almost entirely homework. They ask about screen-saver locks, administrator rights for systemwide settings, Gatekeeper-style application assessment, Bluetooth policy, and update freshness. Some of those items are CAT II or CAT III. They still are not “hacking.” They are the difference between a machine that asks for a password after idle time and a machine that does not. A school or clinic can understand that difference without a computer-science degree if the rule is translated. “Push a profile so a password is required to dismiss the screen saver” is a sentence a coordinator can take to a vendor or to their next staff meeting.</p>
+
+<p>Configuration work also has a moral that incident-response stories hide: you can do it before harm. You do not need a case number to turn on encryption. You do not need a threat briefing to stop automatic login. You need a list, a severity rank, and time. DISA already published the list for DoD systems using the same products. This project’s contribution is to make a first pass readable and locally checkable. It will not hunt malware. It will not replace a backup. It will tell you, after a named person approved the commands, which selected settings already match and which do not.</p>
+
+<p>There is a temptation to dress that up as a score. “You are 87 percent secure” is a sentence that belongs in advertising, not in a report. A settings gap is specific. FileVault was off. TFTP was already off. Two rules were not evaluated because they need a profile. That list is something you can fix in an afternoon or escalate to a director. A single percentage hides the CAT I miss and invents precision the scan does not have. Honest configuration reporting looks like a checklist with blanks, not like a health-app ring.</p>
+
+<p>It is fair to ask whether talking about “gaps” blames the victim. It should not. A teacher did not fail a moral test because a cart laptop shipped with convenient defaults. Vendors ship convenience because convenience sells. Large organisations hire people to undo that convenience against a baseline. Small organisations often cannot. Public baselines and open tools exist so that undo step is not a luxury good. The person who left encryption off is usually the person who was never shown the toggle in a way that stuck. A STIG rule, in plain English, is one way to show it.</p>
+
+<p>Hollywood hacking will keep selling tickets. Everyday computers will keep being lost, shared, and left on overnight. The national-interest work is on the second list. If a clinic can see that FileVault is off before the laptop leaves the building, the country is slightly better off — not because a film villain was defeated, but because a foreseeable gap was closed. That is what a STIG is for. That is what a first scan should talk about, in ordinary words.</p>
+
+<p class="note">Next: <a href="human-approval-before-any-check.html">Nothing runs until a person types their name</a>.</p>
+</article>
+</main>
+<footer>
+  <a href="https://github.com/himanshusaxenagithub/stig-ai-pipeline">stig-ai-pipeline</a>
+  · <a href="https://stig.hsaxena.com">stig.hsaxena.com</a>
+  · <a href="../index.html">Start</a> · <a href="../demo.html">Example run</a> · <a href="index.html">Essays</a>
+</footer>
+</body>
+</html>

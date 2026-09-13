@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 300" role="img" aria-labelledby="ap-title ap-desc">
+  <title id="ap-title">Example: a person approves each check by name</title>
+  <desc id="ap-desc">Sample approval screen. A read-only command is shown. The name field is filled with a fictional reviewer. Nothing runs until that step.</desc>
+  <defs>
+    <style>
+      .card { fill: #fff; stroke: #d9e1e9; stroke-width: 1.25; }
+      .ttl { fill: #1b2733; font: 600 15px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+      .sub { fill: #5e6e7f; font: 13px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+      .code { fill: #d6e2f0; font: 12px ui-monospace, "SF Mono", Consolas, monospace; }
+      .term { fill: #16243b; }
+      .btn { fill: #16243b; }
+      .btnt { fill: #fff; font: 600 12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+      .field { fill: #fff; stroke: #d9e1e9; }
+      .flag { fill: #fdf5e6; stroke: #e8d9b3; }
+      .flagt { fill: #5a3f0b; font: 600 12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+      .chip { fill: #eef2f6; }
+      .chipt { fill: #5e6e7f; font: 600 11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+    </style>
+  </defs>
+  <rect class="flag" x="12" y="10" width="268" height="26" rx="13"/>
+  <text class="flagt" x="146" y="28" text-anchor="middle">EXAMPLE  fictional reviewer name</text>
+
+  <rect class="card" x="12" y="50" width="876" height="236" rx="12"/>
+  <text class="ttl" x="32" y="80">APPL-26-005020 · Enforce FileVault</text>
+  <rect class="chip" x="320" y="64" width="88" height="20" rx="10"/>
+  <text class="chipt" x="364" y="78" text-anchor="middle">unreviewed</text>
+  <text class="sub" x="32" y="104">Read-only check. Nothing here changes the Mac. Type a name only after you have read the command.</text>
+
+  <rect class="term" x="32" y="120" width="836" height="56" rx="8"/>
+  <text class="code" x="48" y="144">fdesetup status</text>
+  <text class="code" x="48" y="164">Expect: FileVault is On.</text>
+
+  <text class="sub" x="32" y="204">Your name (required)</text>
+  <rect class="field" x="32" y="212" width="280" height="36" rx="8"/>
+  <text class="ttl" x="44" y="235">Jordan Hale</text>
+  <rect class="btn" x="328" y="212" width="150" height="36" rx="8"/>
+  <text class="btnt" x="403" y="235" text-anchor="middle">Approve selected</text>
+  <text class="sub" x="500" y="235">Approval freezes a fingerprint of this command.</text>
+</svg>

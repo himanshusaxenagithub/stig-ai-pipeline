@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 260" role="img" aria-labelledby="dl-title dl-desc">
+  <title id="dl-title">Example: download a local scanner zip</title>
+  <desc id="dl-desc">A sample download card for STIG-Scanner-macOS.zip with twelve selected rules. This page never scans.</desc>
+  <defs>
+    <style>
+      .card { fill: #fff; stroke: #d9e1e9; stroke-width: 1.25; }
+      .ttl { fill: #1b2733; font: 600 16px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+      .sub { fill: #5e6e7f; font: 13px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+      .btn { fill: #16243b; }
+      .btnt { fill: #fff; font: 600 13px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+      .zip { fill: #eef2f6; stroke: #d9e1e9; }
+      .zipt { fill: #16243b; font: 600 13px ui-monospace, "SF Mono", Consolas, monospace; }
+      .flag { fill: #fdf5e6; stroke: #e8d9b3; }
+      .flagt { fill: #5a3f0b; font: 600 12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+    </style>
+  </defs>
+  <rect class="flag" x="12" y="10" width="220" height="26" rx="13"/>
+  <text class="flagt" x="122" y="28" text-anchor="middle">EXAMPLE  no file is created</text>
+
+  <rect class="card" x="12" y="52" width="876" height="192" rx="12"/>
+  <rect class="zip" x="40" y="80" width="120" height="136" rx="10"/>
+  <rect x="70" y="68" width="60" height="24" rx="4" fill="#16243b"/>
+  <text class="btnt" x="100" y="85" text-anchor="middle">ZIP</text>
+  <text class="zipt" x="100" y="150" text-anchor="middle">macOS</text>
+  <text class="sub" x="100" y="172" text-anchor="middle">local only</text>
+
+  <text class="ttl" x="190" y="100">Download STIG-Scanner-macOS.zip</text>
+  <text class="sub" x="190" y="126">Preconfigured with 12 of 160 rules from Apple macOS 26 (Tahoe) V1R3.</text>
+  <text class="sub" x="190" y="148">This website does not scan. The zip is the same project files plus a selection list.</text>
+  <rect class="btn" x="190" y="168" width="210" height="36" rx="8"/>
+  <text class="btnt" x="295" y="191" text-anchor="middle">Download the scanner</text>
+  <text class="sub" x="420" y="191">Then unzip it on the clinic MacBook.</text>
+</svg>
