@@ -12,6 +12,7 @@ import json
 from .evaluate import PASS, FAIL, ERROR, MANUAL, SKIPPED
 from .scan import ScanReport, SEVERITY_LABEL
 from .pdf import to_pdf
+from .summary import breakdown_rows, coverage_rows, severity_rows, summarize_report
 
 _ORDER = {"high": 0, "medium": 1, "low": 2}
 _ICON = {PASS: "PASS", FAIL: "FAIL", ERROR: "ERROR", MANUAL: "MANUAL", SKIPPED: "SKIP"}
@@ -52,6 +53,32 @@ def to_markdown(report: ScanReport) -> str:
     L.append(f"**{evaluated} of {total} rules ({pct:.1f}%) were actually evaluated on this host.** "
              f"The remaining {total - evaluated} produced no compliance evidence and must not be "
              f"counted as either compliant or non-compliant.")
+    L.append("")
+
+    story = summarize_report(report)
+    L.append("## What this means")
+    L.append("")
+    L.append(f"**{story.risk_label} remaining risk.** {story.headline}")
+    L.append("")
+    L.append(story.meaning)
+    L.append("")
+    L.append(story.next_step)
+    L.append("")
+    L.append(f"*{story.judged_line}*")
+    L.append("")
+    L.append("```")
+    for label, bar, caption in breakdown_rows(story):
+        L.append(f"{label:<22} {bar}  {caption}")
+    if any(story.fails_by_severity.values()):
+        L.append("")
+        L.append("Fails by severity")
+        for label, bar, caption in severity_rows(story):
+            L.append(f"{label:<22} {bar}  {caption}")
+    L.append("")
+    L.append("Coverage")
+    for label, bar, caption in coverage_rows(story):
+        L.append(f"{label:<22} {bar}  {caption}")
+    L.append("```")
     L.append("")
 
     if untrusted:

@@ -10,6 +10,9 @@ from __future__ import annotations
 
 from .evaluate import PASS, FAIL, ERROR, MANUAL, SKIPPED
 from .scan import ScanReport, SEVERITY_LABEL
+from .summary import (
+    breakdown_rows, coverage_rows, severity_rows, summarize_report,
+)
 
 PAGE_W = 612
 PAGE_H = 792
@@ -63,6 +66,28 @@ def _layout(report: ScanReport) -> list[tuple]:
     out.append(("body",
                 f"Pass {c[PASS]}   Fail {c[FAIL]}   Error {c[ERROR]}   "
                 f"Manual {c[MANUAL]}   Skipped {c[SKIPPED]}   Total {total}"))
+    out.append(("gap", ""))
+
+    story = summarize_report(report)
+    out.append(("h1", "What this means"))
+    out.append(("h2", f"{story.risk_label} remaining risk"))
+    out.append(("body", story.headline))
+    out.append(("body", story.meaning))
+    out.append(("body", story.next_step))
+    out.append(("gap", ""))
+    out.append(("h2", "How the numbers break down"))
+    for label, bar, caption in breakdown_rows(story):
+        out.append(("row", f"{label:<22} {bar}  {caption}"))
+    out.append(("meta", story.judged_line))
+    if any(story.fails_by_severity.values()):
+        out.append(("gap", ""))
+        out.append(("h2", "Fails by severity"))
+        for label, bar, caption in severity_rows(story):
+            out.append(("row", f"{label:<22} {bar}  {caption}"))
+    out.append(("gap", ""))
+    out.append(("h2", "Coverage"))
+    for label, bar, caption in coverage_rows(story):
+        out.append(("row", f"{label:<22} {bar}  {caption}"))
     out.append(("gap", ""))
 
     if untrusted:

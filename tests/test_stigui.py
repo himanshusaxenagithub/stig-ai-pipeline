@@ -101,6 +101,18 @@ class TestShippedPacks(unittest.TestCase):
         self.assertIn("from-site", html)
         self.assertIn("unreviewed", html)
 
+    def test_page_renders_a_plain_language_scan_story(self):
+        html = (Path(ui.__file__).resolve().parent / "app.html").read_text(encoding="utf-8")
+        self.assertIn("scan-story", html)
+        self.assertIn("renderScanStory", html)
+        self.assertIn("storyFromScan", html)
+        self.assertIn("remaining risk", html)
+        self.assertIn("See what failed", html)
+        self.assertIn("Fails by severity", html)
+        self.assertIn("How much we checked", html)
+        self.assertIn("percent secure", html)
+        self.assertIn("untrusted", html)
+
 
 class TestAppMode(unittest.TestCase):
     """The double-click program: files in the user's folder, one instance,

@@ -9,6 +9,7 @@
     --ink:#1b2733; --muted:#5e6e7f; --line:#d9e1e9; --mist:#eef2f6;
     --navy:#16243b; --red:#c0392b; --redbg:#fbecea; --green:#1e7a54; --greenbg:#eaf3ee;
     --gold:#a8761f; --goldbg:#fdf5e6; --paper:#fff;
+    --pass:#1e7a54; --fail:#c0392b; --err:#8a6d3b; --skip:#7b8b9c;
   }
   *{box-sizing:border-box}
   body{margin:0;font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
@@ -70,6 +71,51 @@
   .warn{background:var(--redbg);color:var(--red);border-radius:6px;padding:6px 9px;font-size:13px;margin-top:6px}
   .note{background:var(--mist);border-radius:8px;padding:12px 14px;font-size:13.5px;color:var(--muted);margin-top:14px}
   .coverage{background:var(--navy);color:#e4ecf5;border-radius:10px;padding:16px 18px;font-size:15px;line-height:1.55}
+  .story{margin:16px 0 0}
+  .risk{border-radius:12px;padding:16px 18px;border:1px solid var(--line);margin:0 0 14px}
+  .risk.critical{background:var(--redbg);border-color:#e8b4ae}
+  .risk.high{background:#fde8dc;border-color:#e8c4b0}
+  .risk.moderate{background:var(--goldbg);border-color:#e8d9b3}
+  .risk.low{background:var(--greenbg);border-color:#b7d4c6}
+  .risk.incomplete{background:var(--mist);border-color:var(--line)}
+  .risk-kicker{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.6px;
+               text-transform:uppercase;margin:0 0 6px;padding:2px 8px;border-radius:999px}
+  .critical .risk-kicker{background:var(--red);color:#fff}
+  .high .risk-kicker{background:#c45c26;color:#fff}
+  .moderate .risk-kicker{background:var(--gold);color:#fff}
+  .low .risk-kicker{background:var(--green);color:#fff}
+  .incomplete .risk-kicker{background:var(--muted);color:#fff}
+  .risk h3{margin:0 0 8px;font-size:20px;line-height:1.3}
+  .risk p{margin:0 0 8px}
+  .risk p:last-child{margin:0}
+  .callout{border-radius:10px;padding:12px 14px;margin:0 0 14px;font-size:14px;line-height:1.55}
+  .callout.warn{background:var(--redbg);color:#7a241c;border:1px solid #e8b4ae}
+  .callout.nudge{background:#e8eef7;color:#2b4a78;border:1px solid #c5d2e6}
+  .callout.ok{background:var(--greenbg);color:#14553a;border:1px solid #b7d4c6}
+  .callout ul{margin:8px 0 0;padding-left:18px}
+  .callout a{color:inherit;font-weight:600}
+  .charts{display:flex;gap:12px;flex-wrap:wrap;margin:0 0 14px}
+  .chart{flex:1 1 220px;border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:var(--mist)}
+  .chart h3{margin:0 0 10px;font-size:13px;color:var(--muted);font-weight:600;
+            text-transform:uppercase;letter-spacing:.4px}
+  .donut-wrap{position:relative;width:148px;height:148px;margin:0 auto 10px}
+  .donut-wrap svg{transform:rotate(-90deg);width:148px;height:148px}
+  .donut-wrap svg circle{fill:none;stroke-width:3.6}
+  .donut-label{position:absolute;inset:0;display:flex;flex-direction:column;
+               align-items:center;justify-content:center;text-align:center;pointer-events:none}
+  .donut-label b{font-size:22px;line-height:1.1}
+  .donut-label span{font-size:11px;color:var(--muted);max-width:86px}
+  .legend{list-style:none;margin:0;padding:0;font-size:13px}
+  .legend li{display:flex;justify-content:space-between;gap:10px;padding:3px 0}
+  .swatch{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px;vertical-align:middle}
+  .hbar{display:flex;align-items:center;gap:8px;margin:8px 0}
+  .hbar .lbl{flex:0 0 92px;font-size:12px;color:var(--muted)}
+  .hbar .track{flex:1;height:10px;background:#fff;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+  .hbar .track > i{display:block;height:100%;border-radius:999px}
+  .hbar .n{flex:0 0 28px;text-align:right;font-variant-numeric:tabular-nums;font-size:13px}
+  .stack{display:flex;height:16px;border-radius:999px;overflow:hidden;border:1px solid var(--line);background:#fff}
+  .stack > i{display:block;height:100%;min-width:0}
+  .stack-legend{display:flex;flex-wrap:wrap;gap:10px 14px;margin:10px 0 0;font-size:12px;color:var(--muted)}
   .bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:14px 0}
   .progress{height:8px;background:var(--mist);border-radius:999px;overflow:hidden;margin:14px 0 8px}
   .progress > span{display:block;height:100%;background:var(--navy);width:0;transition:width .15s linear}
@@ -85,7 +131,12 @@
   .pick b{display:block;font-size:17px;margin-bottom:3px}
   .pick small{color:var(--muted);font-size:13px}
   .pick:disabled{opacity:.55;cursor:wait}
-  @media (max-width:640px){ .stat{flex-basis:calc(50% - 10px)} }
+  @media (max-width:640px){
+    .stat{flex-basis:calc(50% - 10px)}
+    .donut-wrap{width:128px;height:128px}
+    .donut-wrap svg{width:128px;height:128px}
+    .hbar .lbl{flex-basis:72px}
+  }
 </style>
 </head>
 <body>
@@ -176,8 +227,8 @@
   <!-- 4 ---------------------------------------------------------------- -->
   <section id="s-scan" hidden>
     <h2>Scan this computer</h2>
-    <p class="sub">Only approved, unmodified checks run. The report says first how many rules were
-      actually evaluated.</p>
+    <p class="sub">Only approved, unmodified checks run. After the scan you get a plain-English
+      remaining-risk headline, charts, and an honest coverage caveat — not a fake "percent secure."</p>
     <div class="bar">
       <button class="go" id="go-scan">Run the approved checks</button>
       <label><input type="checkbox" id="incl"> also run unreviewed checks, marked untrusted</label>
@@ -478,10 +529,216 @@ function renderPack(p) {
 
 // ---- 4. scan ---------------------------------------------------------
 function scanRow(x) {
-  return `<tr>
-    <td><span class="chip s-${esc(x.status)}">${esc(x.status)}</span></td>
+  const sev = x.severity || ({"CAT I":"high","CAT II":"medium","CAT III":"low"}[x.cat] || "");
+  const flag = x.trusted === false
+    ? ` <span class="chip s-manual" title="check was not approved">untrusted</span>` : "";
+  return `<tr data-status="${esc(x.status)}" data-severity="${esc(sev)}">
+    <td><span class="chip s-${esc(x.status)}">${esc(x.status)}</span>${flag}</td>
     <td><code>${esc(x.stig_id)}</code></td><td>${esc(x.cat || "")}</td>
     <td>${esc(x.title)}</td><td class="muted">${esc(x.detail || "")}</td></tr>`;
+}
+
+function storyFromScan(r) {
+  if (r.summary && r.summary.headline) return r.summary;
+  const c = Object.assign({pass:0, fail:0, error:0, manual:0, skipped:0}, r.counts || {});
+  const results = r.results || [];
+  const by = {high:0, medium:0, low:0};
+  const serious = [];
+  let untrusted = 0;
+  results.forEach(x => {
+    const sev = x.severity || ({"CAT I":"high","CAT II":"medium","CAT III":"low"}[x.cat] || "");
+    if (x.status === "fail") {
+      if (by[sev] !== undefined) by[sev] += 1;
+      if (sev === "high") serious.push({stig_id:x.stig_id, title:x.title, cat:"CAT I"});
+    }
+    if (x.trusted === false && (x.status === "pass" || x.status === "fail")) untrusted += 1;
+  });
+  const evaluated = c.pass + c.fail;
+  const total = r.total || results.length || (c.pass+c.fail+c.error+c.manual+c.skipped);
+  const notEval = Math.max(0, total - evaluated);
+  const cov = total ? evaluated / total * 100 : 0;
+  const rate = evaluated ? c.fail / evaluated * 100 : null;
+  let risk = "incomplete";
+  if (evaluated <= 0) risk = "incomplete";
+  else if (by.high > 0) risk = "critical";
+  else if (by.medium >= 3 || (rate !== null && rate >= 50)) risk = "high";
+  else if (by.medium >= 1 || by.low >= 3 || (rate !== null && rate >= 15)) risk = "moderate";
+  else risk = "low";
+  const labels = {critical:"Critical", high:"High", moderate:"Moderate", low:"Low", incomplete:"Incomplete"};
+  const judged = evaluated
+    ? (c.fail ? `${c.fail} of ${evaluated} checks we could judge still fail (${rate.toFixed(1)}%).`
+              : `All ${evaluated} checks we could judge met the requirement.`)
+    : "No rule produced a pass or fail, so remaining risk cannot be judged.";
+  return {
+    risk, risk_label: labels[risk],
+    headline: judged,
+    meaning: "This is remaining risk among the rules we could check, not a percentage of how secure the machine is.",
+    next_step: risk === "incomplete"
+      ? "Open Checks, read each command, approve it under your own name, then run the scan."
+      : (c.fail ? "Work through the failing rules below, highest severity first."
+                : "Approve more checks and scan again to close the coverage gap."),
+    coverage_line: r.coverage || `${evaluated} of ${total} rules (${cov.toFixed(1)}%) were actually evaluated on this host.`,
+    judged_line: judged,
+    evaluated, not_evaluated: notEval, total,
+    coverage_pct: Math.round(cov * 10) / 10,
+    fail_rate_pct: rate === null ? null : Math.round(rate * 10) / 10,
+    counts: c, fails_by_severity: by, untrusted, serious_fails: serious,
+  };
+}
+
+function donutSVG(segments) {
+  const total = segments.reduce((s, x) => s + x.value, 0);
+  const bg = `<circle cx="18" cy="18" r="15.9155" stroke="#d9e1e9"></circle>`;
+  if (!total) return `<svg viewBox="0 0 36 36" aria-hidden="true">${bg}</svg>`;
+  let offset = 0;
+  const rings = segments.filter(s => s.value > 0).map(s => {
+    const pct = 100 * s.value / total;
+    const el = `<circle cx="18" cy="18" r="15.9155" stroke="${s.color}"
+      stroke-dasharray="${pct} ${100 - pct}" stroke-dashoffset="${-offset}"></circle>`;
+    offset += pct;
+    return el;
+  });
+  return `<svg viewBox="0 0 36 36" role="img" aria-label="${esc(segments.map(s => s.label + ' ' + s.value).join(', '))}">${bg}${rings.join("")}</svg>`;
+}
+
+function hbar(label, value, max, color) {
+  const pct = max ? Math.max(value ? 4 : 0, Math.min(100, 100 * value / max)) : 0;
+  return `<div class="hbar"><span class="lbl">${esc(label)}</span>
+    <span class="track"><i style="width:${pct}%;background:${color}"></i></span>
+    <span class="n">${value}</span></div>`;
+}
+
+function filterScanRows(kind) {
+  document.querySelectorAll("#scan-table tbody tr").forEach(tr => {
+    const st = tr.dataset.status, sev = tr.dataset.severity;
+    let show = true;
+    if (kind === "fail") show = st === "fail";
+    else if (kind === "cat1") show = st === "fail" && sev === "high";
+    else if (kind === "error") show = st === "error";
+    else if (kind === "skip") show = st === "skipped" || st === "manual";
+    tr.hidden = !show;
+  });
+  const table = $("#scan-findings") || $("#scan-table");
+  if (table) table.scrollIntoView({behavior: "smooth", block: "start"});
+}
+
+function renderScanStory(r) {
+  const s = storyFromScan(r);
+  const c = Object.assign({pass:0, fail:0, error:0, manual:0, skipped:0}, s.counts || {});
+  const notRun = (c.manual || 0) + (c.skipped || 0);
+  const judged = [
+    {label:"Met the requirement", value:c.pass, color:"#1e7a54"},
+    {label:"Did not", value:c.fail, color:"#c0392b"},
+  ];
+  const mix = [
+    {label:"Met", value:c.pass, color:"#1e7a54"},
+    {label:"Did not", value:c.fail, color:"#c0392b"},
+    {label:"Could not be judged", value:c.error, color:"#8a6d3b"},
+    {label:"Not run", value:notRun, color:"#7b8b9c"},
+  ];
+  const cover = [
+    {label:"Evaluated", value:s.evaluated, color:"#16243b"},
+    {label:"Not evaluated", value:s.not_evaluated, color:"#7b8b9c"},
+  ];
+  const by = Object.assign({high:0, medium:0, low:0}, s.fails_by_severity || {});
+  const catMax = Math.max(by.high, by.medium, by.low, 1);
+  const judgedTotal = c.pass + c.fail;
+  const failPct = (s.fail_rate_pct != null) ? s.fail_rate_pct
+    : (judgedTotal ? Math.round(c.fail / judgedTotal * 1000) / 10 : 0);
+  const center = judgedTotal
+    ? (c.fail ? `<b>${failPct}%</b><span>still fail among what we could check</span>`
+              : `<b>${c.pass}</b><span>met the requirement</span>`)
+    : `<b>—</b><span>nothing judged</span>`;
+  const coverPct = s.coverage_pct != null ? s.coverage_pct
+    : (s.total ? Math.round(s.evaluated / s.total * 1000) / 10 : 0);
+  const serious = s.serious_fails || [];
+  const seriousList = serious.length
+    ? `<ul>${serious.slice(0, 8).map(x =>
+        `<li><code>${esc(x.stig_id)}</code> ${esc(x.title)}</li>`).join("")}
+       ${serious.length > 8 ? `<li class="muted">and ${serious.length - 8} more</li>` : ""}</ul>` : "";
+  let callout = "";
+  if (s.untrusted) {
+    callout += `<div class="callout warn"><b>Untrusted results.</b> ${s.untrusted}
+      result${s.untrusted === 1 ? "" : "s"} came from checks no person has approved.
+      They are not compliance evidence. Approve the commands and scan again.</div>`;
+  }
+  if (s.risk === "critical") {
+    callout += `<div class="callout warn"><b>Serious settings failed.</b>
+      CAT I is DISA's highest severity — these are the findings most likely to be
+      exploited. <a href="#scan-findings" id="jump-cat1">Jump to the CAT I failures</a>
+      and fix those first, then the rest of the list, toward STIG compliance.
+      ${seriousList}</div>`;
+  } else if (c.fail) {
+    callout += `<div class="callout warn"><b>This computer still fails STIG checks we could run.</b>
+      ${esc(s.next_step)}
+      <a href="#scan-findings" id="jump-fails">See the failing rules</a>.</div>`;
+  } else if (s.risk === "incomplete") {
+    callout += `<div class="callout nudge"><b>Nothing was actually evaluated.</b>
+      ${esc(s.next_step)}</div>`;
+  } else if (s.not_evaluated) {
+    callout += `<div class="callout nudge"><b>No failures among what we checked — coverage is still incomplete.</b>
+      ${esc(s.next_step)} Silence is not compliance.</div>`;
+  } else {
+    callout += `<div class="callout ok"><b>Every rule in this pack was judged and met the requirement.</b>
+      ${esc(s.next_step)}</div>`;
+  }
+  const mixTotal = mix.reduce((n, x) => n + x.value, 0) || 1;
+  return `
+    <div class="risk ${esc(s.risk)}">
+      <div class="risk-kicker">${esc(s.risk_label)} remaining risk</div>
+      <h3>${esc(s.headline)}</h3>
+      <p>${esc(s.meaning)}</p>
+      <p><b>${esc(s.judged_line)}</b> ${esc(s.coverage_line)}</p>
+    </div>
+    ${callout}
+    <div class="charts">
+      <div class="chart">
+        <h3>Among what we could judge</h3>
+        <div class="donut-wrap">${donutSVG(judged)}<div class="donut-label">${center}</div></div>
+        <ul class="legend">${judged.map(x => `<li><span><i class="swatch" style="background:${x.color}"></i>${esc(x.label)}</span><b>${x.value}</b></li>`).join("")}</ul>
+      </div>
+      <div class="chart">
+        <h3>Fails by severity</h3>
+        ${hbar("CAT I — most serious", by.high, catMax, "#c0392b")}
+        ${hbar("CAT II", by.medium, catMax, "#a8761f")}
+        ${hbar("CAT III", by.low, catMax, "#7b8b9c")}
+        <p class="muted" style="margin:10px 0 0;font-size:12px">Only rules that ran and failed. CAT I is the most serious.</p>
+      </div>
+      <div class="chart">
+        <h3>How much we checked</h3>
+        <div class="donut-wrap">${donutSVG(cover)}<div class="donut-label"><b>${coverPct}%</b><span>of the pack evaluated</span></div></div>
+        <ul class="legend">${cover.map(x => `<li><span><i class="swatch" style="background:${x.color}"></i>${esc(x.label)}</span><b>${x.value}</b></li>`).join("")}</ul>
+      </div>
+    </div>
+    <div class="chart" style="margin-bottom:14px">
+      <h3>Every result in this scan</h3>
+      <div class="stack" title="pass / fail / error / not run">${mix.map(x =>
+        `<i style="width:${(100 * x.value / mixTotal).toFixed(2)}%;background:${x.color}" title="${esc(x.label)} ${x.value}"></i>`
+      ).join("")}</div>
+      <div class="stack-legend">${mix.map(x =>
+        `<span><i class="swatch" style="background:${x.color}"></i>${esc(x.label)} ${x.value}</span>`
+      ).join("")}</div>
+    </div>
+    <div class="bar">
+      <button class="go" type="button" id="see-fails" ${c.fail ? "" : "disabled"}>See what failed</button>
+      <button class="ghost" type="button" data-scan-filter="">All results</button>
+      <button class="ghost" type="button" data-scan-filter="fail">Did not meet</button>
+      <button class="ghost" type="button" data-scan-filter="cat1">CAT I fails</button>
+      <button class="ghost" type="button" data-scan-filter="error">Could not be judged</button>
+      <button class="ghost" type="button" data-scan-filter="skip">Not run</button>
+    </div>`;
+}
+
+function bindScanStory() {
+  const see = $("#see-fails");
+  if (see) see.onclick = () => filterScanRows("fail");
+  const cat1 = $("#jump-cat1");
+  if (cat1) cat1.onclick = e => { e.preventDefault(); filterScanRows("cat1"); };
+  const fails = $("#jump-fails");
+  if (fails) fails.onclick = e => { e.preventDefault(); filterScanRows("fail"); };
+  document.querySelectorAll("[data-scan-filter]").forEach(btn => {
+    btn.onclick = () => filterScanRows(btn.getAttribute("data-scan-filter") || "");
+  });
 }
 function setScanBar(i, total) {
   const bar = $("#scan-bar");
@@ -498,8 +755,14 @@ function bumpScanCount(status) {
 }
 function finishScan(r) {
   const c = r.counts || {};
+  const story = $("#scan-story");
+  if (story) {
+    story.hidden = false;
+    story.innerHTML = renderScanStory(r);
+    bindScanStory();
+  }
   $("#scan-coverage").hidden = false;
-  $("#scan-coverage").textContent = r.coverage || "";
+  $("#scan-coverage").textContent = r.coverage || (r.summary && r.summary.coverage_line) || "";
   $("#n-pass").textContent = c.pass ?? 0;
   $("#n-fail").textContent = c.fail ?? 0;
   $("#n-error").textContent = c.error ?? 0;
@@ -515,6 +778,8 @@ function finishScan(r) {
     $("#scan-table tbody").innerHTML = r.results.map(scanRow).join("");
   }
   $("#scan-table").hidden = false;
+  const findings = $("#scan-findings");
+  if (findings) findings.hidden = false;
   setScanBar(r.total || (r.results || []).length, r.total || (r.results || []).length);
   $("#scan-status").textContent = "done";
 }
@@ -523,12 +788,14 @@ function handleScanEvent(ev) {
   if (ev.phase === "check") {
     $("#scan-status").textContent = `${ev.index} of ${ev.total} — ${ev.stig_id} ${ev.title || ""}`;
     setScanBar(Math.max(0, ev.index - 1), ev.total);
+    const box = $("#scan-findings"); if (box) box.hidden = false;
     $("#scan-table").hidden = false;
     return;
   }
   if (ev.phase === "result") {
     bumpScanCount(ev.status);
     $("#scan-table tbody").insertAdjacentHTML("beforeend", scanRow(ev));
+    const box = $("#scan-findings"); if (box) box.hidden = false;
     $("#scan-table").hidden = false;
     setScanBar(ev.index, ev.total);
     $("#scan-status").textContent = `${ev.index} of ${ev.total} — ${ev.status}`;
@@ -565,6 +832,7 @@ $("#go-scan").onclick = async () => {
   $("#go-scan").disabled = true; $("#scan-status").textContent = "starting…";
   $("#scan-out").innerHTML = `
     <div class="progress" id="scan-bar" hidden><span></span></div>
+    <div class="story" id="scan-story" hidden></div>
     <div class="coverage" id="scan-coverage" hidden></div>
     <div class="stats" id="scan-stats" hidden>
       <div class="stat"><b id="n-pass">0</b><span>met the requirement</span></div>
@@ -573,7 +841,7 @@ $("#go-scan").onclick = async () => {
       <div class="stat"><b id="n-skip">0</b><span>not run</span></div>
     </div>
     <p class="muted" id="scan-files" hidden></p>
-    <div class="wrap"><table id="scan-table" hidden><thead><tr>
+    <div class="wrap" id="scan-findings" hidden><table id="scan-table" hidden><thead><tr>
       <th>Status</th><th>Rule</th><th>Severity</th><th>Requirement</th><th>Detail</th>
     </tr></thead><tbody></tbody></table></div>`;
   try {
