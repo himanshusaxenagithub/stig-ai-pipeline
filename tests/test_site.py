@@ -63,6 +63,8 @@ class TestSiteExport(unittest.TestCase):
             self.assertIn("stigscan/pdf.py", names)
             info = zf.getinfo("Start.command")
             self.assertEqual(info.compress_type, zipfile.ZIP_STORED)
+            vbs = zf.read("run-hidden.vbs").decode("utf-8")
+            self.assertRegex(vbs, r"(?i)Dim\b.*\bargs\b")
 
     def test_official_urls_are_https(self):
         for g in scannable_guides():
