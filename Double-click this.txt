@@ -12,7 +12,10 @@ How to run STIG Checker — no technical skill needed
    That is a private copy from python.org. It is not a system install
    and does not need an administrator password.
 
-5. A page opens in your browser. Pick MacBook or Windows PC and follow the page.
+5. A page opens in your browser. If you downloaded this from the website,
+   your selected rules are already loaded — read and approve them, then scan.
+   Otherwise pick MacBook or Windows PC and follow the page.
 
 You do not need the command line.
 Approve checks under your own name. Nothing runs until you do.
+A PDF report is saved with the other reports (Show files).

@@ -1,5 +1,48 @@
 # Changelog
 
+## v0.6.2 — 2026-09-13
+
+### Fixed
+
+- The rules page no longer pre-ticks every machine check. Selection starts
+  empty; Select shown / CAT I / machine-check still fill it explicitly, and
+  download still requires at least one rule.
+- The site fetches `packages/scanner-src.zip?v=<payload sha256>` with
+  `cache: "no-store"` so a browser that cached the pre-`Dim args` zip cannot
+  keep serving it after a Pages deploy. Delete the old unzipped folder before
+  unpacking a new download.
+
+## v0.6.1 — 2026-09-13
+
+### Fixed
+
+- `run-hidden.vbs` declared `args` under `Option Explicit`. Without `Dim args`
+  Windows Script Host stopped at line 51 (`800A01F4`) when someone double-clicked
+  the website's STIG-Scanner-Windows zip. Selection.json is still passed through
+  when present.
+
+## v0.6.0 — 2026-09-13
+
+### Added — public website and a configured local scanner
+
+- GitHub Pages site under `docs/`: pick MacBook or Windows, read the filed
+  explanations, select rules, download an OS-specific scanner zip already
+  pointed at that selection. Static HTML/JS only — no API key, no remote
+  host scan. Expected URL:
+  `https://himanshusaxenagithub.github.io/stig-ai-pipeline/`
+- The site ships catalogue metadata (validated release, rule count, SHA-256
+  when pinned) because Pages cannot fetch `dl.dod.cyber.mil`. The local
+  program still downloads the official zip and refuses a mismatch.
+- `packaging/build_site.py` exports `docs/data/` and `docs/packages/scanner-src.zip`.
+- `packaging/build_scanpack.py` builds the same configured folder from the CLI.
+- `stigui --selection` / `--pack` open a website pack; `selection.json` next
+  to Start.command is picked up automatically. Checks stay unreviewed until
+  a person types their name.
+- PDF scan reports (`stigscan/pdf.py`), written beside the JSON and Markdown
+  by both `stig-scan scan` and the local page. Standard library only.
+- `.github/workflows/pages.yml` deploys `docs/` when Pages is set to GitHub
+  Actions. Branch-folder `/docs` also works with the committed files.
+
 ## v0.5.0 — 2026-09-11
 
 ### Added — a page instead of a terminal

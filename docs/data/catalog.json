@@ -1,0 +1,80 @@
+{
+  "generated": "2026-09-13T01:18:02Z",
+  "download_page": "https://public.cyber.mil/stigs/downloads/",
+  "base": "https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip",
+  "note": "GitHub Pages cannot download from dl.dod.cyber.mil: browsers block the request (CORS) and many networks block the host. This site ships the filed explanations and check metadata this project validated (release and rule count below; SHA-256 when pinned). The local scanner still fetches the official zip, verifies it, and refuses a file that does not match.",
+  "guides": [
+    {
+      "key": "macos-26",
+      "label": "MacBook \u2014 macOS 26 (Tahoe)",
+      "platform": "macos",
+      "release": 3,
+      "rules": 160,
+      "sha256": null,
+      "template": "U_Apple_macOS_26_V1R{rel}_STIG.zip",
+      "filename": "U_Apple_macOS_26_V1R3_STIG.zip",
+      "url": "https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_Apple_macOS_26_V1R3_STIG.zip",
+      "desktop": true,
+      "checkpack": "macos-26-v1r3",
+      "annotation": "U_Apple_macOS_26_V1R3_STIG_Manual-xccdf.ai-cache.json",
+      "scannable": true
+    },
+    {
+      "key": "macos-15",
+      "label": "MacBook \u2014 macOS 15 (Sequoia)",
+      "platform": "macos",
+      "release": 7,
+      "rules": null,
+      "sha256": null,
+      "template": "U_Apple_macOS_15_V1R{rel}_STIG.zip",
+      "filename": "U_Apple_macOS_15_V1R7_STIG.zip",
+      "url": "https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_Apple_macOS_15_V1R7_STIG.zip",
+      "desktop": true,
+      "checkpack": null,
+      "annotation": null,
+      "scannable": false
+    },
+    {
+      "key": "windows-11",
+      "label": "Windows 11 PC",
+      "platform": "windows",
+      "release": 9,
+      "rules": 257,
+      "sha256": null,
+      "template": "U_MS_Windows_11_V2R{rel}_STIG.zip",
+      "filename": "U_MS_Windows_11_V2R9_STIG.zip",
+      "url": "https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_MS_Windows_11_V2R9_STIG.zip",
+      "desktop": true,
+      "checkpack": "windows-11-v2r9",
+      "annotation": "U_MS_Windows_11_STIG_V2R9_Manual-xccdf.ai-cache.json",
+      "scannable": true
+    }
+  ],
+  "cli_only": [
+    {
+      "key": "windows-server-2019",
+      "label": "Windows Server 2019",
+      "platform": "windows"
+    },
+    {
+      "key": "ubuntu-24.04",
+      "label": "Canonical Ubuntu 24.04 LTS",
+      "platform": "linux"
+    },
+    {
+      "key": "rhel-9",
+      "label": "Red Hat Enterprise Linux 9",
+      "platform": "linux"
+    },
+    {
+      "key": "sql-server-2022",
+      "label": "Microsoft SQL Server 2022",
+      "platform": "database"
+    }
+  ],
+  "payload": {
+    "file": "packages/scanner-src.zip",
+    "sha256": "9a44a8655d9b54c818671152026ca3299f921aea7258712d7004d7544833a08b",
+    "bytes": 397598
+  }
+}

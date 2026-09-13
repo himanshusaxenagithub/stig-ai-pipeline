@@ -58,3 +58,23 @@ been run in this project; read its output the first time. Windows signing
 The macOS build is chosen from the latest python-build-standalone release
 for this machine's architecture; the Windows build is pinned to the version
 in the script.
+
+## Public website data
+
+    python3 packaging/build_site.py --out docs
+
+Rewrites `docs/data/` (catalogue + explained rule lists + desktop check
+packs) and `docs/packages/scanner-src.zip` (the source payload the Pages
+site turns into a configured scanner). The HTML/JS in `docs/` is hand-written
+and is not replaced.
+
+## A configured scanner from the command line
+
+    python3 packaging/build_scanpack.py \
+        --platform macos \
+        --pack checkpacks/macos-26-v1r3.json \
+        --id APPL-26-000054 \
+        -o dist/STIG-Scanner-macOS
+
+Same shape as a source checkout, plus `selection.json` and a filtered pack.
+Every check remains unreviewed. This does not run a scan.

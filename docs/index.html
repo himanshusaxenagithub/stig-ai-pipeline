@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>STIG Checker — pick a guide, download a local scanner</title>
+<meta name="description" content="Read DISA STIGs in plain English, pick the rules to scan, and download a Mac or Windows program that runs the scan on your own machine.">
+<link rel="icon" href="data:,">
+<style>
+  :root{
+    --ink:#1b2733; --muted:#5e6e7f; --line:#d9e1e9; --mist:#eef2f6;
+    --navy:#16243b; --red:#c0392b; --redbg:#fbecea; --green:#1e7a54; --greenbg:#eaf3ee;
+    --gold:#a8761f; --goldbg:#fdf5e6; --paper:#fff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+       color:var(--ink);background:#f6f8fa}
+  header{background:var(--navy);color:#fff;padding:18px 24px}
+  header h1{margin:0;font-size:18px;font-weight:600;letter-spacing:.2px}
+  header p{margin:4px 0 0;color:#9fb6d0;font-size:13px}
+  .head-row{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;
+            max-width:1100px;margin:0 auto}
+  .host-badge{border:1px solid #3b4d6b;color:#cfdcec;padding:6px 12px;border-radius:8px;font-size:13px}
+  .banner{background:var(--goldbg);color:#5a3f0b;border-bottom:1px solid #e8d9b3;padding:12px 24px;
+        font-size:14px;text-align:center}
+  main{max-width:1100px;margin:0 auto;padding:0 20px 80px}
+  nav{display:flex;gap:4px;margin:20px 0 0;flex-wrap:wrap}
+  nav button{border:1px solid var(--line);background:var(--paper);padding:9px 16px;border-radius:8px;
+             cursor:pointer;font:inherit;font-size:14px;color:var(--muted)}
+  nav button[aria-selected=true]{background:var(--navy);border-color:var(--navy);color:#fff}
+  nav button:disabled{opacity:.45;cursor:not-allowed}
+  section{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:22px;margin-top:16px}
+  section[hidden]{display:none}
+  h2{margin:0 0 6px;font-size:18px}
+  .sub{margin:0 0 18px;color:var(--muted);font-size:14px}
+  button.go{background:var(--navy);color:#fff;border:0;border-radius:8px;padding:10px 18px;
+            font:inherit;cursor:pointer}
+  button.go:disabled{opacity:.5;cursor:not-allowed}
+  button.ghost{background:var(--paper);color:var(--ink);border:1px solid var(--line);
+               border-radius:8px;padding:8px 14px;font:inherit;cursor:pointer}
+  input[type=search],select{font:inherit;padding:8px 10px;border:1px solid var(--line);
+       border-radius:8px;background:var(--paper);color:var(--ink)}
+  .stats{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}
+  .stat{flex:1 1 130px;border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--mist)}
+  .stat b{display:block;font-size:26px;line-height:1.1}
+  .stat span{font-size:12px;color:var(--muted)}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-size:12px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);font-weight:600}
+  .wrap{overflow-x:auto}
+  .chip{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;white-space:nowrap}
+  .c-high{background:var(--redbg);color:var(--red)} .c-medium{background:var(--goldbg);color:var(--gold)}
+  .c-low{background:var(--mist);color:var(--muted)}
+  .t-quick-win{background:var(--greenbg);color:var(--green)}
+  .t-config-profile{background:#e8eef7;color:#2b4a78}
+  .t-needs-judgment{background:var(--goldbg);color:var(--gold)}
+  .t-risky-change{background:var(--redbg);color:var(--red)}
+  .t-unexplained{background:var(--mist);color:var(--muted)}
+  .note{background:var(--mist);border-radius:8px;padding:12px 14px;font-size:13.5px;color:var(--muted);margin-top:14px}
+  .bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:14px 0}
+  .muted{color:var(--muted)}
+  .err{background:var(--redbg);color:var(--red);border-radius:8px;padding:10px 12px;margin-top:14px}
+  .err-inline{color:var(--red)}
+  .picks{display:flex;gap:12px;flex-wrap:wrap;margin:0 0 14px}
+  .pick{flex:1 1 260px;text-align:left;border:1px solid var(--line);border-radius:12px;
+        padding:16px 18px;background:var(--paper);cursor:pointer;font:inherit;color:var(--ink)}
+  .pick:hover{border-color:var(--navy)}
+  .pick[data-mine=true]{border-color:var(--navy);background:var(--navy);color:#fff}
+  .pick[data-mine=true] small{color:#9fb6d0}
+  .pick b{display:block;font-size:17px;margin-bottom:3px}
+  .pick small{color:var(--muted);font-size:13px}
+  a{color:#2b4a78}
+  code{font:12px/1.4 ui-monospace,"SF Mono",Consolas,monospace}
+  footer{max-width:1100px;margin:0 auto;padding:10px 20px 40px;color:var(--muted);font-size:13px}
+  @media (max-width:640px){ .stat{flex-basis:calc(50% - 10px)} }
+</style>
+</head>
+<body>
+<header>
+  <div class="head-row">
+    <div>
+      <h1>STIG Checker</h1>
+      <p>Read a Department of Defense checklist in plain English, pick the rules to scan, then download a program that runs on your own computer.</p>
+    </div>
+    <div class="host-badge">Hosted on GitHub Pages · MIT licence</div>
+  </div>
+</header>
+<div class="banner">
+  This website does not scan your machine and never will. Scanning stays on the computer you download the program to. Checks stay unreviewed until a person types their name.
+</div>
+
+<main>
+  <nav>
+    <button id="tab-landing" aria-selected="true">1 · Computer</button>
+    <button id="tab-rules" disabled>2 · Rules</button>
+    <button id="tab-download" disabled>3 · Download</button>
+  </nav>
+
+  <section id="s-landing">
+    <h2>Which computer are you securing?</h2>
+    <p class="sub">The matching DISA STIG — the release this project validated — is loaded with its filed plain-English explanations. Servers, Linux and databases stay on the command line.</p>
+    <div class="picks">
+      <button class="pick" data-os="macos" type="button">
+        <b>MacBook</b>
+        <small>Apple macOS 26 (Tahoe) V1R3 · 160 rules</small>
+      </button>
+      <button class="pick" data-os="windows" type="button">
+        <b>Windows PC</b>
+        <small>Microsoft Windows 11 V2R9 · 257 rules</small>
+      </button>
+    </div>
+    <p class="muted" id="fetch-note">Loading the catalogue…</p>
+    <div class="note">
+      <b>Local vs hosted.</b> This page is static: it lists STIGs and explanations
+      this repository already ships. It cannot reach <code>dl.dod.cyber.mil</code>
+      from a browser. The official zip is downloaded later, on your machine, by
+      the scanner (or by <code>python3 -m stigprep fetch</code>), and is checked
+      against the pinned SHA-256 when one is recorded and always against the
+      validated rule count. If that host is blocked, use
+      <a href="https://public.cyber.mil/stigs/downloads/">public.cyber.mil/stigs/downloads</a>.
+    </div>
+  </section>
+
+  <section id="s-rules" hidden>
+    <h2 id="rules-title">Every rule, in plain English</h2>
+    <p class="sub" id="rules-sub"></p>
+    <div id="guide-out"></div>
+    <p class="muted" id="rules-status"></p>
+    <div class="bar">
+      <input type="search" id="rules-find" placeholder="Search rules…" style="flex:1 1 240px">
+      <select id="rules-cat">
+        <option value="">All severities</option><option value="high">CAT I only</option>
+        <option value="medium">CAT II only</option><option value="low">CAT III only</option>
+      </select>
+      <select id="rules-triage">
+        <option value="">All kinds</option><option value="quick-win">Quick win</option>
+        <option value="config-profile">Needs a profile pushed out</option>
+        <option value="needs-judgment">Needs a decision</option>
+        <option value="risky-change">Can break things</option>
+      </select>
+      <select id="rules-mode">
+        <option value="">All rules</option>
+        <option value="shell">Machine checks</option>
+        <option value="manual">Needs a person</option>
+      </select>
+      <span class="muted" id="rules-count"></span>
+    </div>
+    <div class="bar">
+      <button class="ghost" id="sel-all" type="button">Select shown</button>
+      <button class="ghost" id="sel-none" type="button">Clear shown</button>
+      <button class="ghost" id="sel-shell" type="button">Machine checks only</button>
+      <button class="ghost" id="sel-cati" type="button">CAT I only</button>
+      <button class="go" id="go-download" type="button">Download a scanner for this selection</button>
+    </div>
+    <div class="wrap"><table id="rules-table"><thead><tr>
+      <th></th><th>Rule</th><th>Severity</th><th>What it asks of you</th><th>Kind</th>
+    </tr></thead><tbody></tbody></table></div>
+  </section>
+
+  <section id="s-download" hidden>
+    <h2>Download the local scanner</h2>
+    <p class="sub">The zip is a configured copy of this project. Double-click it on the computer you picked. Approval and scanning happen there, not here.</p>
+    <div id="dl-summary"></div>
+    <div class="bar">
+      <button class="go" id="go-build" type="button">Download the scanner</button>
+      <span class="muted" id="dl-status"></span>
+    </div>
+    <div class="note">
+      Delete the previous unzipped scanner folder first, then unpack this zip
+      into a new folder. Windows → <code>STIG Checker.bat</code>.
+      Mac → right-click <code>STIG Checker.command</code> → Open.
+      If Python is missing, the program offers a private copy from python.org.
+      Read every command, type your name, then scan. A PDF lands in the files folder.
+    </div>
+  </section>
+</main>
+
+<footer>
+  <a href="https://github.com/himanshusaxenagithub/stig-ai-pipeline">stig-ai-pipeline</a>
+  on GitHub · free hosting on GitHub Pages ·
+  expected URL
+  <code>https://himanshusaxenagithub.github.io/stig-ai-pipeline/</code>
+</footer>
+
+<script src="zip.js?v=0.6.2"></script>
+<script src="site.js?v=0.6.2"></script>
+</body>
+</html>

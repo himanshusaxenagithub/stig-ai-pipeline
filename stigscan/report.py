@@ -11,6 +11,7 @@ import json
 
 from .evaluate import PASS, FAIL, ERROR, MANUAL, SKIPPED
 from .scan import ScanReport, SEVERITY_LABEL
+from .pdf import to_pdf
 
 _ORDER = {"high": 0, "medium": 1, "low": 2}
 _ICON = {PASS: "PASS", FAIL: "FAIL", ERROR: "ERROR", MANUAL: "MANUAL", SKIPPED: "SKIP"}

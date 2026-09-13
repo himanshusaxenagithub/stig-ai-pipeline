@@ -58,6 +58,8 @@ class Guide:
     sha256: str | None = None     # pinned digest of that release, when recorded
     lookahead: int = 6            # how many newer releases to try first
     desktop: bool = False         # offered in the page; everything else is CLI only
+    checkpack: str | None = None  # shipped pack stem, when this project has one
+    annotation: str | None = None # annotations/<name>, when explanations are filed
 
     def candidates(self) -> list[tuple[int, str]]:
         """(release, filename) to try, in order.
@@ -79,11 +81,15 @@ class Guide:
 
 CATALOG: list[Guide] = [
     Guide("macos-26", "MacBook — macOS 26 (Tahoe)", "macos",
-          "U_Apple_macOS_26_V1R{rel}_STIG.zip", release=3, rules=160, desktop=True),
+          "U_Apple_macOS_26_V1R{rel}_STIG.zip", release=3, rules=160, desktop=True,
+          checkpack="macos-26-v1r3",
+          annotation="U_Apple_macOS_26_V1R3_STIG_Manual-xccdf.ai-cache.json"),
     Guide("macos-15", "MacBook — macOS 15 (Sequoia)", "macos",
           "U_Apple_macOS_15_V1R{rel}_STIG.zip", release=7, desktop=True),
     Guide("windows-11", "Windows 11 PC", "windows",
-          "U_MS_Windows_11_V2R{rel}_STIG.zip", release=9, rules=257, desktop=True),
+          "U_MS_Windows_11_V2R{rel}_STIG.zip", release=9, rules=257, desktop=True,
+          checkpack="windows-11-v2r9",
+          annotation="U_MS_Windows_11_STIG_V2R9_Manual-xccdf.ai-cache.json"),
     Guide("windows-server-2019", "Windows Server 2019", "windows",
           "U_MS_Windows_Server_2019_V3R{rel}_STIG.zip", release=8, rules=282),
     Guide("ubuntu-24.04", "Canonical Ubuntu 24.04 LTS", "linux",
@@ -110,6 +116,11 @@ def desktop_guides() -> list[Guide]:
 
 def cli_only_guides() -> list[Guide]:
     return [g for g in CATALOG if not g.desktop]
+
+
+def scannable_guides() -> list[Guide]:
+    """Desktop guides that have a shipped check pack (the website scan path)."""
+    return [g for g in desktop_guides() if g.checkpack]
 
 
 def for_platform(platform: str) -> list[Guide]:

@@ -2,7 +2,7 @@
 ' appears. You do not need to touch this file; double-click Start.bat.
 Option Explicit
 
-Dim fso, sh, root, py, localPy, btn, rc
+Dim fso, sh, root, py, localPy, btn, rc, args
 Set fso = CreateObject("Scripting.FileSystemObject")
 Set sh  = CreateObject("WScript.Shell")
 
@@ -48,4 +48,8 @@ Else
 End If
 
 sh.Environment("Process")("PYTHONPATH") = root
-sh.Run py & " -m stigui --app", 0, False
+args = " -m stigui --app"
+If fso.FileExists(fso.BuildPath(root, "selection.json")) Then
+  args = args & " --selection selection.json"
+End If
+sh.Run py & args, 0, False
