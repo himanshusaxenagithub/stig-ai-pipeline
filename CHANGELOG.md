@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.6.4 — 2026-09-13
+
+### Changed — layman-friendly start page
+
+- The GitHub Pages start step now leads with why STIGs matter, a short
+  “what is a STIG” explainer with diagrams, what the tool does, and a
+  five-step process. MacBook / Windows pick is unchanged and still starts
+  the download flow.
+- CORS, `dl.dod.cyber.mil`, SHA-256 and `stigprep fetch` notes move into
+  a collapsed Technical notes block (and a footer link). The catalogue
+  note is no longer written into the landing status line.
+
 ## v0.6.3 — 2026-09-13
 
 ### Added — plain-language scan results

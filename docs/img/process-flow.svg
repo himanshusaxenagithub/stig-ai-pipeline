@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 168" role="img" aria-labelledby="flow-title flow-desc">
+  <title id="flow-title">How STIG Checker works, step by step</title>
+  <desc id="flow-desc">Use this website, select rules, download a scanner, approve and scan on your own computer, then read the results.</desc>
+  <defs>
+    <style>
+      .box { fill: #fff; stroke: #d9e1e9; stroke-width: 1.25; }
+      .num { fill: #16243b; }
+      .numt { fill: #fff; font: 700 13px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+      .ttl { fill: #1b2733; font: 600 13px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+      .sub { fill: #5e6e7f; font: 11.5px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+      .chev { fill: #9aa8b8; }
+    </style>
+  </defs>
+
+  <g transform="translate(8,18)">
+    <rect class="box" width="168" height="132" rx="12"/>
+    <circle class="num" cx="28" cy="28" r="13"/>
+    <text class="numt" x="28" y="33" text-anchor="middle">1</text>
+    <text class="ttl" x="50" y="33">This website</text>
+    <text class="sub" x="16" y="64">Learn what a STIG is</text>
+    <text class="sub" x="16" y="82">at stig.hsaxena.com</text>
+    <text class="sub" x="16" y="100">Pick Mac or Windows</text>
+  </g>
+  <polygon class="chev" points="186,74 204,84 186,94"/>
+
+  <g transform="translate(212,18)">
+    <rect class="box" width="168" height="132" rx="12"/>
+    <circle class="num" cx="28" cy="28" r="13"/>
+    <text class="numt" x="28" y="33" text-anchor="middle">2</text>
+    <text class="ttl" x="50" y="33">Select</text>
+    <text class="sub" x="16" y="64">Read rules in plain</text>
+    <text class="sub" x="16" y="82">English. Tick the ones</text>
+    <text class="sub" x="16" y="100">you want to scan.</text>
+  </g>
+  <polygon class="chev" points="390,74 408,84 390,94"/>
+
+  <g transform="translate(416,18)">
+    <rect class="box" width="168" height="132" rx="12"/>
+    <circle class="num" cx="28" cy="28" r="13"/>
+    <text class="numt" x="28" y="33" text-anchor="middle">3</text>
+    <text class="ttl" x="50" y="33">Download</text>
+    <text class="sub" x="16" y="64">Save a zip built for</text>
+    <text class="sub" x="16" y="82">your selection. This</text>
+    <text class="sub" x="16" y="100">page never scans.</text>
+  </g>
+  <polygon class="chev" points="594,74 612,84 594,94"/>
+
+  <g transform="translate(620,18)">
+    <rect class="box" width="168" height="132" rx="12"/>
+    <circle class="num" cx="28" cy="28" r="13"/>
+    <text class="numt" x="28" y="33" text-anchor="middle">4</text>
+    <text class="ttl" x="50" y="33">Approve &amp; scan</text>
+    <text class="sub" x="16" y="64">Open the program on</text>
+    <text class="sub" x="16" y="82">your computer. Type</text>
+    <text class="sub" x="16" y="100">your name to approve.</text>
+  </g>
+  <polygon class="chev" points="798,74 816,84 798,94"/>
+
+  <g transform="translate(824,18)">
+    <rect class="box" width="148" height="132" rx="12"/>
+    <circle class="num" cx="28" cy="28" r="13"/>
+    <text class="numt" x="28" y="33" text-anchor="middle">5</text>
+    <text class="ttl" x="50" y="33">Results</text>
+    <text class="sub" x="16" y="64">A local report and</text>
+    <text class="sub" x="16" y="82">PDF: what passed,</text>
+    <text class="sub" x="16" y="100">what failed, the risk.</text>
+  </g>
+</svg>

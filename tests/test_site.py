@@ -85,12 +85,39 @@ class TestWebsitePage(unittest.TestCase):
         self.assertIn("GitHub Pages", html)
         self.assertIn("https://stig.hsaxena.com", html)
 
+    def test_landing_explains_stigs_before_hosting_caveats(self):
+        html = (ROOT / "docs" / "index.html").read_text(encoding="utf-8")
+        self.assertIn("What is a STIG?", html)
+        self.assertIn("Security Technical Implementation Guide", html)
+        self.assertIn("What this tool does", html)
+        self.assertIn('id="os-pick"', html)
+        self.assertIn('data-os="macos"', html)
+        self.assertIn('data-os="windows"', html)
+        self.assertIn("img/stig-idea.svg", html)
+        self.assertIn("img/process-flow.svg", html)
+        self.assertTrue((ROOT / "docs" / "img" / "stig-idea.svg").is_file())
+        self.assertTrue((ROOT / "docs" / "img" / "process-flow.svg").is_file())
+        landing = html.split('id="s-landing"', 1)[1].split('id="s-rules"', 1)[0]
+        self.assertIn("Technical notes", landing)
+        self.assertLess(landing.find("<details"), landing.find("dl.dod.cyber.mil"))
+        self.assertNotIn("<b>Local vs hosted.</b>", html)
+        hero = landing.split('id="os-pick"', 1)[0]
+        self.assertNotIn("dl.dod.cyber.mil", hero)
+        self.assertNotIn("CORS", hero)
+        self.assertNotIn("SHA-256", hero)
+
     def test_site_js_builds_a_selection_not_a_remote_scan(self):
         js = (ROOT / "docs" / "site.js").read_text(encoding="utf-8")
         self.assertIn("selection_format", js)
         self.assertIn("unreviewed", js)
         self.assertIn("pack.checks", js)
         self.assertNotIn("/api/scan", js)
+
+    def test_site_js_does_not_dump_catalog_note_on_the_hero(self):
+        js = (ROOT / "docs" / "site.js").read_text(encoding="utf-8")
+        self.assertNotIn('$("#fetch-note").textContent = catalog.note', js)
+        self.assertIn("tech-catalog-note", js)
+        self.assertIn("Guides are ready", js)
 
     def test_rules_page_starts_with_no_stigs_selected(self):
         js = (ROOT / "docs" / "site.js").read_text(encoding="utf-8")
