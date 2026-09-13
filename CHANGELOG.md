@@ -29,7 +29,7 @@
   explanations, select rules, download an OS-specific scanner zip already
   pointed at that selection. Static HTML/JS only — no API key, no remote
   host scan. Expected URL:
-  `https://himanshusaxenagithub.github.io/stig-ai-pipeline/`
+  `https://stig.hsaxena.com`
 - The site ships catalogue metadata (validated release, rule count, SHA-256
   when pinned) because Pages cannot fetch `dl.dod.cyber.mil`. The local
   program still downloads the official zip and refuses a mismatch.
