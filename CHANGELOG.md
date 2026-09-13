@@ -4,11 +4,12 @@
 
 ### Changed — one Site activity number
 
-- The start page shows a single **Visitors** figure: GoatCounter’s public
-  visitor total. The Opens / Users pair is gone. That public counter is
-  one metric, not pageviews vs unique visitors.
-- Short note: approximate public total; not DoD adoption or customer
-  counts. A muted link points at the public GoatCounter page.
+- The start page shows a single **Site visitors** figure: people who
+  opened this website, per GoatCounter’s public counter. The Opens /
+  Users pair is gone. That number is not “users” of the scanner.
+- Short note: approximate public total; not DoD adoption; not a count of
+  people who downloaded or ran the scanner. A muted link points at the
+  public GoatCounter page.
 
 ## v0.7.4 — 2026-09-13
 
