@@ -1,0 +1,55 @@
+# Run the test suite on every push and pull request, on all three platforms
+# the scanner supports. The Windows job is the only place the Windows
+# launcher path is exercised on Windows itself.
+#
+# GitHub keeps every run, with its date and log, at Actions → tests. That
+# public record is the point as much as the green tick.
+
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  unit:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python: ["3.9", "3.12"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Unit tests
+        run: python -m unittest discover -s tests -v
+      - name: Launchers run under an interpreter that ignores the environment
+        run: python -I run.py --help
+
+  site:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Export the site data the way Pages does
+        run: python3 packaging/build_site.py --out /tmp/site
+      - name: The exported payload zip contains the launchers and run.py
+        run: |
+          python3 - <<'PY'
+          import zipfile
+          names = zipfile.ZipFile("/tmp/site/packages/scanner-src.zip").namelist()
+          for need in ("run.py", "Start.command", "STIG Checker.command", "STIG Checker.bat",
+                       "run-hidden.vbs", "scripts/ensure-python.sh", "scripts/ensure-python.ps1"):
+              assert need in names, need
+          print("payload ok:", len(names), "files")
+          PY
