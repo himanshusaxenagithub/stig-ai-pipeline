@@ -298,6 +298,12 @@ def _page_stream(lines: list[tuple], page_no: int, page_count: int) -> bytes:
 
 
 def _pdf_escape(text: str) -> str:
-    cleaned = text.replace("\u2014", "-").replace("\u2013", "-").replace("\u2026", "...")
+    # The base-14 fonts are Latin-1 only. Map the few typographic characters
+    # the reports use so they do not print as "?".
+    for src, dst in (("\u2014", "-"), ("\u2013", "-"), ("\u2026", "..."), ("\u2192", "to"),
+                     ("\u2190", "from"), ("\u2018", "'"), ("\u2019", "'"),
+                     ("\u201c", '"'), ("\u201d", '"'), ("\u2022", "-"), ("\u00a0", " ")):
+        text = text.replace(src, dst)
+    cleaned = text
     cleaned = cleaned.encode("latin-1", "replace").decode("latin-1")
     return cleaned.replace("\\", "\\\\").replace("(", "\\(").replace(")", "\\)")

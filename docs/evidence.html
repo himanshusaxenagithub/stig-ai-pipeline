@@ -68,12 +68,37 @@
         <a href="https://github.com/himanshusaxenagithub/stig-ai-pipeline">github.com/himanshusaxenagithub/stig-ai-pipeline</a>.
       </li>
       <li>
-        <time datetime="2026-09-13">2026-09-13</time>
-        <b>This release reports gaps; it does not apply remediations</b>
+        <time datetime="2026-09-14">2026-09-14</time>
+        <b>The page reports gaps and drafts; it never changes the system</b>
         The local program finds configuration gaps and writes JSON, Markdown and a PDF.
-        It does not change the system. A static safety gate refuses writes, network clients,
-        privilege escalation and destructive verbs. Any later fix-drafting work is intended
-        to stay human-gated and dry-run by default.
+        A static safety gate refuses writes, network clients, privilege escalation and
+        destructive verbs in any check. After a scan the page can <em>draft</em> Plan of
+        Action and Milestones entries (<code>stigassess</code>) and remediation scripts
+        (<code>stigharden</code>). Drafts are files a named person reads; the page cannot
+        approve, close or apply any of them: every draft is human-gated. Applying a drafted fix exists only on the
+        command line, is a dry-run unless <code>--apply-for-real</code> is passed together
+        with <code>--by</code> and <code>--i-have-reviewed</code>, and is refused in CI.
+      </li>
+      <li>
+        <time datetime="2026-09-14">2026-09-14</time>
+        <b>The double-click program is the same Python, not a binary</b>
+        <code>STIG Checker.command</code> (Mac) and <code>STIG Checker.bat</code> (Windows)
+        start the local page from the unzipped folder. If the computer has no Python, the
+        launcher offers to download a private copy (python-build-standalone on a Mac,
+        python.org's embeddable build on Windows) into the user's own application folder;
+        nothing is installed system-wide and no administrator password is needed. Nothing is
+        compiled or packed: the folder holds the same <code>.py</code> files that are in the
+        repository, so a reviewer can read exactly what runs.
+      </li>
+      <li>
+        <time datetime="2026-09-14">2026-09-14</time>
+        <b>Automated tests</b>
+        <code>python3 -m unittest discover -s tests</code> runs 299 tests on the date above
+        (parsers, the approval digest, the safety gate, the Windows extractor, the site data
+        export, the browser zip, the launchers, and the local page's HTTP routes). Separately,
+        the double-click path — website download, unzip, launcher, page, approval, scan, PDF,
+        Quit — was run end to end ten times in a real browser before v0.7.6 shipped; the three
+        defects that found are listed in <code>CHANGELOG.md</code> under v0.7.6.
       </li>
       <li>
         <time datetime="2026-09-13">2026-09-13</time>
@@ -81,7 +106,7 @@
         Start page demo: <a href="index.html#demo">index.html#demo</a>.
         Longer labeled walk-through, when that file is on this site:
         <a href="demo.html">demo.html</a>.
-        Essays, when published: <a href="articles/">articles/</a>.
+        Essays: <a href="https://hsaxena.com/writing">hsaxena.com/writing</a> (ten notes, plain English; not on this product site).
         Optional public notes: <a href="used.html">used.html</a>.
         Moderated reviews: <a href="reviews.html">reviews.html</a>.
       </li>
@@ -118,7 +143,8 @@
       <li>Site files: <code>docs/index.html</code>, <code>docs/site.js</code>, this page</li>
       <li>Approval model: <code>docs/REVIEW_WORKFLOW.md</code> and <code>stigscan/pack.py</code></li>
       <li>Shipped CAT I counts: <code>docs/data/checkpacks/macos-26-v1r3.json</code> and <code>windows-11-v2r9.json</code> (<code>"severity": "high"</code>)</li>
-      <li>Tests for this site: <code>tests/test_site.py</code> — <code>python3 -m unittest discover -s tests</code></li>
+      <li>Tests for this site: <code>tests/test_site.py</code>; launchers: <code>tests/test_start_scripts.py</code>; everything: <code>python3 -m unittest discover -s tests</code></li>
+      <li>Drafting after a scan: <code>stigassess/</code>, <code>stigharden/</code>, and their tests; the CLI-only apply gate is <code>stigharden/apply.py</code></li>
     </ul>
 
     <div class="note">
@@ -137,7 +163,7 @@
   · <a href="reviews.html">Reviews</a>
   · <a href="used.html">Used this?</a>
   · <a href="demo.html">Example run</a>
-  · <a href="articles/">Essays</a>
+  · <a href="https://hsaxena.com/writing">Essays</a>
   · <a href="https://github.com/himanshusaxenagithub/stig-ai-pipeline">GitHub</a>
   · <a href="https://stig.hsaxena.com">https://stig.hsaxena.com</a>
   <p class="contact">

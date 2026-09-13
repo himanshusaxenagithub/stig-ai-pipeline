@@ -47,8 +47,10 @@ Else
   py = """" & localPy & """"
 End If
 
-sh.Environment("Process")("PYTHONPATH") = root
-args = " -m stigui --app"
+' run.py puts this folder on sys.path itself. That matters for the private
+' embeddable Python, whose ._pth file makes it ignore PYTHONPATH and the
+' current folder, so running stigui as a module would fail to find it.
+args = " """ & fso.BuildPath(root, "run.py") & """ --app"
 If fso.FileExists(fso.BuildPath(root, "selection.json")) Then
   args = args & " --selection selection.json"
 End If

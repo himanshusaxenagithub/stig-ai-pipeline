@@ -1,5 +1,57 @@
 # Changelog
 
+## v0.7.6 — 2026-09-14
+
+### Fixed — three ways the double-click did not work, found by running it
+
+Ten end-to-end runs (five from the website download, five from GitHub's
+Download ZIP), each from a fresh unzip through the real launcher into a
+real browser and out through Quit, found three defects that unit tests had
+not:
+
+- **The website's zip arrived non-executable on a Mac.** `docs/zip.js`
+  wrote 0755 for `.command` files but stamped every entry as MS-DOS, so
+  Archive Utility ignored the mode and macOS refused `STIG Checker.command`
+  with "you do not have appropriate access privileges". The central
+  directory now says Unix. A test runs the real `zip.js` under Node and
+  checks the archive with Python.
+- **The GitHub ZIP had the same problem for a different reason.**
+  `Start.command`, `STIG Checker.command` and `scripts/ensure-python.sh`
+  were committed as 100644. GitHub's zip keeps git's modes, so the
+  README's own Mac quick start could not run. All three are 100755 and a
+  test checks both the working copy and the index.
+- **Windows without Python would have failed after the bootstrap.**
+  python.org's embeddable build ships a `._pth` file that makes the
+  interpreter ignore `PYTHONPATH` and stop adding the current folder to
+  `sys.path`, so `python -m stigui` fails with "No module named stigui"
+  on exactly the machine `ensure-python.ps1` is for. A root `run.py` puts
+  its own folder on `sys.path` and every launcher calls it. A test
+  reproduces the embeddable behaviour with `python -I`.
+
+Also:
+
+- `Start.command` no longer trusts a Python just because `command -v`
+  finds one: a Mac without the Xcode Command Line Tools has a
+  `/usr/bin/python3` stub that opens an installer when run, and an old
+  3.8 parses none of this code. Candidates are checked for 3.9+; the stub
+  is skipped; a private copy downloaded on an earlier run is preferred.
+- PDF reports printed `?` for the arrow in the run timestamp line; the
+  Latin-1 fallback now maps the typographic characters the reports use.
+
+The end-to-end run is in the repository as `tests/e2e/double_click.py`
+(needs Playwright; not part of `unittest discover`). `docs/evidence.html`
+gains dated entries for the drafting modules, the double-click program
+and the test count, and its essay links now point at hsaxena.com/writing
+rather than a folder this site does not have.
+
+Not verified here, and worth one command on a Mac with a normal network:
+the SHA-256 pinned in `scripts/ensure-python.ps1` for
+`python-3.12.7-embed-amd64.zip` (`0d57bb6c…`). python.org publishes only
+an MD5 on the release page and this sandbox cannot reach the file. If
+the digest is wrong, every Windows PC without Python fails at the
+bootstrap step with a clear message; `curl -sL <url> | shasum -a 256`
+settles it.
+
 ## v0.7.5 — 2026-09-13
 
 ### Changed — one Site activity number

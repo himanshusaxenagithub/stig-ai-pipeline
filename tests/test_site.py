@@ -253,6 +253,9 @@ class TestDemoPage(unittest.TestCase):
         self.assertIn('href="https://hsaxena.com"', html)
         self.assertEqual(html.count("Ten short essays"), 0)
         self.assertEqual(html.count('href="articles/"'), 0)
+        # no page on this site may link to a folder that does not exist
+        for page in (ROOT / "docs").glob("*.html"):
+            self.assertNotIn('href="articles/"', page.read_text(encoding="utf-8"), page.name)
 
 
 class TestEvidenceAndTransparency(unittest.TestCase):
@@ -287,7 +290,7 @@ class TestEvidenceAndTransparency(unittest.TestCase):
         self.assertIn("Select CAT I for demo", html)
         self.assertIn('href="index.html#demo"', html)
         self.assertIn('href="demo.html"', html)
-        self.assertIn('href="articles/"', html)
+        self.assertIn('href="https://hsaxena.com/writing"', html)  # essays live on the personal site
         self.assertIn('href="used.html"', html)
         self.assertIn("What we do not claim", html)
         self.assertIn("not", html.lower())
@@ -484,6 +487,42 @@ class TestGoatCounter(unittest.TestCase):
         self.assertIn("Not Department of Defense adoption", html)
         self.assertIn("—", html)
         self.assertNotIn("countapi", html.lower())
+
+
+class TestBrowserZip(unittest.TestCase):
+    """docs/zip.js builds the download in the visitor's browser. Run it for
+    real under Node and check the archive it makes with Python's zipfile."""
+
+    def _zip_from_browser(self) -> bytes:
+        import shutil, subprocess, tempfile
+        node = shutil.which("node")
+        if not node:
+            self.skipTest("node is not installed here")
+        script = (ROOT / "docs" / "zip.js").read_text(encoding="utf-8") + """
+const files = {"STIG Checker.command": "#!/bin/bash\\necho hi\\n", "Start.bat": "@echo off\\n",
+               "selection.json": "{}\\n"};
+const blob = zipStore(files, "STIG-Scanner-macOS/");
+blob.arrayBuffer().then(b => process.stdout.write(Buffer.from(b)));
+"""
+        with tempfile.NamedTemporaryFile("w", suffix=".js", delete=False) as fh:
+            fh.write(script)
+        out = subprocess.run([node, fh.name], capture_output=True, check=True)
+        return out.stdout
+
+    def test_command_files_keep_their_execute_bit(self):
+        import io, zipfile
+        data = self._zip_from_browser()
+        with zipfile.ZipFile(io.BytesIO(data)) as zf:
+            by_name = {i.filename: i for i in zf.infolist()}
+            cmd = by_name["STIG-Scanner-macOS/STIG Checker.command"]
+            bat = by_name["STIG-Scanner-macOS/Start.bat"]
+            # host OS byte 3 = Unix; without it unpackers ignore the mode and
+            # macOS refuses to run the .command ("you do not have permission").
+            self.assertEqual(cmd.create_system, 3)
+            self.assertEqual((cmd.external_attr >> 16) & 0o777, 0o755)
+            self.assertEqual((bat.external_attr >> 16) & 0o777, 0o644)
+            self.assertEqual(zf.read(cmd).decode(), "#!/bin/bash\necho hi\n")
+            self.assertIsNone(zf.testzip())
 
 
 if __name__ == "__main__":

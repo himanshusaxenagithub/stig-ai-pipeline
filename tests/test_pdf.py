@@ -61,5 +61,14 @@ class TestPdfReport(unittest.TestCase):
         self.assertIn(b"FIPS", pdf)
 
 
+class TestLatin1Fallbacks(unittest.TestCase):
+    def test_typographic_characters_do_not_become_question_marks(self):
+        from stigscan.pdf import _pdf_escape
+        out = _pdf_escape("2026-09-13T22:54:24Z \u2192 2026-09-13T22:54:25Z \u2022 it\u2019s \u201cok\u201d")
+        self.assertNotIn("?", out)
+        self.assertIn(" to ", out)
+        self.assertIn("it's", out)
+
+
 if __name__ == "__main__":
     unittest.main()

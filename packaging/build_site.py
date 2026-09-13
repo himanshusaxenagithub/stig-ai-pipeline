@@ -146,7 +146,7 @@ def _payload_files() -> list[Path]:
         for path in sorted(folder.rglob("*")):
             if path.is_file() and path.suffix != ".pyc" and "__pycache__" not in path.parts:
                 out.append(path)
-    for name in ("Start.command", "Start.bat", "STIG Checker.command",
+    for name in ("run.py", "Start.command", "Start.bat", "STIG Checker.command",
                  "STIG Checker.bat", "run-hidden.vbs", "Double-click this.txt",
                  "LICENSE"):
         path = ROOT / name

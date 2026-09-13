@@ -76,7 +76,10 @@ function zipStore(files, prefix) {
     const central = new Uint8Array(46 + nameBytes.length);
     const cv = new DataView(central.buffer);
     cv.setUint32(0, 0x02014b50, true);
-    cv.setUint16(4, 20, true);
+    // "version made by": high byte 3 = Unix. Without it, Archive Utility and
+    // unzip treat the entry as MS-DOS and ignore the mode below, so the
+    // .command files come out non-executable and macOS refuses to run them.
+    cv.setUint16(4, (3 << 8) | 20, true);
     cv.setUint16(6, 20, true);
     cv.setUint32(16, crc, true);
     cv.setUint32(20, data.length, true);

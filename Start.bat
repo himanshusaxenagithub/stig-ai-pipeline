@@ -15,9 +15,9 @@ if exist "run-hidden.vbs" (
 )
 
 REM run-hidden.vbs missing: fall back to running here directly.
-where py >nul 2>nul && (py -m stigui --app & goto done)
-where pythonw >nul 2>nul && (start "" pythonw -m stigui --app & goto done)
-where python >nul 2>nul && (python -m stigui --app & goto done)
+where py >nul 2>nul && (py run.py --app & goto done)
+where pythonw >nul 2>nul && (start "" pythonw run.py --app & goto done)
+where python >nul 2>nul && (python run.py --app & goto done)
 echo Python 3 is not installed.
 echo Get it from https://www.python.org/downloads/ and tick "Add python.exe to PATH".
 start "" "https://www.python.org/downloads/"

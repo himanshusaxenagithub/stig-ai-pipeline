@@ -8,13 +8,28 @@ if [ ! -d "stigui" ]; then
   exit 1
 fi
 
+usable() {
+  # A real Python 3.9 or newer, not just a name that resolves.
+  local path
+  path="$(command -v "$1" 2>/dev/null)" || return 1
+  # A Mac without the Xcode Command Line Tools still has /usr/bin/python3,
+  # but it is a stub that opens an installer the moment it is run. Do not
+  # poke it; the private download below is the right answer on that Mac.
+  if [ "$path" = "/usr/bin/python3" ] && [ "$(uname)" = "Darwin" ] \
+     && ! xcode-select -p >/dev/null 2>&1; then
+    return 1
+  fi
+  "$path" -c 'import sys; raise SystemExit(0 if sys.version_info >= (3, 9) else 1)' >/dev/null 2>&1
+}
+
 find_python() {
   local c
-  for c in python3 python /usr/bin/python3 /usr/local/bin/python3 /opt/homebrew/bin/python3; do
-    command -v "$c" >/dev/null 2>&1 && { echo "$c"; return 0; }
-  done
   local bundled="$HOME/Library/Application Support/STIG Checker/runtime/bin/python3"
+  # A private copy downloaded on an earlier run wins: it is known to work.
   [ -x "$bundled" ] && { echo "$bundled"; return 0; }
+  for c in python3 python /opt/homebrew/bin/python3 /usr/local/bin/python3 /usr/bin/python3; do
+    usable "$c" && { command -v "$c"; return 0; }
+  done
   return 1
 }
 
@@ -37,9 +52,10 @@ fi
 
 echo "Opening in your browser…"
 echo "Leave this window open while you use the page; closing it stops the program."
-export PYTHONPATH="$(pwd)"
 EXTRA=()
 if [ -f "selection.json" ]; then
   EXTRA+=(--selection selection.json)
 fi
-exec "$PY" -m stigui --app "${EXTRA[@]}"
+# run.py puts this folder on sys.path itself, so this works under a private
+# Python that ignores PYTHONPATH as well as under the system one.
+exec "$PY" run.py --app "${EXTRA[@]}"
