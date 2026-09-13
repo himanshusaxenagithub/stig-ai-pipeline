@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Evidence &amp; transparency — STIG Checker</title>
+<meta name="description" content="Dated, checkable facts about STIG Checker: MIT licence, no API key, human approval before any check runs, supported platforms, and how to reproduce a CAT I scan. https://stig.hsaxena.com/evidence.html">
+<meta name="author" content="Himanshu Saxena">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="meta.css">
+</head>
+<body>
+<header>
+  <div class="head-row">
+    <div>
+      <h1><a href="index.html">STIG Checker</a></h1>
+      <p>Free Department of Defense checklists, in plain English, scanned on your own computer.</p>
+    </div>
+    <div class="host-badge">Hosted on GitHub Pages · MIT licence</div>
+  </div>
+</header>
+<div class="banner">
+  This page lists what you can verify from public files. It is a record, not a pitch.
+</div>
+<p class="crumbs"><a href="index.html">Start</a> · Evidence &amp; transparency · <a href="used.html">Used this?</a></p>
+
+<main>
+  <article class="paper">
+    <p class="kicker">Public record</p>
+    <h1 class="page">Evidence &amp; transparency</h1>
+    <p class="byline">Himanshu Saxena · dated <time datetime="2026-09-13">13 September 2026</time> ·
+      <a href="https://stig.hsaxena.com/evidence.html">stig.hsaxena.com/evidence.html</a></p>
+
+    <p>Anyone can clone the repository, open this site, and check the statements below. Dates are the day this page was written. If a later commit changes a fact, the git history is the correction.</p>
+
+    <h2>What is objectively true</h2>
+    <ul class="facts">
+      <li>
+        <time datetime="2026-09-13">2026-09-13</time>
+        <b>The public site is static GitHub Pages</b>
+        The files live in this repository’s <code>docs/</code> folder and are served at
+        <a href="https://stig.hsaxena.com">https://stig.hsaxena.com</a>
+        (CNAME <code>stig.hsaxena.com</code>). The page does not scan the visitor’s machine
+        and never will. There is no live-chat widget and no remote host check.
+      </li>
+      <li>
+        <time datetime="2026-09-13">2026-09-13</time>
+        <b>MIT licence, no account, no API key</b>
+        <a href="https://github.com/himanshusaxenagithub/stig-ai-pipeline/blob/main/LICENSE">LICENSE</a>
+        is MIT (Copyright 2026 H. Saxena). The hosted page is HTML, CSS and JavaScript.
+        The downloaded scanner is this project’s Python. Neither asks for an account or an API key.
+      </li>
+      <li>
+        <time datetime="2026-09-13">2026-09-13</time>
+        <b>A person must approve every check</b>
+        Shipped checks stay <b>unreviewed</b> until someone reads the exact command and types their name.
+        Approval freezes a SHA-256 digest of the command, the comparison, and the expected value.
+        If those bytes change later, the check is treated as drifted and will not run.
+        Unapproved checks do not run. The program never approves a check for you.
+      </li>
+      <li>
+        <time datetime="2026-09-13">2026-09-13</time>
+        <b>Platforms</b>
+        Scanner profiles exist for <b>macOS</b>, <b>Linux</b> and <b>Windows</b>.
+        This website builds a zip for a desk Mac (Apple macOS 26 Tahoe V1R3, 160 rules)
+        or a Windows 11 PC (V2R9, 257 rules). Linux and servers stay on the command line.
+        Source:
+        <a href="https://github.com/himanshusaxenagithub/stig-ai-pipeline">github.com/himanshusaxenagithub/stig-ai-pipeline</a>.
+      </li>
+      <li>
+        <time datetime="2026-09-13">2026-09-13</time>
+        <b>This release reports gaps; it does not apply remediations</b>
+        The local program finds configuration gaps and writes JSON, Markdown and a PDF.
+        It does not change the system. A static safety gate refuses writes, network clients,
+        privilege escalation and destructive verbs. Any later fix-drafting work is intended
+        to stay human-gated and dry-run by default.
+      </li>
+      <li>
+        <time datetime="2026-09-13">2026-09-13</time>
+        <b>Where to look next</b>
+        Start page demo: <a href="index.html#demo">index.html#demo</a>.
+        Longer labeled walk-through, when that file is on this site:
+        <a href="demo.html">demo.html</a>.
+        Essays, when published: <a href="articles/">articles/</a>.
+        Optional public notes: <a href="used.html">used.html</a>.
+      </li>
+    </ul>
+
+    <h2 id="example-run">A first CAT I pass (the real path)</h2>
+    <p>You do not need invented results to see how the tool works. These are the steps on the live start page. Nothing downloads until you ask. Nothing runs until you type your name on your own computer.</p>
+    <ol>
+      <li>Open <a href="https://stig.hsaxena.com">stig.hsaxena.com</a> (or <a href="index.html">index.html</a>).</li>
+      <li>Under <b>Demo — try a simple first scan</b>, pick <b>MacBook · CAT I demo</b> or <b>Windows PC · CAT I demo</b>. The rules list opens with the CAT I filter on.</li>
+      <li>Review the short list. Click <b>Select CAT I for demo</b>. The shipped Apple macOS 26 (Tahoe) V1R3 pack lists <b>13</b> high-severity (CAT I) rules; the Windows 11 V2R9 pack lists <b>27</b>. Those counts come from the JSON this repository publishes, not from a live scan of your machine.</li>
+      <li>Choose <b>Download a scanner for this selection</b>, then download the zip. Delete any previous unzipped scanner folder first.</li>
+      <li>On that computer: Windows → <code>STIG Checker.bat</code>. Mac → right-click <code>STIG Checker.command</code> → Open. The local page binds to <code>127.0.0.1</code>.</li>
+      <li>Read each command. Type your name to approve the ones you accept. Then run the approved checks. Coverage is stated first — rules that were not judged are not counted as pass or fail.</li>
+    </ol>
+    <p>If <a href="demo.html">demo.html</a> is present, it is a longer illustrated story of the same path. Figures there that are marked <b>sample data</b> are invented for the narrative. They are not a scan of a real organisation.</p>
+
+    <div class="not-claim" id="not-claimed">
+      <h2>What we do not claim</h2>
+      <ul>
+        <li>This project is <b>not</b> a Department of Defense or DISA product. Those organisations have not endorsed it. STIGs are public checklists DISA publishes; using the identifiers does not imply a relationship.</li>
+        <li>GitHub stars, forks, watchers or traffic are <b>not</b> evidence of organisational adoption.</li>
+        <li>We do not publish usage counts, customer logos, or testimonials on this site. If someone later chooses to post a public note, it will be theirs — see <a href="used.html">Used this?</a>. This page invents none.</li>
+        <li>Sample or example-run figures labeled as sample data are <b>not</b> real clinic, school or company results.</li>
+        <li>Selecting CAT I, or finishing a first scan, is <b>not</b> a claim that a system is “STIG compliant,” accredited, or safe.</li>
+        <li>The tool finds configuration gaps. That is not a claim about hacking, exploits, or active attacks.</li>
+      </ul>
+    </div>
+
+    <h2>How a reviewer can check</h2>
+    <ul>
+      <li>Licence: <a href="https://github.com/himanshusaxenagithub/stig-ai-pipeline/blob/main/LICENSE">LICENSE</a></li>
+      <li>Source: <a href="https://github.com/himanshusaxenagithub/stig-ai-pipeline">himanshusaxenagithub/stig-ai-pipeline</a></li>
+      <li>Site files: <code>docs/index.html</code>, <code>docs/site.js</code>, this page</li>
+      <li>Approval model: <code>docs/REVIEW_WORKFLOW.md</code> and <code>stigscan/pack.py</code></li>
+      <li>Shipped CAT I counts: <code>docs/data/checkpacks/macos-26-v1r3.json</code> and <code>windows-11-v2r9.json</code> (<code>"severity": "high"</code>)</li>
+      <li>Tests for this site: <code>tests/test_site.py</code> — <code>python3 -m unittest discover -s tests</code></li>
+    </ul>
+
+    <div class="note">
+      Official STIG packages come from DISA
+      (<a href="https://public.cyber.mil/stigs/downloads/">public.cyber.mil/stigs/downloads</a>
+      or <code>dl.dod.cyber.mil</code>). This site ships catalogue metadata because browsers cannot
+      fetch that host (CORS). The local scanner still downloads the official zip when you ask it to,
+      and refuses a file that does not match the pinned release / rule count (and SHA-256 when one is recorded).
+    </div>
+  </article>
+</main>
+
+<footer>
+  <a href="index.html">Start</a>
+  · <a href="evidence.html">Evidence</a>
+  · <a href="used.html">Used this?</a>
+  · <a href="demo.html">Example run</a>
+  · <a href="articles/">Essays</a>
+  · <a href="https://github.com/himanshusaxenagithub/stig-ai-pipeline">GitHub</a>
+  · <a href="https://stig.hsaxena.com">https://stig.hsaxena.com</a>
+</footer>
+</body>
+</html>

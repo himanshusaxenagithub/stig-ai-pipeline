@@ -255,5 +255,71 @@ class TestDemoPage(unittest.TestCase):
         self.assertEqual(html.count('href="articles/"'), 0)
 
 
+class TestEvidenceAndTransparency(unittest.TestCase):
+    def test_landing_has_a_subtle_reviewer_link(self):
+        html = (ROOT / "docs" / "index.html").read_text(encoding="utf-8")
+        self.assertIn("For reviewers / transparency", html)
+        self.assertIn('href="evidence.html"', html)
+        footer = html.split("<footer>", 1)[1]
+        self.assertIn("For reviewers / transparency", footer)
+        self.assertNotIn("EB-2", html)
+        self.assertNotIn("NIW", html)
+        self.assertNotIn("immigration", html.lower())
+        self.assertNotIn("chatbot", html.lower())
+        self.assertNotIn("chat bot", html.lower())
+
+    def test_evidence_page_lists_checkable_facts(self):
+        html = (ROOT / "docs" / "evidence.html").read_text(encoding="utf-8")
+        self.assertTrue((ROOT / "docs" / "meta.css").is_file())
+        self.assertIn('href="meta.css"', html)
+        self.assertIn("Evidence", html)
+        self.assertIn("2026-09-13", html)
+        self.assertIn("MIT", html)
+        self.assertIn("API key", html)
+        self.assertIn("unreviewed", html)
+        self.assertIn("approve", html.lower())
+        self.assertIn("macOS", html)
+        self.assertIn("Linux", html)
+        self.assertIn("Windows", html)
+        self.assertIn("https://stig.hsaxena.com", html)
+        self.assertIn("https://github.com/himanshusaxenagithub/stig-ai-pipeline", html)
+        self.assertIn("CAT I", html)
+        self.assertIn("Select CAT I for demo", html)
+        self.assertIn('href="index.html#demo"', html)
+        self.assertIn('href="demo.html"', html)
+        self.assertIn('href="articles/"', html)
+        self.assertIn('href="used.html"', html)
+        self.assertIn("What we do not claim", html)
+        self.assertIn("not", html.lower())
+        self.assertIn("endorsed", html.lower())
+        self.assertIn("stars", html.lower())
+        self.assertIn("sample data", html.lower())
+        self.assertIn("dry-run", html)
+        self.assertIn("human-gated", html)
+        self.assertNotIn("chatbot", html.lower())
+        self.assertNotIn("EB-2", html)
+        self.assertNotIn("NIW", html)
+        self.assertNotIn("immigration", html.lower())
+        self.assertNotIn("endorsed by the Department of Defense", html)
+        self.assertNotIn("Pentagon publishes", html)
+
+    def test_used_page_invites_notes_and_invents_none(self):
+        html = (ROOT / "docs" / "used.html").read_text(encoding="utf-8")
+        self.assertIn("Used this?", html)
+        self.assertIn("mailto:1992.hsaxena@gmail.com", html)
+        self.assertIn("1992.hsaxena@gmail.com", html)
+        self.assertIn("issues/new?template=used-this.yml", html)
+        self.assertIn("personal", html.lower())
+        self.assertIn("No invented quotes", html)
+        self.assertNotIn("chatbot", html.lower())
+        self.assertNotIn("EB-2", html)
+        self.assertNotIn("<blockquote", html)
+        template = (ROOT / ".github" / "ISSUE_TEMPLATE" / "used-this.yml").read_text(
+            encoding="utf-8")
+        self.assertIn("Optional public note", template)
+        self.assertIn("Prefer not to say", template)
+        self.assertIn("personal data", template.lower())
+
+
 if __name__ == "__main__":
     unittest.main()

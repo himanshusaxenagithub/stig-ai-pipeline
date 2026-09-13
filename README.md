@@ -67,7 +67,7 @@ A hosted page leads with the fact that the US Department of Defense publishes fr
 
 A **[worked example](https://stig.hsaxena.com/demo.html)** (`docs/demo.html`) shows the same path as an article — pick OS, select CAT I, download, approve, read the risk story — with labeled sample data, so a new reader does not have to click through a real scan. Longer background essays live on the personal site, [hsaxena.com](https://hsaxena.com), not on this product Pages site.
 
-**Hosted (this site):** lists the validated STIG, shows explanations from `annotations/`, builds a download. It does not run host checks and does not need an API key.
+**Hosted (this site):** lists the validated STIG, shows explanations from `annotations/`, builds a download. It does not run host checks and does not need an API key. A static [Evidence and transparency](docs/evidence.html) page lists what a reviewer can verify from public files (licence, approval gate, platforms, how to reproduce a CAT I scan) and what this project does not claim. An optional [Used this?](docs/used.html) page is an invitation only — it does not invent testimonials.
 
 **Local (the download):** `stigui` on `127.0.0.1`, human approval, content-frozen digests, the read-only allowlist, then a PDF on the machine that was scanned.
 

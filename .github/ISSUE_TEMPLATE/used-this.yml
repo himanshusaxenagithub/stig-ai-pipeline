@@ -1,0 +1,55 @@
+name: Optional public note
+description: Say you tried STIG Checker, if you want that note on the public record. No personal data required.
+title: "Optional public note"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you. This issue is **public**.
+
+        Organisation type is optional. A name is not required.
+
+        Do **not** include names of people, patient or student data, hostnames,
+        IP addresses, screenshots of real machines, or other personal information.
+  - type: dropdown
+    id: org_type
+    attributes:
+      label: Organisation type (optional)
+      description: A category only. Do not name the organisation unless you intend that name to be public.
+      options:
+        - Prefer not to say
+        - School or education
+        - Clinic or health
+        - Small office
+        - Home lab
+        - Managed service provider
+        - Other
+    validations:
+      required: false
+  - type: dropdown
+    id: what_used
+    attributes:
+      label: What did you use?
+      options:
+        - The website (stig.hsaxena.com)
+        - The downloaded local scanner
+        - The command line
+        - More than one of the above
+        - Prefer not to say
+    validations:
+      required: false
+  - type: textarea
+    id: note
+    attributes:
+      label: Optional note you are willing to keep public
+      description: A sentence or two is enough. Leave blank if you only wanted to record that you tried it.
+      placeholder: I ran the CAT I demo on a lab Mac. The approval step was clear.
+    validations:
+      required: false
+  - type: checkboxes
+    id: public_no_pii
+    attributes:
+      label: Public record
+      options:
+        - label: I understand this issue is public and I have not included personal data.
+          required: true
