@@ -26,7 +26,7 @@ from pathlib import Path
 
 from .extract import build_pack
 from .pack import CheckPack, PackError, APPROVED, UNREVIEWED, REJECTED, MODE_SHELL
-from .report import to_json, to_markdown
+from .report import to_json, to_markdown, to_pdf
 from .runner import ShellRunner, FixtureRunner
 from .safety import audit
 from . import platforms
@@ -224,6 +224,7 @@ def cmd_scan(args) -> int:
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / f"{pack.pack_id}_scan.json").write_text(to_json(report), encoding="utf-8")
     (out_dir / f"{pack.pack_id}_scan.md").write_text(to_markdown(report), encoding="utf-8")
+    (out_dir / f"{pack.pack_id}_scan.pdf").write_bytes(to_pdf(report))
 
     c = report.counts()
     print(f"Scanned {pack.pack_id} on {report.host.get('hostname')}")
@@ -236,6 +237,7 @@ def cmd_scan(args) -> int:
             print(f"    {r.stig_id}  {r.title[:64]}")
     print(f"  wrote {out_dir / (pack.pack_id + '_scan.json')}")
     print(f"  wrote {out_dir / (pack.pack_id + '_scan.md')}")
+    print(f"  wrote {out_dir / (pack.pack_id + '_scan.pdf')}")
     return 0
 
 

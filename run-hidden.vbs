@@ -48,4 +48,8 @@ Else
 End If
 
 sh.Environment("Process")("PYTHONPATH") = root
-sh.Run py & " -m stigui --app", 0, False
+args = " -m stigui --app"
+If fso.FileExists(fso.BuildPath(root, "selection.json")) Then
+  args = args & " --selection selection.json"
+End If
+sh.Run py & args, 0, False

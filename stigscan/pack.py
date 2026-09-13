@@ -193,6 +193,44 @@ class CheckPack:
         path.write_text(json.dumps(body, indent=2) + "\n", encoding="utf-8")
 
     # ---- queries -------------------------------------------------------
+    def subset(self, ids, pack_id: str | None = None) -> "CheckPack":
+        """A new pack containing only *ids*, in that order.
+
+        Checks are copied. Review state is not changed: a shipped pack
+        stays unreviewed until a person approves it on their machine.
+        """
+        want = []
+        seen: set[str] = set()
+        for item in ids:
+            sid = str(item).strip()
+            if sid and sid not in seen:
+                seen.add(sid)
+                want.append(sid)
+        if not want:
+            raise PackError("a selection must name at least one rule")
+        by_id = {c.stig_id: c for c in self.checks}
+        missing = [sid for sid in want if sid not in by_id]
+        if missing:
+            shown = ", ".join(missing[:8])
+            extra = f" (+{len(missing) - 8} more)" if len(missing) > 8 else ""
+            raise PackError(f"not in this pack: {shown}{extra}")
+        checks = [Check.from_dict(asdict(by_id[sid])) for sid in want]
+        note = (self.notes or "").rstrip()
+        extra = ("Selected subset for a local scan. Every check remains "
+                 "unreviewed until a named person approves it.")
+        if extra not in note:
+            note = f"{note}\n{extra}".strip()
+        return CheckPack(
+            pack_id=pack_id or (self.pack_id + "-selected"),
+            stig_title=self.stig_title,
+            stig_version=self.stig_version,
+            created=self.created,
+            notes=note,
+            pack_format=self.pack_format,
+            platform=self.platform,
+            checks=checks,
+        )
+
     def get(self, stig_id: str) -> Check | None:
         for c in self.checks:
             if c.stig_id == stig_id:

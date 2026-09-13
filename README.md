@@ -59,7 +59,45 @@ Keep the `.bat` / `.command` file inside the unzipped folder. Do not drag it to 
 
 The same steps are in `Double-click this.txt` next to those files.
 
-The page is served on your own computer (`127.0.0.1`). Nothing is uploaded. It never approves a check for you and never runs one you have not approved.
+The page is served on your own computer (`127.0.0.1`). Nothing is uploaded. It never approves a check for you and never runs one you have not approved. After a scan it writes a PDF report next to the JSON and Markdown reports.
+
+## Public website (GitHub Pages)
+
+A hosted page walks the same first steps — pick MacBook or Windows, read the filed plain-English explanations, tick the rules to scan — then downloads an OS-specific scanner zip **preconfigured for that selection**. The zip is this project’s Python files plus `selection.json`. It is not a remote scanner.
+
+**Hosted (this site):** lists the validated STIG, shows explanations from `annotations/`, builds a download. It does not run host checks and does not need an API key.
+
+**Local (the download):** `stigui` on `127.0.0.1`, human approval, content-frozen digests, the read-only allowlist, then a PDF on the machine that was scanned.
+
+Expected URL after Pages is on:
+
+`https://himanshusaxenagithub.github.io/stig-ai-pipeline/`
+
+### Why the site does not fetch `dl.dod.cyber.mil`
+
+GitHub Pages is static files. Browsers block that host (CORS), and many networks block it too. The site therefore ships the catalogue, the pinned release / rule-count (and SHA-256 when one is recorded), and the filed explanations this project validated — the same data `stigprep parse --explain` attaches. The local program still downloads the official zip when you ask it to, and refuses a file that does not match. If the host is blocked, use [public.cyber.mil/stigs/downloads](https://public.cyber.mil/stigs/downloads/).
+
+### Turn on GitHub Pages
+
+Free hosting. Either:
+
+1. **Branch folder (fewest clicks).** Repository **Settings → Pages → Build and deployment → Source:** Deploy from a branch. Branch `main`, folder `/docs`. The committed `docs/` tree is enough.
+2. **GitHub Actions.** Settings → Pages → Source: GitHub Actions. `.github/workflows/pages.yml` regenerates `docs/data/` from the catalogue and deploys. Same URL.
+
+Refresh the shipped JSON after changing annotations or check packs:
+
+```bash
+python3 packaging/build_site.py --out docs
+```
+
+Build a configured scanner without the website:
+
+```bash
+python3 packaging/build_scanpack.py \
+    --platform macos --pack checkpacks/macos-26-v1r3.json \
+    --id APPL-26-000054 --id APPL-26-002038 \
+    -o dist/STIG-Scanner-macOS
+```
 
 ### Command line
 
@@ -165,6 +203,7 @@ python3 -m stigscan approve checkpacks/macos-26-v1r3.json \
 python3 -m stigscan verify checkpacks/macos-26-v1r3.json
 
 # 5. Scan. Only approved, unmodified checks run.
+#    Writes JSON, Markdown and a PDF into out/.
 python3 -m stigscan scan checkpacks/macos-26-v1r3.json -o out/
 ```
 

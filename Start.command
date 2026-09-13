@@ -38,4 +38,8 @@ fi
 echo "Opening in your browser…"
 echo "Leave this window open while you use the page; closing it stops the program."
 export PYTHONPATH="$(pwd)"
-exec "$PY" -m stigui --app
+EXTRA=()
+if [ -f "selection.json" ]; then
+  EXTRA+=(--selection selection.json)
+fi
+exec "$PY" -m stigui --app "${EXTRA[@]}"

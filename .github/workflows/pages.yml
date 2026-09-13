@@ -1,0 +1,49 @@
+# Publish the static site under docs/ to GitHub Pages.
+#
+# Enable once: repository Settings → Pages → Source = GitHub Actions
+# (or Source = Deploy from a branch, folder /docs — that uses the
+# committed files and does not need this workflow).
+#
+# The site is static. It never runs a host scan. This job only refreshes
+# the filed-explanation JSON and the scanner source zip from the repo.
+
+name: github-pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Export site data
+        run: python3 packaging/build_site.py --out docs
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs
+
+  deploy:
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

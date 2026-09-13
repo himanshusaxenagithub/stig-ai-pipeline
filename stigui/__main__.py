@@ -48,10 +48,13 @@ from stigprep.catalog import (CATALOG, desktop_guides, cli_only_guides,
 from stigscan import platforms
 from stigscan.extract import build_pack
 from stigscan.pack import CheckPack, PackError, APPROVED, MODE_SHELL
-from stigscan.report import to_json as report_json, to_markdown as report_markdown
+from stigscan.report import to_json as report_json, to_markdown as report_markdown, to_pdf
 from stigscan.runner import ShellRunner
 from stigscan.safety import audit
 from stigscan.scan import run_scan, SEVERITY_LABEL
+from stigscan.selection import (
+    SelectionError, apply_selection, find_selection, load_selection,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 PAGE = Path(__file__).resolve().parent / "app.html"
@@ -148,6 +151,8 @@ class Session:
         self.checklist_path: Path | None = None
         self.pack: CheckPack | None = None
         self.pack_path: Path | None = None
+        self.selection: dict | None = None
+        self.rules_cache: list[dict] = []
         self.lock = threading.Lock()
 
     # -- module 1 ----------------------------------------------------------
@@ -172,7 +177,7 @@ class Session:
             bucket = (r.ai or {}).get("triage") or "unexplained"
             triage[bucket] = triage.get(bucket, 0) + 1
 
-        return {
+        result = {
             "title": benchmark.title,
             "version": benchmark.version,
             "release": benchmark.release_info,
@@ -186,6 +191,48 @@ class Session:
             "files": written,
             "rules": [_rule_row(r) for r in benchmark.rules],
         }
+        self.rules_cache = result["rules"]
+        return result
+
+    def apply_website_selection(self, path: Path) -> dict:
+        """Open a selection.json from the public site (or a local rebuild).
+
+        The filtered pack is copied into the work folder so approvals stay
+        with the person, not the zip they downloaded. Every check is left
+        exactly as shipped — unreviewed — until they approve it here.
+        """
+        selection = load_selection(path)
+        pack_path = Path(selection.get("pack_path") or "")
+        if not pack_path.is_file():
+            pack_path = path.parent / (selection.get("pack_path") or "")
+        if not pack_path.is_file():
+            source = selection.get("source_pack") or ""
+            for candidate in (
+                path.parent / "checkpacks" / f"{source}.json",
+                path.parent / "checkpacks" / f"{source}-selected.json",
+                ROOT / "checkpacks" / f"{source}.json",
+            ):
+                if candidate.is_file():
+                    pack_path = candidate
+                    break
+        if not pack_path.is_file():
+            raise SelectionError(
+                "this selection names a check pack that is not in the folder")
+        pack = CheckPack.load(pack_path)
+        # A zip from the website already contains the filtered pack. A
+        # selection that still points at the full shipped pack is filtered now.
+        want = set(selection["rule_ids"])
+        if {c.stig_id for c in pack.checks} != want:
+            pack = apply_selection(pack, selection)
+        target = self.workdir / f"{pack.pack_id}.json"
+        pack.save(target)
+        self.pack, self.pack_path = pack, target
+        self.selection = selection
+        from stigprep.explain import load_annotations
+        ids = {c.stig_id for c in pack.checks}
+        ann = load_annotations(Path("no-such-guide.zip"), ids)
+        self.rules_cache = [_rule_row_from_check(c, ann.get(c.stig_id) or {}) for c in pack.checks]
+        return self.pack_state()
 
     # -- module 2 ----------------------------------------------------------
     def author(self, platform_name: str) -> dict:
@@ -292,6 +339,7 @@ class Session:
         out = self.workdir / "out"
         (out / f"{self.pack.pack_id}_scan.json").write_text(report_json(report), encoding="utf-8")
         (out / f"{self.pack.pack_id}_scan.md").write_text(report_markdown(report), encoding="utf-8")
+        (out / f"{self.pack.pack_id}_scan.pdf").write_bytes(to_pdf(report))
 
         counts = report.counts()
         evaluated = counts["pass"] + counts["fail"]
@@ -308,7 +356,8 @@ class Session:
                 "either compliant or non-compliant."
             ),
             "evidence": str(record),
-            "files": [f"{self.pack.pack_id}_scan.json", f"{self.pack.pack_id}_scan.md"],
+            "files": [f"{self.pack.pack_id}_scan.json", f"{self.pack.pack_id}_scan.md",
+                      f"{self.pack.pack_id}_scan.pdf"],
             "results": [
                 {
                     "stig_id": r.stig_id,
@@ -336,6 +385,24 @@ def _rule_row(rule) -> dict:
         "caution": ai.get("caution", ""),
         "check_text": rule.check_text,
         "fix_text": rule.fix_text,
+    }
+
+
+def _rule_row_from_check(check, ai: dict | None = None) -> dict:
+    """A rules-tab row when the person arrived with a website selection."""
+    ai = ai or {}
+    return {
+        "stig_id": check.stig_id,
+        "group_id": check.group_id,
+        "cat": SEVERITY_LABEL.get(check.severity, check.severity),
+        "severity": check.severity,
+        "title": check.title,
+        "summary": ai.get("summary", ""),
+        "triage": ai.get("triage", ""),
+        "automation": ai.get("automation", ""),
+        "caution": ai.get("caution", ""),
+        "check_text": "",
+        "fix_text": "",
     }
 
 
@@ -488,6 +555,8 @@ class Handler(BaseHTTPRequestHandler):
                 "app": Handler.app_mode,
                 "packs": shipped_packs(platforms.detect()),
                 "pack": self.session.pack_state(),
+                "selection": self.session.selection,
+                "rules": self.session.rules_cache,
             })
 
         if url.path == "/api/download":
@@ -578,7 +647,7 @@ class Handler(BaseHTTPRequestHandler):
                     return self._stream_scan(session, bool(payload.get("include_unreviewed")))
 
             return self._fail("not found", 404)
-        except (ValueError, KeyError, PackError) as e:
+        except (ValueError, KeyError, PackError, SelectionError) as e:
             return self._fail(str(e))
         except Exception as e:  # surfaced in the page rather than the terminal
             return self._fail(f"{type(e).__name__}: {e}", 500)
@@ -610,6 +679,10 @@ def main(argv=None) -> int:
                          "and stop when the page has been closed for a while")
     ap.add_argument("--idle-minutes", type=int, default=None,
                     help=f"stop after this long with no page open (app mode: {IDLE_MINUTES})")
+    ap.add_argument("--pack", default=None,
+                    help="check pack to open on start")
+    ap.add_argument("--selection", default=None,
+                    help="selection.json from the public website")
     args = ap.parse_args(argv)
 
     if not PAGE.exists():
@@ -635,6 +708,14 @@ def main(argv=None) -> int:
 
     Handler.session = Session(workdir)
     Handler.app_mode = bool(args.app)
+    selection_path = Path(args.selection).resolve() if args.selection else find_selection(ROOT)
+    if selection_path and selection_path.is_file():
+        try:
+            Handler.session.apply_website_selection(selection_path)
+        except (SelectionError, PackError, OSError) as e:
+            print(f"warning: could not load selection {selection_path}: {e}", flush=True)
+    elif args.pack:
+        Handler.session.load_pack(Path(args.pack))
     Handler.last_seen = time.monotonic()
     port = args.port or _free_port()
     httpd = ThreadingHTTPServer(("127.0.0.1", port), Handler)
