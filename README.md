@@ -71,7 +71,7 @@ A hosted page walks the same first steps — pick MacBook or Windows, read the f
 
 Expected URL after Pages is on:
 
-`https://himanshusaxenagithub.github.io/stig-ai-pipeline/`
+`https://hsaxena.com`
 
 ### Why the site does not fetch `dl.dod.cyber.mil`
 
