@@ -69,20 +69,15 @@ A hosted page walks the same first steps — pick MacBook or Windows, read the f
 
 **Local (the download):** `stigui` on `127.0.0.1`, human approval, content-frozen digests, the read-only allowlist, then a PDF on the machine that was scanned.
 
-Expected URL after Pages is on:
-
-`https://himanshusaxenagithub.github.io/stig-ai-pipeline/`
+Live site: [`https://himanshusaxenagithub.github.io/stig-ai-pipeline/`](https://himanshusaxenagithub.github.io/stig-ai-pipeline/)
 
 ### Why the site does not fetch `dl.dod.cyber.mil`
 
 GitHub Pages is static files. Browsers block that host (CORS), and many networks block it too. The site therefore ships the catalogue, the pinned release / rule-count (and SHA-256 when one is recorded), and the filed explanations this project validated — the same data `stigprep parse --explain` attaches. The local program still downloads the official zip when you ask it to, and refuses a file that does not match. If the host is blocked, use [public.cyber.mil/stigs/downloads](https://public.cyber.mil/stigs/downloads/).
 
-### Turn on GitHub Pages
+### Publishing
 
-Free hosting. Either:
-
-1. **Branch folder (fewest clicks).** Repository **Settings → Pages → Build and deployment → Source:** Deploy from a branch. Branch `main`, folder `/docs`. The committed `docs/` tree is enough.
-2. **GitHub Actions.** Settings → Pages → Source: GitHub Actions. `.github/workflows/pages.yml` regenerates `docs/data/` from the catalogue and deploys. Same URL.
+The live site is served from `docs/` on `main` (branch folder `/docs`, or GitHub Actions via `.github/workflows/pages.yml`).
 
 Refresh the shipped JSON after changing annotations or check packs:
 
