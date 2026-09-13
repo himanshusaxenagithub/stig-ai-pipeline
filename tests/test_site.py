@@ -81,6 +81,7 @@ class TestWebsitePage(unittest.TestCase):
         js = (ROOT / "docs" / "site.js").read_text(encoding="utf-8")
         self.assertIn("selection_format", js)
         self.assertIn("unreviewed", js)
+        self.assertIn("pack.checks", js)
         self.assertNotIn("/api/scan", js)
 
 

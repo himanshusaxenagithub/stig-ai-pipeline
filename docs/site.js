@@ -251,7 +251,8 @@ async function downloadScanner() {
       + "or enable GitHub Pages so packages/scanner-src.zip is available.");
   }
   const files = unzipStore(await srcResp.arrayBuffer());
-  const ids = [...selected];
+  const ids = (pack.checks || []).filter(c => selected.has(c.stig_id)).map(c => c.stig_id);
+  if (!ids.length) throw new Error("select at least one rule that is in the shipped pack");
   const packId = (guide.checkpack || "pack") + "-selected";
   const filtered = filterPack(pack, ids, packId);
   const selection = {
