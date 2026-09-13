@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 280" role="img" aria-labelledby="pick-title pick-desc">
+  <title id="pick-title">Example: pick the computer</title>
+  <desc id="pick-desc">Two cards, MacBook and Windows PC. The MacBook card is selected. Labeled as sample data.</desc>
+  <defs>
+    <style>
+      .card { fill: #fff; stroke: #d9e1e9; stroke-width: 1.25; }
+      .sel { fill: #16243b; stroke: #16243b; }
+      .ttl { font: 600 16px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+      .sub { font: 13px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+      .ink { fill: #1b2733; }
+      .muted { fill: #5e6e7f; }
+      .on { fill: #fff; }
+      .onm { fill: #9fb6d0; }
+      .flag { fill: #fdf5e6; stroke: #e8d9b3; }
+      .flagt { fill: #5a3f0b; font: 600 12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+      .cap { fill: #5e6e7f; font: 12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+    </style>
+  </defs>
+  <rect class="flag" x="12" y="12" width="196" height="28" rx="14"/>
+  <text class="flagt" x="110" y="31" text-anchor="middle">EXAMPLE - not a live scan</text>
+  <text class="cap" x="450" y="54" text-anchor="middle">Cedar Ridge Family Clinic - one staff MacBook</text>
+
+  <g transform="translate(70,78)">
+    <rect class="sel" width="350" height="150" rx="12"/>
+    <text class="ttl on" x="24" y="42">MacBook</text>
+    <text class="sub onm" x="24" y="68">Apple macOS 26 (Tahoe) V1R3 - 160 rules</text>
+    <text class="sub onm" x="24" y="96">Selected for this example</text>
+    <text class="sub on" x="24" y="126">You would tap this on the start page.</text>
+  </g>
+  <g transform="translate(480,78)">
+    <rect class="card" width="350" height="150" rx="12"/>
+    <text class="ttl ink" x="24" y="42">Windows PC</text>
+    <text class="sub muted" x="24" y="68">Microsoft Windows 11 V2R9 - 257 rules</text>
+    <text class="sub muted" x="24" y="96">Not chosen in this walk-through</text>
+    <text class="sub muted" x="24" y="126">Same later steps, different checklist.</text>
+  </g>
+</svg>

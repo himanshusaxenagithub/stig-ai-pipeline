@@ -29,6 +29,9 @@
              cursor:pointer;font:inherit;font-size:14px;color:var(--muted)}
   nav button[aria-selected=true]{background:var(--navy);border-color:var(--navy);color:#fff}
   nav button:disabled{opacity:.45;cursor:not-allowed}
+  nav a.tab-link{border:1px solid var(--line);background:var(--paper);padding:9px 16px;border-radius:8px;
+             font:inherit;font-size:14px;color:var(--muted);text-decoration:none;display:inline-block}
+  nav a.tab-link:hover{border-color:var(--navy);color:var(--ink)}
   section{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:22px;margin-top:16px}
   section[hidden]{display:none}
   h2{margin:0 0 6px;font-size:18px}
@@ -79,6 +82,12 @@
   .hero .lead{font-size:16px;color:var(--ink);margin:0 0 14px;max-width:42rem}
   .hero-actions{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:16px 0 4px}
   .hero-actions .muted{font-size:13px}
+  .ghost-link{background:var(--paper);color:var(--ink);border:1px solid var(--line);border-radius:8px;
+              padding:10px 18px;font:inherit;text-decoration:none;display:inline-block}
+  .read-first{margin:22px 0 8px;padding:0;list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .read-first li{border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--mist)}
+  .read-first b{display:block;margin-bottom:4px}
+  .read-first span{color:var(--muted);font-size:14px}
   .why{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:18px 0 8px}
   .why article{background:var(--mist);border-radius:10px;padding:14px 16px}
   .why h3{margin:0 0 6px;font-size:15px}
@@ -115,6 +124,7 @@
   @media (max-width:800px){
     .why{grid-template-columns:1fr}
     .does{grid-template-columns:1fr}
+    .read-first{grid-template-columns:1fr}
     .hero h2{font-size:22px}
     .flow-wide{display:none}
     .flow-fallback{display:block}
@@ -141,6 +151,7 @@
     <button id="tab-landing" aria-selected="true">1 · Start</button>
     <button id="tab-rules" disabled>2 · Rules</button>
     <button id="tab-download" disabled>3 · Download</button>
+    <a class="tab-link" href="demo.html">Example run</a>
   </nav>
 
   <section id="s-landing">
@@ -150,6 +161,8 @@
       <div class="hero-actions">
         <a class="go-link" href="#demo">Try a simple first scan</a>
         <a class="ghost-link" href="#os-pick">Or load the full checklist</a>
+        <a class="ghost-link" href="demo.html">See an example run</a>
+        <a class="ghost-link" href="https://hsaxena.com">Essays on my site</a>
         <span class="muted">No account · nothing uploaded</span>
       </div>
     </div>
@@ -188,8 +201,17 @@
       </article>
     </div>
 
+    <h3>See an example first — no scan required</h3>
+    <p class="sub">A static walk-through uses labeled sample data so you can see the path before you pick a computer. Longer essays live on <a href="https://hsaxena.com">hsaxena.com</a>, not on this product site.</p>
+    <ul class="read-first">
+      <li>
+        <b><a href="demo.html">A worked example</a></b>
+        <span>Pick OS → CAT I → download → approve → results with a remaining-risk story. Fictional clinic data, clearly marked.</span>
+      </li>
+    </ul>
+
     <h3>What is a STIG?</h3>
-    <p class="sub">A <b>STIG</b> (Security Technical Implementation Guide) is a DoD checklist that locks down a common system. Each one has a few hundred settings, ranked by how serious a miss would be: CAT I first, then II, then III.</p>
+    <p class="sub">A <b>STIG</b> (Security Technical Implementation Guide) is a checklist the Defense Information Systems Agency (DISA) writes for the Department of Defense. Each one locks down a named product. A typical desk guide has on the order of one or two hundred settings, ranked by how serious a miss would be: CAT I first, then II, then III. DISA releases many of these guides at <a href="https://public.cyber.mil/stigs/downloads/">public.cyber.mil</a>. This site is not a DISA product.</p>
     <figure class="diagram">
       <img src="img/stig-idea.svg" alt="A long checklist of settings becomes a ranked CAT I, II and III plan, then a check of your own computer.">
     </figure>
@@ -333,7 +355,10 @@
   <a href="https://github.com/himanshusaxenagithub/stig-ai-pipeline">stig-ai-pipeline</a>
   on GitHub · free hosting on GitHub Pages ·
   <a href="https://stig.hsaxena.com">https://stig.hsaxena.com</a>
+  · <a href="demo.html">Example run</a>
+  · <a href="https://hsaxena.com">Essays on my site</a>
   · <a href="#tech-notes">Technical notes</a>
+  · <a href="evidence.html">For reviewers / transparency</a>
 </footer>
 
 <script src="zip.js?v=0.6.6"></script>

@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 320" role="img" aria-labelledby="sel-title sel-desc">
+  <title id="sel-title">Example: select CAT I rules only</title>
+  <desc id="sel-desc">A sample rules table with CAT I rows ticked and CAT II rows left clear. Labeled as example data.</desc>
+  <defs>
+    <style>
+      .card { fill: #fff; stroke: #d9e1e9; stroke-width: 1.25; }
+      .head { fill: #5e6e7f; font: 600 11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+      .row { fill: #1b2733; font: 13px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+      .muted { fill: #5e6e7f; font: 12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+      .chip { font: 600 11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+      .flag { fill: #fdf5e6; stroke: #e8d9b3; }
+      .flagt { fill: #5a3f0b; font: 600 12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+      .btn { fill: #16243b; }
+      .btnt { fill: #fff; font: 600 12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+    </style>
+  </defs>
+  <rect class="flag" x="12" y="10" width="248" height="26" rx="13"/>
+  <text class="flagt" x="136" y="28" text-anchor="middle">EXAMPLE - fictional clinic selection</text>
+
+  <rect class="btn" x="12" y="48" width="92" height="28" rx="8"/>
+  <text class="btnt" x="58" y="67" text-anchor="middle">CAT I only</text>
+  <text class="muted" x="116" y="67">12 of 160 rules shown - 12 selected for the scan</text>
+
+  <rect class="card" x="12" y="88" width="876" height="220" rx="12"/>
+  <text class="head" x="36" y="112">RULE</text>
+  <text class="head" x="200" y="112">SEVERITY</text>
+  <text class="head" x="320" y="112">WHAT IT ASKS</text>
+
+  <rect x="28" y="128" width="14" height="14" rx="3" fill="#16243b"/>
+  <path d="M31 135 l4 4 8-8" fill="none" stroke="#fff" stroke-width="1.8"/>
+  <text class="row" x="56" y="140">APPL-26-005020</text>
+  <rect x="200" y="126" width="52" height="18" rx="9" fill="#fbecea"/>
+  <text class="chip" x="226" y="139" text-anchor="middle" fill="#c0392b">CAT I</text>
+  <text class="row" x="320" y="140">Enforce FileVault full-disk encryption</text>
+
+  <rect x="28" y="158" width="14" height="14" rx="3" fill="#16243b"/>
+  <path d="M31 165 l4 4 8-8" fill="none" stroke="#fff" stroke-width="1.8"/>
+  <text class="row" x="56" y="170">APPL-26-002066</text>
+  <rect x="200" y="156" width="52" height="18" rx="9" fill="#fbecea"/>
+  <text class="chip" x="226" y="169" text-anchor="middle" fill="#c0392b">CAT I</text>
+  <text class="row" x="320" y="170">Disable automatic login</text>
+
+  <rect x="28" y="188" width="14" height="14" rx="3" fill="#16243b"/>
+  <path d="M31 195 l4 4 8-8" fill="none" stroke="#fff" stroke-width="1.8"/>
+  <text class="row" x="56" y="200">APPL-26-002038</text>
+  <rect x="200" y="186" width="52" height="18" rx="9" fill="#fbecea"/>
+  <text class="chip" x="226" y="199" text-anchor="middle" fill="#c0392b">CAT I</text>
+  <text class="row" x="320" y="200">Disable the built-in TFTP service</text>
+
+  <rect x="28" y="218" width="14" height="14" rx="3" fill="#fff" stroke="#d9e1e9"/>
+  <text class="row" x="56" y="230">APPL-26-000002</text>
+  <rect x="200" y="216" width="56" height="18" rx="9" fill="#fdf5e6"/>
+  <text class="chip" x="228" y="229" text-anchor="middle" fill="#a8761f">CAT II</text>
+  <text class="row" x="320" y="230">Require a password to dismiss the screen saver</text>
+  <text class="muted" x="320" y="248">Cleared - not in this first pass</text>
+
+  <text class="muted" x="36" y="288">Sample rows only. Real CAT I IDs come from the Apple macOS 26 (Tahoe) V1R3 STIG that DISA publishes.</text>
+</svg>

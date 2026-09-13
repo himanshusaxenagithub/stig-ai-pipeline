@@ -86,6 +86,14 @@ class TestWebsitePage(unittest.TestCase):
         self.assertIn("does not scan your machine", html)
         self.assertIn("GitHub Pages", html)
         self.assertIn("https://stig.hsaxena.com", html)
+        self.assertIn('href="demo.html"', html)
+        self.assertIn("https://hsaxena.com", html)
+        self.assertIn("Essays on my site", html)
+        self.assertNotIn('href="articles/"', html)
+        self.assertNotIn("Ten short essays", html)
+        self.assertIn("Defense Information Systems Agency", html)
+        self.assertNotIn("Pentagon publishes", html)
+        self.assertNotIn("the Pentagon publishes", html.lower())
 
     def test_landing_explains_stigs_before_hosting_caveats(self):
         html = (ROOT / "docs" / "index.html").read_text(encoding="utf-8")
@@ -193,6 +201,58 @@ class TestWebsitePage(unittest.TestCase):
         html = (ROOT / "docs" / "index.html").read_text(encoding="utf-8")
         self.assertIn("Delete the previous unzipped scanner folder", html)
         self.assertIn("site.js?v=", html)
+
+
+def _visible_words(html: str) -> list[str]:
+    import re
+    text = re.sub(r"<script\b.*?</script>", " ", html, flags=re.S | re.I)
+    text = re.sub(r"<style\b.*?</style>", " ", text, flags=re.S | re.I)
+    text = re.sub(r"<[^>]+>", " ", text)
+    text = re.sub(r"&[a-zA-Z]+;", " ", text)
+    return re.findall(r"[A-Za-z0-9']+", text)
+
+
+DEMO_SVGS = (
+    "demo-pick-os.svg",
+    "demo-select-cati.svg",
+    "demo-download.svg",
+    "demo-approve.svg",
+    "demo-results.svg",
+)
+
+
+class TestDemoPage(unittest.TestCase):
+    def test_demo_page_is_a_labeled_example_not_a_live_scan(self):
+        html = (ROOT / "docs" / "demo.html").read_text(encoding="utf-8")
+        self.assertIn("Example run", html)
+        self.assertIn("Sample data", html)
+        self.assertIn("does not scan", html.lower())
+        self.assertIn("Cedar Ridge Family Clinic", html)
+        self.assertIn("Jordan Hale", html)
+        self.assertIn("remaining risk", html.lower())
+        self.assertIn("CAT I", html)
+        self.assertIn("Himanshu Saxena", html)
+        self.assertIn("https://stig.hsaxena.com", html)
+        self.assertIn("Defense Information Systems Agency", html)
+        self.assertNotIn("Pentagon publishes", html)
+        self.assertNotIn('href="articles/"', html)
+        self.assertTrue((ROOT / "docs" / "pages.css").is_file())
+        for name in DEMO_SVGS:
+            self.assertIn(f"img/{name}", html)
+            self.assertTrue((ROOT / "docs" / "img" / name).is_file())
+        import xml.etree.ElementTree as ET
+        for name in DEMO_SVGS:
+            ET.parse(ROOT / "docs" / "img" / name)
+        words = _visible_words(html)
+        self.assertGreaterEqual(len(words), 400)
+
+    def test_product_site_does_not_host_the_essay_library(self):
+        articles = ROOT / "docs" / "articles"
+        self.assertFalse(articles.exists(), "essays belong on hsaxena.com, not this Pages site")
+        html = (ROOT / "docs" / "index.html").read_text(encoding="utf-8")
+        self.assertIn('href="https://hsaxena.com"', html)
+        self.assertEqual(html.count("Ten short essays"), 0)
+        self.assertEqual(html.count('href="articles/"'), 0)
 
 
 if __name__ == "__main__":

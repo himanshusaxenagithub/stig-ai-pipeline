@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Example run — STIG Checker</title>
+<meta name="description" content="A worked example of STIG Checker: pick a computer, select CAT I rules, download a local scanner, approve each check, and read a remaining-risk story. Sample data only. https://stig.hsaxena.com/demo.html">
+<meta name="author" content="Himanshu Saxena">
+<link rel="stylesheet" href="pages.css">
+</head>
+<body>
+<header>
+  <div class="head-row">
+    <div>
+      <h1><a href="index.html">STIG Checker</a></h1>
+      <p>Free Department of Defense checklists, in plain English, scanned on your own computer.</p>
+    </div>
+    <div class="host-badge">Hosted on GitHub Pages · MIT licence</div>
+  </div>
+</header>
+<div class="banner">
+  This is a written example, not a live scan. The figures use invented clinic data so you can see the steps without downloading anything.
+</div>
+<p class="crumbs"><a href="index.html">Start</a> · Example run</p>
+
+<main>
+  <article class="paper">
+    <p class="kicker">Demo / example run</p>
+    <h1>A first CAT I scan, shown as a story</h1>
+    <p class="byline">Himanshu Saxena · sample walk-through for <a href="https://stig.hsaxena.com">stig.hsaxena.com</a></p>
+
+    <div class="example-flag">
+      <b>Sample data.</b> The clinic, the reviewer name, and the pass/fail counts below are invented so this page can stand alone. The rule identifiers (for example <code>APPL-26-005020</code>) are real IDs from the Apple macOS 26 (Tahoe) V1R3 STIG that the Defense Information Systems Agency (DISA) publishes for the Department of Defense. This website still does not scan any machine.
+    </div>
+
+    <p class="lead">You do not need to click through a real scan to understand this tool. The path is short: pick the computer, choose the most serious rules, download a program, approve each check on that machine, and read a report that says what was actually judged.</p>
+
+    <p>This page follows one imaginary first pass. A small family clinic — call it Cedar Ridge Family Clinic — has one staff MacBook. There is no security team. The office manager wants to know whether the machine meets the most serious items on the public DoD checklist for that operating system. They will not harden the whole guide today. They will start with CAT I: DISA’s highest severity.</p>
+
+    <h2>1 · Pick the computer</h2>
+    <p>On the <a href="index.html">start page</a> the clinic chooses MacBook. That loads the filed plain-English list for Apple macOS 26 (Tahoe) V1R3 — 160 rules in the validated guide this project ships. Windows PC is the other desk choice. Servers, Linux and databases stay on the command line; this website is for a desk Mac or Windows PC.</p>
+    <p>Nothing is uploaded. The page is static GitHub Pages. Choosing an operating system only loads JSON this repository already published.</p>
+    <figure class="diagram">
+      <img src="img/demo-pick-os.svg" alt="Example: MacBook card selected, Windows PC left unselected. Banner says this is not a live scan.">
+      <figcaption>Figure 1. Example choice. Cedar Ridge picks the MacBook. The Windows card would load a different DISA STIG.</figcaption>
+    </figure>
+
+    <h2>2 · Select CAT I only</h2>
+    <p>The rules page lists every requirement in ordinary language: what it asks, how serious it is, and whether a machine can check it. Severity uses DISA’s own ranking. CAT I is high. CAT II is medium. CAT III is low.</p>
+    <p>For a first pass the clinic taps <b>CAT I only</b>. In this example that ticks 12 rules and clears the rest. FileVault, automatic login, Gatekeeper, System Integrity Protection, and a few network services sit in that set. A CAT II row about the screen-saver password stays unticked. That is a deliberate first cut, not a claim that CAT II does not matter.</p>
+    <figure class="diagram">
+      <img src="img/demo-select-cati.svg" alt="Example rules table with three CAT I rows ticked and one CAT II row cleared.">
+      <figcaption>Figure 2. Example selection. Twelve CAT I rules go into the scanner. The IDs are from the real macOS 26 V1R3 guide; the “12 selected” count is sample data for this story.</figcaption>
+    </figure>
+    <p>Some CAT I items need a configuration profile or a person at the keyboard. The list says so. The scanner will not pretend those produced a yes-or-no answer later.</p>
+
+    <h2>3 · Download a local scanner</h2>
+    <p>The download step builds a zip for that selection: <code>STIG-Scanner-macOS.zip</code>. It is this project’s Python files plus a <code>selection.json</code> that names the twelve rules. The website still has not run a host check. Browsers on this site cannot and do not scan the visitor’s computer.</p>
+    <figure class="diagram">
+      <img src="img/demo-download.svg" alt="Example download card for STIG-Scanner-macOS.zip, twelve rules, labeled as example.">
+      <figcaption>Figure 3. Example download. Unzip the folder on the clinic MacBook. Delete any previous unzipped scanner folder first so an old copy is not what you double-click.</figcaption>
+    </figure>
+    <p>On the Mac, the office manager right-clicks <code>STIG Checker.command</code> and chooses Open. The local page binds to <code>127.0.0.1</code>. If Python is missing, the program can offer a private copy from python.org. That copy is not a system-wide install.</p>
+
+    <h2>4 · Approve every check</h2>
+    <p>Every shipped check is <b>unreviewed</b> until a named person reads the exact command and types their name. Approval freezes a fingerprint of the command, the comparison, and the expected value. If those bytes change later, the check is treated as drifted and will not run.</p>
+    <p>In this story Jordan Hale — a fictional name — reads <code>fdesetup status</code> for FileVault, sees that it is a read-only command, and approves it. They do the same for the other commands they accept. They leave two checks unapproved because those need a profile they have not built yet. Unapproved checks do not run. The report will say so.</p>
+    <figure class="diagram">
+      <img src="img/demo-approve.svg" alt="Example approval screen with a read-only FileVault command and the fictional name Jordan Hale.">
+      <figcaption>Figure 4. Example approval. A person types their own name. The program never approves a check for you and never runs one you have not approved.</figcaption>
+    </figure>
+    <p>A safety gate still refuses anything that looks like a change: writes, network clients, privilege escalation, destructive verbs. Approval is not a licence to mutate the system. This first module only looks.</p>
+
+    <h2>5 · Read the results and the risk story</h2>
+    <p>After the approved checks run, the local page writes JSON, Markdown and a PDF next to each other. Coverage is stated first. In this invented result set:</p>
+    <ul>
+      <li>12 rules were in the pack.</li>
+      <li>10 produced a pass or a fail (83.3% evaluated).</li>
+      <li>2 produced no yes-or-no evidence (not approved, or not a machine check).</li>
+      <li>7 met the requirement. 3 did not. All three failures were CAT I.</li>
+    </ul>
+    <p>Because CAT I failed, the remaining-risk headline is <b>Critical</b>. That word is about the rules that were judged, not a percentage of how secure the laptop is. Silence is not compliance. The two unevaluated rules must not be counted as passing.</p>
+    <figure class="diagram">
+      <img src="img/demo-results.svg" alt="Example remaining-risk card: critical, three CAT I failures, coverage 10 of 12, sample charts.">
+      <figcaption>Figure 5. Example report story. The bars and counts are invented. The wording matches what the local scanner actually writes: remaining risk among what we checked.</figcaption>
+    </figure>
+
+    <h3>Sample findings (invented)</h3>
+    <table class="sample-table">
+      <thead>
+        <tr><th>Rule</th><th>Result</th><th>Plain meaning</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>APPL-26-005020</code></td>
+          <td><span class="chip c-fail">fail</span></td>
+          <td>FileVault was not on. A lost Mac could be read.</td>
+        </tr>
+        <tr>
+          <td><code>APPL-26-002066</code></td>
+          <td><span class="chip c-fail">fail</span></td>
+          <td>Automatic login was still enabled.</td>
+        </tr>
+        <tr>
+          <td><code>APPL-26-999999</code></td>
+          <td><span class="chip c-fail">fail</span></td>
+          <td>Security updates were older than the 30-day window in the rule.</td>
+        </tr>
+        <tr>
+          <td><code>APPL-26-002038</code></td>
+          <td><span class="chip c-pass">pass</span></td>
+          <td>The built-in TFTP service was not running.</td>
+        </tr>
+        <tr>
+          <td><code>APPL-26-002060</code></td>
+          <td><span class="chip c-skip">not evaluated</span></td>
+          <td>Needs a configuration profile Jordan did not approve yet.</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>The next step in the real program is the same as in this story: start with the CAT I failures, then decide whether to approve more checks or stop. Planned later modules will help write an assessment and, only after another human gate, safe remediation. This release does not change settings for you.</p>
+
+    <h2>What this example is not</h2>
+    <ul>
+      <li>It is not a scan of your computer and not evidence about any real clinic.</li>
+      <li>It is not an official Department of Defense product. DISA publishes the STIGs; this project is independent open source under an MIT licence.</li>
+      <li>It is not a claim that twelve CAT I rules equal a complete baseline. A full macOS 26 guide in this repository has 160 rules.</li>
+      <li>It is not permission to skip approval. On a real machine you type your own name after you have read each command.</li>
+    </ul>
+
+    <h2>Do the same steps for real</h2>
+    <p>When you are ready, return to the start page, pick your own computer, and build a scanner for your own selection. Longer background essays live on the personal site, not here.</p>
+    <div class="hero-actions">
+      <a class="go-link" href="index.html#os-pick">Choose your computer</a>
+      <a class="ghost-link" href="https://hsaxena.com">Essays on my site</a>
+    </div>
+  </article>
+</main>
+
+<footer>
+  <a href="https://github.com/himanshusaxenagithub/stig-ai-pipeline">stig-ai-pipeline</a>
+  on GitHub · <a href="https://stig.hsaxena.com">https://stig.hsaxena.com</a>
+  · <a href="index.html">Start</a>
+  · <a href="demo.html">Example run</a>
+  · <a href="https://hsaxena.com">Essays on my site</a>
+</footer>
+</body>
+</html>

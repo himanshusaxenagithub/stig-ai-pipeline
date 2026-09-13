@@ -65,6 +65,8 @@ The page is served on your own computer (`127.0.0.1`). Nothing is uploaded. It n
 
 A hosted page leads with the fact that the US Department of Defense publishes free STIG checklists, then explains them and helps you check your PC. It includes a **Demo — try a simple first scan** path (CAT I only, then a one-click select), then the same first steps — pick MacBook or Windows, read the filed plain-English explanations, tick the rules to scan — then downloads an OS-specific scanner zip **preconfigured for that selection**. The zip is this project’s Python files plus `selection.json`. It is not a remote scanner. Hosting caveats (CORS, official zip fetch) sit under Technical notes, not in the hero.
 
+A **[worked example](https://stig.hsaxena.com/demo.html)** (`docs/demo.html`) shows the same path as an article — pick OS, select CAT I, download, approve, read the risk story — with labeled sample data, so a new reader does not have to click through a real scan. Longer background essays live on the personal site, [hsaxena.com](https://hsaxena.com), not on this product Pages site.
+
 **Hosted (this site):** lists the validated STIG, shows explanations from `annotations/`, builds a download. It does not run host checks and does not need an API key.
 
 **Local (the download):** `stigui` on `127.0.0.1`, human approval, content-frozen digests, the read-only allowlist, then a PDF on the machine that was scanned.

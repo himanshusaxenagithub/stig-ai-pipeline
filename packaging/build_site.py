@@ -10,8 +10,9 @@ Writes, under the output folder:
   data/checkpacks/<id>.json  full shipped packs used to build a scan selection
   packages/scanner-src.zip   source payload the browser turns into a scanner
 
-The site itself (index.html, site.js, zip.js) is hand-written and is not
-replaced. This script only refreshes the data the page reads.
+The site itself (index.html, site.js, zip.js, demo.html, pages.css)
+is hand-written and is not replaced. This script only refreshes
+the data the start page reads.
 
 GitHub Pages cannot fetch dl.dod.cyber.mil (browsers block it, and many
 networks do too). The exported JSON is the filed explanation set this

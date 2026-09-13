@@ -32,6 +32,21 @@
   batch that would mark an item complete or invent a command.
 - Tests and fixtures under `tests/fixtures/assess/`.
 
+## v0.6.8 — 2026-09-13
+
+### Added — example run on the product site
+
+- `docs/demo.html` is a static, article-style walk-through of pick OS →
+  CAT I select → download → approve → remaining-risk results. Figures are
+  SVG illustrations with invented clinic data, labeled as example. The
+  start page links it from the hero, the step tabs, a short “see an
+  example first” block, and the footer.
+- Longer essays belong on the personal site
+  ([hsaxena.com](https://hsaxena.com)), not on this product Pages site.
+  The start page has one outbound pointer, not an essay library.
+- Landing copy attributes STIGs to DISA / the Department of Defense.
+  It does not say “the Pentagon publishes.”
+
 ## v0.6.7 — 2026-09-13
 
 ### Changed — DoD-plain landing wording
