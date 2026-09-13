@@ -6,11 +6,12 @@
 
 - Pages footers list Contact: `1992.hsaxena@gmail.com`, plus optional
   [hsaxena.com](https://hsaxena.com) and [writing](https://hsaxena.com/writing).
-- `docs/reviews.html` is a FormSubmit form (required name, email, review;
-  optional organisation). Subject: `STIG site review submission`. First use
-  needs the FormSubmit activation email. Approved reviews live in
-  `docs/data/reviews.json` (starts empty; no email field). Copy states that
-  reviews appear only after manual approval and emails are never published.
+- `docs/reviews.html` is a FormSubmit form (required title, name, email,
+  review; optional organisation). Subject: `STIG site review submission`.
+  First use needs the FormSubmit activation email. Approved reviews live in
+  `docs/data/reviews.json` (starts empty; no email field; public fields are
+  title, name, optional organisation, text). Copy states that reviews appear
+  only after manual approval and emails are never published.
 - `docs/used.html` stays as the optional public-note path and points at Reviews.
 - GoatCounter: `docs/site-config.js` holds `goatcounterCode`
   (`YOUR_GOATCOUNTER_CODE` until a real site is created). `docs/site-chrome.js`

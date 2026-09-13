@@ -81,15 +81,25 @@ The public site footer lists one email: [1992.hsaxena@gmail.com](mailto:1992.hsa
 
 ### Moderated reviews
 
-[docs/reviews.html](docs/reviews.html) posts to FormSubmit (`https://formsubmit.co/1992.hsaxena@gmail.com`) with subject `STIG site review submission`. Required fields: full name, email, review text. Organisation or role is optional. Email is for approval only and is never rendered.
+[docs/reviews.html](docs/reviews.html) posts to FormSubmit (`https://formsubmit.co/1992.hsaxena@gmail.com`) with subject `STIG site review submission`. Required fields: title, full name, email, review text. Organisation or role is optional. Email is for approval only and is never rendered.
 
 **Activate FormSubmit (first use).** Submit the form once from the live site. FormSubmit emails `1992.hsaxena@gmail.com` an activation link. Click it. Until then, later submissions stay queued and the thank-you page (`docs/review-thanks.html`) may not appear.
 
 **Approve a review.** Do not paste the submitter’s email into the public file.
 
 1. Read the FormSubmit email. Keep the address off the site.
-2. Add an object to `docs/data/reviews.json` → `reviews` with `name`, optional `organization`, and `text` only. No `email` field.
-3. Merge that change. The reviews page loads that JSON and shows name (+ optional organisation) and text. An empty list is correct until someone is approved.
+2. Add an object to `docs/data/reviews.json` → `reviews` with `title`, `name`, optional `organization`, and `text` only. No `email` field.
+
+```json
+{
+  "title": "Short headline from the form",
+  "name": "Full Name",
+  "organization": "Optional org or role",
+  "text": "The approved review text."
+}
+```
+
+3. Merge that change. The reviews page loads that JSON and shows title, name (+ optional organisation), and text. An empty list is correct until someone is approved.
 
 The [Used this?](docs/used.html) page stays as the optional public-note / GitHub-issue path. Do not remove it.
 
