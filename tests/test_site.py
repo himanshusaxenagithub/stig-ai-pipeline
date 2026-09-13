@@ -97,6 +97,9 @@ class TestWebsitePage(unittest.TestCase):
         self.assertIn("img/process-flow.svg", html)
         self.assertTrue((ROOT / "docs" / "img" / "stig-idea.svg").is_file())
         self.assertTrue((ROOT / "docs" / "img" / "process-flow.svg").is_file())
+        import xml.etree.ElementTree as ET
+        for name in ("stig-idea.svg", "process-flow.svg"):
+            ET.parse(ROOT / "docs" / "img" / name)
         landing = html.split('id="s-landing"', 1)[1].split('id="s-rules"', 1)[0]
         self.assertIn("Technical notes", landing)
         self.assertLess(landing.find("<details"), landing.find("dl.dod.cyber.mil"))
