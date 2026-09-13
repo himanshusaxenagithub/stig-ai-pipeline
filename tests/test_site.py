@@ -424,10 +424,10 @@ class TestContactAndReviews(unittest.TestCase):
 
 
 class TestGoatCounter(unittest.TestCase):
-    def test_site_config_has_placeholder_code(self):
+    def test_site_config_has_goatcounter_code(self):
         js = (ROOT / "docs" / "site-config.js").read_text(encoding="utf-8")
-        self.assertIn("YOUR_GOATCOUNTER_CODE", js)
-        self.assertIn("goatcounterCode", js)
+        self.assertIn('goatcounterCode: "stig-hsaxena"', js)
+        self.assertNotIn("YOUR_GOATCOUNTER_CODE", js)
         self.assertIn("1992.hsaxena@gmail.com", js)
         self.assertNotIn("countapi", js.lower())
 
