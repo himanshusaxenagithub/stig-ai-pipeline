@@ -1,4 +1,4 @@
-/* Shared chrome for the demo page and essays. Landing keeps its own inline CSS. */
+/* Shared chrome for the demo page. Landing keeps its own inline CSS. */
 :root{
   --ink:#1b2733; --muted:#5e6e7f; --line:#d9e1e9; --mist:#eef2f6;
   --navy:#16243b; --red:#c0392b; --redbg:#fbecea; --green:#1e7a54; --greenbg:#eaf3ee;

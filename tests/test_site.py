@@ -87,7 +87,10 @@ class TestWebsitePage(unittest.TestCase):
         self.assertIn("GitHub Pages", html)
         self.assertIn("https://stig.hsaxena.com", html)
         self.assertIn('href="demo.html"', html)
-        self.assertIn('href="articles/"', html)
+        self.assertIn("https://hsaxena.com", html)
+        self.assertIn("Essays on my site", html)
+        self.assertNotIn('href="articles/"', html)
+        self.assertNotIn("Ten short essays", html)
         self.assertIn("Defense Information Systems Agency", html)
         self.assertNotIn("Pentagon publishes", html)
         self.assertNotIn("the Pentagon publishes", html.lower())
@@ -209,19 +212,6 @@ def _visible_words(html: str) -> list[str]:
     return re.findall(r"[A-Za-z0-9']+", text)
 
 
-ARTICLES = (
-    "why-free-dod-checklists-matter.html",
-    "what-a-stig-is.html",
-    "schools-and-clinics-without-security-teams.html",
-    "configuration-gaps-not-hacking.html",
-    "human-approval-before-any-check.html",
-    "coverage-honesty-in-security-reports.html",
-    "open-source-as-public-infrastructure.html",
-    "from-checklist-to-plain-english.html",
-    "a-first-cati-scan-for-beginners.html",
-    "after-the-scan-assessment-and-remediation.html",
-)
-
 DEMO_SVGS = (
     "demo-pick-os.svg",
     "demo-select-cati.svg",
@@ -231,7 +221,7 @@ DEMO_SVGS = (
 )
 
 
-class TestDemoAndEssays(unittest.TestCase):
+class TestDemoPage(unittest.TestCase):
     def test_demo_page_is_a_labeled_example_not_a_live_scan(self):
         html = (ROOT / "docs" / "demo.html").read_text(encoding="utf-8")
         self.assertIn("Example run", html)
@@ -245,6 +235,8 @@ class TestDemoAndEssays(unittest.TestCase):
         self.assertIn("https://stig.hsaxena.com", html)
         self.assertIn("Defense Information Systems Agency", html)
         self.assertNotIn("Pentagon publishes", html)
+        self.assertNotIn('href="articles/"', html)
+        self.assertTrue((ROOT / "docs" / "pages.css").is_file())
         for name in DEMO_SVGS:
             self.assertIn(f"img/{name}", html)
             self.assertTrue((ROOT / "docs" / "img" / name).is_file())
@@ -254,31 +246,13 @@ class TestDemoAndEssays(unittest.TestCase):
         words = _visible_words(html)
         self.assertGreaterEqual(len(words), 400)
 
-    def test_ten_essays_are_linked_and_in_range(self):
-        index = (ROOT / "docs" / "articles" / "index.html").read_text(encoding="utf-8")
-        self.assertEqual(len(ARTICLES), 10)
-        titles = []
-        for name in ARTICLES:
-            path = ROOT / "docs" / "articles" / name
-            self.assertTrue(path.is_file(), name)
-            self.assertIn(f'href="{name}"', index)
-            html = path.read_text(encoding="utf-8")
-            self.assertIn("Himanshu Saxena", html)
-            self.assertIn("Defense Information Systems Agency", html)
-            self.assertNotIn("Pentagon publishes", html)
-            self.assertIn('href="../index.html"', html)
-            self.assertIn('href="../demo.html"', html)
-            words = _visible_words(html)
-            self.assertGreaterEqual(len(words), 800, f"{name} has {len(words)} words")
-            self.assertLessEqual(len(words), 1500, f"{name} has {len(words)} words")
-            titles.append(path.stem)
-        self.assertEqual(len(set(titles)), 10)
-
-    def test_pages_css_and_article_index_exist(self):
-        self.assertTrue((ROOT / "docs" / "pages.css").is_file())
-        html = (ROOT / "docs" / "articles" / "index.html").read_text(encoding="utf-8")
-        self.assertIn("Ten notes on public checklists", html)
-        self.assertIn("Himanshu Saxena", html)
+    def test_product_site_does_not_host_the_essay_library(self):
+        articles = ROOT / "docs" / "articles"
+        self.assertFalse(articles.exists(), "essays belong on hsaxena.com, not this Pages site")
+        html = (ROOT / "docs" / "index.html").read_text(encoding="utf-8")
+        self.assertIn('href="https://hsaxena.com"', html)
+        self.assertEqual(html.count("Ten short essays"), 0)
+        self.assertEqual(html.count('href="articles/"'), 0)
 
 
 if __name__ == "__main__":

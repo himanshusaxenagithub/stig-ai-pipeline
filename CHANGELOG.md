@@ -34,18 +34,16 @@
 
 ## v0.6.8 — 2026-09-13
 
-### Added — example run and public-interest essays
+### Added — example run on the product site
 
 - `docs/demo.html` is a static, article-style walk-through of pick OS →
   CAT I select → download → approve → remaining-risk results. Figures are
   SVG illustrations with invented clinic data, labeled as example. The
-  start page links it from the hero, the step tabs, a “Read first” block,
-  and the footer.
-- Ten plain-English essays under `docs/articles/` (listed from
-  `docs/articles/index.html`) on public DISA checklists, schools and
-  clinics, configuration hygiene, human approval, coverage honesty,
-  open source, translation, a first CAT I pass, and the assessment /
-  remediation roadmap. Written for a non-technical reader.
+  start page links it from the hero, the step tabs, a short “see an
+  example first” block, and the footer.
+- Longer essays belong on the personal site
+  ([hsaxena.com](https://hsaxena.com)), not on this product Pages site.
+  The start page has one outbound pointer, not an essay library.
 - Landing copy attributes STIGs to DISA / the Department of Defense.
   It does not say “the Pentagon publishes.”
 
