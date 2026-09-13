@@ -350,10 +350,22 @@ class TestContactAndReviews(unittest.TestCase):
         self.assertIn('name="_subject"', html)
         self.assertIn("STIG site review submission", html)
         self.assertIn("review-thanks.html", html)
+        self.assertIn('id="review-title"', html)
+        self.assertIn('name="title"', html)
         self.assertIn('name="name"', html)
         self.assertIn('name="email"', html)
         self.assertIn('name="organization"', html)
         self.assertIn('name="review"', html)
+        title_input = html.split('id="review-title"', 1)[1].split(">", 1)[0]
+        self.assertIn("required", title_input)
+        name_input = html.split('id="review-name"', 1)[1].split(">", 1)[0]
+        self.assertIn("required", name_input)
+        email_input = html.split('id="review-email"', 1)[1].split(">", 1)[0]
+        self.assertIn("required", email_input)
+        review_area = html.split('id="review-text"', 1)[1].split(">", 1)[0]
+        self.assertIn("required", review_area)
+        org_input = html.split('id="review-org"', 1)[1].split(">", 1)[0]
+        self.assertNotIn("required", org_input)
         self.assertIn("required", html)
         self.assertIn(
             "Reviews appear only after manual approval. Email addresses are never published.",
@@ -377,6 +389,28 @@ class TestContactAndReviews(unittest.TestCase):
         self.assertIn("data/reviews.json", js)
         self.assertIn('"email" in r', js)
         self.assertIn("No approved reviews yet", js)
+
+    def test_approved_reviews_render_title_name_org_and_text(self):
+        js = (ROOT / "docs" / "site-chrome.js").read_text(encoding="utf-8")
+        fill = js.split("async function fillReviews", 1)[1]
+        self.assertIn("review-title", fill)
+        self.assertIn("escapeHtml(r.title)", fill)
+        self.assertIn("escapeHtml(r.name)", fill)
+        self.assertIn("r.organization", fill)
+        self.assertIn("escapeHtml(r.text)", fill)
+        self.assertIn("r.title && r.name && r.text", fill)
+        self.assertIn('looksLikeEmail(r.title)', fill)
+        sample = {
+            "title": "Example headline",
+            "name": "Example Name",
+            "organization": "Example role",
+            "text": "Fixture text for the public-render contract. Not a real review.",
+        }
+        self.assertNotIn("email", sample)
+        self.assertTrue(sample["title"] and sample["name"] and sample["text"])
+        readme = (ROOT / "README.md").read_text(encoding="utf-8")
+        self.assertIn('"title": "Short headline from the form"', readme)
+        self.assertIn("`title`, `name`, optional `organization`, and `text`", readme)
 
     def test_landing_links_reviews_and_keeps_used_this(self):
         html = (ROOT / "docs" / "index.html").read_text(encoding="utf-8")

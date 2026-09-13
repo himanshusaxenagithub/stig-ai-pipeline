@@ -55,7 +55,8 @@ footer .contact{margin:10px 0 0}
 .review-form button{margin-top:12px;cursor:pointer;border:0}
 .review-form .honey{position:absolute;left:-9999px;height:0;width:0;overflow:hidden}
 #reviews-list .review{border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin:0 0 10px;background:var(--mist)}
-#reviews-list .review-who{margin:0 0 6px}
+#reviews-list .review-title{margin:0 0 4px;font-size:16px}
+#reviews-list .review-who{margin:0 0 6px;color:var(--muted);font-size:14px}
 #reviews-list .review-text{margin:0}
 @media (max-width:640px){
   .paper{padding:20px 16px}

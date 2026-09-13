@@ -46,6 +46,10 @@
       <input type="hidden" name="_template" value="table">
       <input type="text" name="_honey" class="honey" tabindex="-1" autocomplete="off" aria-hidden="true">
 
+      <label for="review-title">Title <span class="req">required</span></label>
+      <input id="review-title" name="title" type="text" required minlength="1" maxlength="200"
+             autocomplete="off">
+
       <label for="review-name">Full name <span class="req">required</span></label>
       <input id="review-name" name="name" type="text" required maxlength="200" autocomplete="name">
 
@@ -65,7 +69,7 @@
     </form>
 
     <h2 id="approved">Approved reviews</h2>
-    <p class="sub">Name and optional organisation only. The approved list is <code>docs/data/reviews.json</code>.</p>
+    <p class="sub">Title, name, and optional organisation. The approved list is <code>docs/data/reviews.json</code>.</p>
     <div id="reviews-list">
       <p class="muted">Loading approved reviews…</p>
     </div>

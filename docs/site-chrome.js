@@ -113,8 +113,9 @@
       const raw = Array.isArray(data) ? data : (data.reviews || []);
       const reviews = raw.filter(function (r) {
         if (!r || typeof r !== "object") return false;
-        if ("email" in r || looksLikeEmail(r.name) || looksLikeEmail(r.text)) return false;
-        return !!(r.name && r.text);
+        if ("email" in r || looksLikeEmail(r.title) || looksLikeEmail(r.name)
+            || looksLikeEmail(r.text)) return false;
+        return !!(r.title && r.name && r.text);
       });
       if (!reviews.length) {
         list.innerHTML =
@@ -124,7 +125,8 @@
       list.innerHTML = reviews.map(function (r) {
         const org = r.organization ? " · " + escapeHtml(r.organization) : "";
         return "<article class=\"review\">" +
-          "<p class=\"review-who\"><b>" + escapeHtml(r.name) + "</b>" + org + "</p>" +
+          "<p class=\"review-title\"><b>" + escapeHtml(r.title) + "</b></p>" +
+          "<p class=\"review-who\">" + escapeHtml(r.name) + org + "</p>" +
           "<p class=\"review-text\">" + escapeHtml(r.text) + "</p>" +
           "</article>";
       }).join("");
