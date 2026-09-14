@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.7.8 — 2026-09-14
+
+### Fixed — evidence page test count
+
+- `docs/evidence.html` now says `python3 -m unittest discover -s tests`
+  runs **301** tests (the live count after the two app-mode tests added
+  in v0.7.7). It had been left at 299.
+
 ## v0.7.7 — 2026-09-13
 
 ### Fixed — Site visitors no longer stuck on —

@@ -299,6 +299,7 @@ class TestEvidenceAndTransparency(unittest.TestCase):
         self.assertIn("sample data", html.lower())
         self.assertIn("dry-run", html)
         self.assertIn("human-gated", html)
+        self.assertIn("runs 301 tests", html)
         self.assertNotIn("chatbot", html.lower())
         self.assertNotIn("EB-2", html)
         self.assertNotIn("NIW", html)
