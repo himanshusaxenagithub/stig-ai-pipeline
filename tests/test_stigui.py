@@ -122,12 +122,17 @@ class TestAppMode(unittest.TestCase):
         import threading
         done = {}
         def run():
-            done["code"] = ui.main(["--app", "--no-browser", "--workdir", workdir,
-                                    "--port", str(port), "--idle-minutes", "0"])
+            try:
+                done["code"] = ui.main(["--app", "--no-browser", "--workdir", workdir,
+                                        "--port", str(port), "--idle-minutes", "0"])
+            except Exception as e:
+                done["error"] = e
         th = threading.Thread(target=run, daemon=True)
         th.start()
-        for _ in range(100):
+        for _ in range(200):
             if (Path(workdir) / ui.RUNNING_FILE).exists():
+                break
+            if "error" in done or "code" in done:
                 break
             time.sleep(0.05)
         return th, done
@@ -136,7 +141,7 @@ class TestAppMode(unittest.TestCase):
         import urllib.request
         req = urllib.request.Request(f"http://127.0.0.1:{port}{path}", method=method,
                                      headers={"X-Stig-Token": TOKEN}, data=b"{}" if method == "POST" else None)
-        with urllib.request.urlopen(req, timeout=5) as r:
+        with ui._local_urlopen(req, timeout=5) as r:
             return json.loads(r.read())
 
     def test_data_dir_is_per_user_on_every_platform(self):
@@ -151,11 +156,39 @@ class TestAppMode(unittest.TestCase):
             (Path(tmp) / ui.RUNNING_FILE).write_text('{"port": 1, "token": "x"}')
             self.assertIsNone(ui._already_running(Path(tmp)), "a dead port must read as not running")
 
+    def test_loopback_server_does_not_reverse_lookup(self):
+        """HTTPServer.server_bind() calls getfqdn(); that hangs on some Macs."""
+        with mock.patch("socket.getfqdn", side_effect=AssertionError("must not reverse-lookup")):
+            port = ui._free_port()
+            httpd = ui.LoopbackServer(("127.0.0.1", port), ui.Handler)
+            try:
+                self.assertEqual(httpd.server_name, "127.0.0.1")
+                self.assertEqual(httpd.server_port, port)
+            finally:
+                httpd.server_close()
+
+    def test_already_running_does_not_use_an_http_proxy(self):
+        import urllib.request
+        seen = []
+        real = urllib.request.build_opener
+        def capture(*handlers):
+            seen.extend(handlers)
+            return real(*handlers)
+        with TemporaryDirectory() as tmp:
+            (Path(tmp) / ui.RUNNING_FILE).write_text('{"port": 1, "token": "x"}')
+            with mock.patch("urllib.request.build_opener", side_effect=capture):
+                self.assertIsNone(ui._already_running(Path(tmp)))
+        proxies = [h for h in seen if isinstance(h, urllib.request.ProxyHandler)]
+        self.assertTrue(proxies, "loopback fetch must install a ProxyHandler")
+        self.assertEqual(proxies[0].proxies, {})
+
     def test_start_reuse_and_quit(self):
         with TemporaryDirectory() as tmp:
             port = ui._free_port()
             th, done = self._start(tmp, port)
-            self.assertTrue((Path(tmp) / ui.RUNNING_FILE).exists())
+            self.assertNotIn("error", done, done.get("error"))
+            self.assertTrue((Path(tmp) / ui.RUNNING_FILE).exists(),
+                            f"server never wrote {ui.RUNNING_FILE}: {done}")
             state = self._api(port, "/api/state")
             self.assertTrue(state["app"])
             self.assertEqual(state["files_dir"], str(Path(tmp).resolve() / "out"))
@@ -173,7 +206,11 @@ class TestAppMode(unittest.TestCase):
             self.assertFalse(th.is_alive(), "Quit must stop the server")
             self.assertEqual(done.get("code"), 0)
             self.assertFalse((Path(tmp) / ui.RUNNING_FILE).exists(), "marker must not outlive the server")
-            self.assertIn("stopped", (Path(tmp) / "stig-checker.log").read_text())
+            log = Path(tmp) / "stig-checker.log"
+            self.assertIn("stopped", log.read_text())
+            # Windows refuses to delete a file this process still has open.
+            log.unlink()
+            self.assertFalse(log.exists())
 
 
 class TestLiveScanProgress(unittest.TestCase):
@@ -229,7 +266,7 @@ class TestLiveScanProgress(unittest.TestCase):
                         headers={"X-Stig-Token": TOKEN, "Content-Type": "application/json",
                                  "Host": "127.0.0.1"},
                         data=json.dumps({"path": str(pack_path)}).encode())
-                    with urllib.request.urlopen(req, timeout=5) as r:
+                    with ui._local_urlopen(req, timeout=5) as r:
                         self.assertTrue(json.loads(r.read())["loaded"])
 
                     conn = http.client.HTTPConnection("127.0.0.1", port, timeout=15)
@@ -378,7 +415,7 @@ class TestDraftHooks(unittest.TestCase):
                              "Host": "127.0.0.1"},
                     data=json.dumps({"apply": True}).encode())
                 try:
-                    urllib.request.urlopen(refused, timeout=5)
+                    ui._local_urlopen(refused, timeout=5)
                     self.fail("apply flag must be refused")
                 except urllib.error.HTTPError as e:
                     body = json.loads(e.read())
@@ -389,7 +426,7 @@ class TestDraftHooks(unittest.TestCase):
                     headers={"X-Stig-Token": TOKEN, "Content-Type": "application/json",
                              "Host": "127.0.0.1"},
                     data=b"{}")
-                with urllib.request.urlopen(req, timeout=10) as r:
+                with ui._local_urlopen(req, timeout=10) as r:
                     data = json.loads(r.read())
                 self.assertEqual(data["kind"], "harden")
                 self.assertEqual(data["applied"], 0)

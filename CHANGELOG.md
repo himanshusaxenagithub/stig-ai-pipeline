@@ -1,5 +1,33 @@
 # Changelog
 
+## v0.7.7 — 2026-09-13
+
+### Fixed — Site visitors no longer stuck on —
+
+- Public totals try CORS-safe `TOTAL.json` first (when `count` > 0),
+  then a per-path JSON sum, then `TOTAL.html` last. The HTML widget has
+  no `Access-Control-Allow-Origin`, so a browser fetch of it must not
+  block the JSON figure.
+- Path counters that 404 (evidence, used, review-thanks) count as 0 and
+  do not abort the sum.
+
+### Fixed — unit tests on macOS and Windows (tests.yml)
+
+The new Actions matrix (`macos-latest` / `windows-latest`, Python 3.9 and
+3.12) failed on three `test_stigui` cases that already passed on Ubuntu.
+Those failures were also on main at `9528c0c`; they are not from the
+GoatCounter JSON-first change.
+
+- **macOS:** CPython's `HTTPServer` reverse-looks-up `127.0.0.1` via
+  `getfqdn` before `listen()`. On GitHub's Mac runners that lookup hangs,
+  so `running.json` is never written and clients time out. The loopback
+  server now uses the bound address as its name. Loopback HTTP also
+  bypasses `HTTP_PROXY`.
+- **Windows:** `--app` left `stig-checker.log` open on `sys.stdout`, so
+  `TemporaryDirectory` cleanup raised WinError 32 after the assertions
+  had already passed. Quit now restores the process streams and closes
+  the log.
+
 ## v0.7.6 — 2026-09-14
 
 ### Fixed — three ways the double-click did not work, found by running it

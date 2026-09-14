@@ -447,9 +447,13 @@ class TestGoatCounter(unittest.TestCase):
         self.assertIn("/demo.html", js)
         self.assertIn("n > 0", js)
         self.assertIn("YOUR_GOATCOUNTER_CODE", js)
+        self.assertIn("resp.status === 404", js)
         order = js.split("async function publicGoatTotal", 1)[1]
-        self.assertLess(order.find("totalFromWidgetHtml"), order.find("totalFromTotalJson"))
         self.assertLess(order.find("totalFromTotalJson"), order.find("totalFromKnownPaths"))
+        self.assertLess(order.find("totalFromKnownPaths"), order.find("totalFromWidgetHtml"))
+        fill = js.split("async function fillSiteActivity", 1)[1]
+        self.assertIn("got.n > 0", fill)
+        self.assertIn("visitorsEl.textContent = formatCount(got.n)", fill)
         self.assertNotIn("countapi", js.lower())
         self.assertNotIn("api.countapi", js.lower())
         snippet = '<span id="gcvc-views">13</span>'
