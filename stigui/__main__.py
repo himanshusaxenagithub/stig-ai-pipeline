@@ -29,6 +29,7 @@ import mimetypes
 import os
 import secrets
 import socket
+import socketserver
 import subprocess
 import sys
 import threading
@@ -96,6 +97,14 @@ def app_data_dir() -> Path:
     return Path(base) / "stig-checker"
 
 
+def _local_urlopen(req, timeout=2):
+    """GET/POST 127.0.0.1 without an HTTP_PROXY. A proxy on the Mac (CI
+    runners, some office networks) would send the loopback request off
+    the machine and hang until the client timeout."""
+    opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+    return opener.open(req, timeout=timeout)
+
+
 def _already_running(workdir: Path) -> str | None:
     """The URL of a live instance recorded in *workdir*, or None."""
     marker = workdir / RUNNING_FILE
@@ -103,12 +112,29 @@ def _already_running(workdir: Path) -> str | None:
         info = json.loads(marker.read_text(encoding="utf-8"))
         url = f"http://127.0.0.1:{int(info['port'])}/api/state"
         req = urllib.request.Request(url, headers={"X-Stig-Token": info["token"]})
-        with urllib.request.urlopen(req, timeout=2) as r:
+        with _local_urlopen(req, timeout=2) as r:
             if r.status == 200:
                 return f"http://127.0.0.1:{int(info['port'])}/?t={info['token']}"
     except (OSError, ValueError, KeyError):
         pass
     return None
+
+
+class LoopbackServer(ThreadingHTTPServer):
+    """Loopback HTTP server that does not reverse-lookup 127.0.0.1.
+
+    CPython's HTTPServer.server_bind() calls socket.getfqdn(host). On a
+    Mac whose reverse DNS for 127.0.0.1 never returns (GitHub's macOS
+    runners, some office networks), that lookup hangs: the socket is
+    bound but listen() has not run, so the page never opens and a client
+    times out. Use the bound address as the name instead.
+    """
+
+    def server_bind(self):
+        socketserver.TCPServer.server_bind(self)
+        host, port = self.server_address[:2]
+        self.server_name = host or "127.0.0.1"
+        self.server_port = port
 
 
 def _write_running(workdir: Path, port: int) -> None:
@@ -806,59 +832,79 @@ def main(argv=None) -> int:
         app_data_dir() if args.app else Path("stig-work").resolve())
     workdir.mkdir(parents=True, exist_ok=True)
 
-    if args.app:
-        # No terminal is attached. Everything that would have been printed
-        # goes to a log beside the files, where a person can find it.
-        log = open(workdir / "stig-checker.log", "a", encoding="utf-8", buffering=1)
-        sys.stdout = sys.stderr = log
-        print(f"--- {_stamp()} starting, pid {os.getpid()}")
-        live = _already_running(workdir)
-        if live:
-            print("already running; opening the page again.")
-            if not args.no_browser:
-                webbrowser.open(live)
-            return 0
-
-    Handler.session = Session(workdir)
-    Handler.app_mode = bool(args.app)
-    selection_path = Path(args.selection).resolve() if args.selection else find_selection(ROOT)
-    if selection_path and selection_path.is_file():
-        try:
-            Handler.session.apply_website_selection(selection_path)
-        except (SelectionError, PackError, OSError) as e:
-            print(f"warning: could not load selection {selection_path}: {e}", flush=True)
-    elif args.pack:
-        Handler.session.load_pack(Path(args.pack))
-    Handler.last_seen = time.monotonic()
-    port = args.port or _free_port()
-    httpd = ThreadingHTTPServer(("127.0.0.1", port), Handler)
-    Handler.httpd = httpd
-    url = f"http://127.0.0.1:{port}/?t={TOKEN}"
-
-    print("stig-ui is running.")
-    print(f"  open   {url}")
-    print(f"  files  {Handler.session.workdir}")
-    print("  stop   Ctrl-C" if not args.app else "  stop   the Quit button on the page")
-    print()
-    print("This page is reachable only from this computer. Nothing is uploaded anywhere.")
-
-    idle = args.idle_minutes if args.idle_minutes is not None else (IDLE_MINUTES if args.app else 0)
-    if idle > 0:
-        threading.Thread(target=_idle_watch, args=(httpd, idle), daemon=True).start()
-    if args.app:
-        _write_running(workdir, port)
-    if not args.no_browser:
-        threading.Timer(0.4, lambda: webbrowser.open(url)).start()
+    log = None
+    saved_out, saved_err = sys.stdout, sys.stderr
+    httpd = None
     try:
-        httpd.serve_forever()
-    except KeyboardInterrupt:
-        print("\nstopped.")
-    finally:
-        httpd.server_close()
         if args.app:
-            _clear_running(workdir)
-            print(f"--- {_stamp()} stopped")
-    return 0
+            # No terminal is attached. Everything that would have been printed
+            # goes to a log beside the files, where a person can find it.
+            log = open(workdir / "stig-checker.log", "a", encoding="utf-8", buffering=1)
+            sys.stdout = sys.stderr = log
+            print(f"--- {_stamp()} starting, pid {os.getpid()}")
+            live = _already_running(workdir)
+            if live:
+                print("already running; opening the page again.")
+                if not args.no_browser:
+                    webbrowser.open(live)
+                return 0
+
+        Handler.session = Session(workdir)
+        Handler.app_mode = bool(args.app)
+        selection_path = Path(args.selection).resolve() if args.selection else find_selection(ROOT)
+        if selection_path and selection_path.is_file():
+            try:
+                Handler.session.apply_website_selection(selection_path)
+            except (SelectionError, PackError, OSError) as e:
+                print(f"warning: could not load selection {selection_path}: {e}", flush=True)
+        elif args.pack:
+            Handler.session.load_pack(Path(args.pack))
+        Handler.last_seen = time.monotonic()
+        port = args.port or _free_port()
+        httpd = LoopbackServer(("127.0.0.1", port), Handler)
+        Handler.httpd = httpd
+        url = f"http://127.0.0.1:{port}/?t={TOKEN}"
+
+        print("stig-ui is running.")
+        print(f"  open   {url}")
+        print(f"  files  {Handler.session.workdir}")
+        print("  stop   Ctrl-C" if not args.app else "  stop   the Quit button on the page")
+        print()
+        print("This page is reachable only from this computer. Nothing is uploaded anywhere.")
+
+        idle = args.idle_minutes if args.idle_minutes is not None else (IDLE_MINUTES if args.app else 0)
+        if idle > 0:
+            threading.Thread(target=_idle_watch, args=(httpd, idle), daemon=True).start()
+        if args.app:
+            _write_running(workdir, port)
+        if not args.no_browser:
+            threading.Timer(0.4, lambda: webbrowser.open(url)).start()
+        try:
+            httpd.serve_forever()
+        except KeyboardInterrupt:
+            print("\nstopped.")
+        finally:
+            if httpd is not None:
+                httpd.server_close()
+            if args.app:
+                _clear_running(workdir)
+                print(f"--- {_stamp()} stopped")
+        return 0
+    finally:
+        # Close the log and put the process streams back. The real
+        # double-click process exits after this; tests keep running, and
+        # Windows will not delete stig-checker.log while this handle is open.
+        if log is not None:
+            try:
+                if sys.stdout is log:
+                    log.flush()
+            except Exception:
+                pass
+            sys.stdout, sys.stderr = saved_out, saved_err
+            try:
+                log.close()
+            except OSError:
+                pass
 
 
 if __name__ == "__main__":
