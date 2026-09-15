@@ -374,10 +374,27 @@ class TestContactAndReviews(unittest.TestCase):
         self.assertIn(
             "Reviews appear only after manual approval. Email addresses are never published.",
             html)
-        self.assertIn("activation", html.lower())
+        self.assertIn("The form emails the maintainer.", html)
+        self.assertNotIn("docs/data/reviews.json", html)
+        self.assertNotIn("data/reviews.json", html)
+        self.assertNotIn("activation", html.lower())
         self.assertIn("used.html", html)
         self.assertNotIn("formspree", html.lower())
         self.assertNotIn("<blockquote", html)
+        thanks = (ROOT / "docs" / "review-thanks.html").read_text(encoding="utf-8")
+        self.assertIn(
+            "Reviews appear only after manual approval. Email addresses are never published.",
+            thanks)
+        self.assertIn("approved by hand", thanks)
+        self.assertIn("will not be published", thanks)
+        self.assertNotIn("docs/data/reviews.json", thanks)
+        self.assertNotIn("data/reviews.json", thanks)
+        self.assertNotIn("activation email", thanks.lower())
+        self.assertNotIn("form is not live", thanks.lower())
+        self.assertIn("You do not need to activate anything", thanks)
+        readme = (ROOT / "README.md").read_text(encoding="utf-8")
+        self.assertIn("Activate FormSubmit (first use, maintainer inbox only)", readme)
+        self.assertIn("docs/data/reviews.json", readme)
 
     def test_approved_reviews_file_starts_empty_and_has_no_email(self):
         path = ROOT / "docs" / "data" / "reviews.json"

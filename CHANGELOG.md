@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.7.9 — 2026-09-15
+
+### Changed — public reviews copy hides maintainer paths
+
+- `docs/reviews.html` no longer shows `docs/data/reviews.json` (or
+  `data/reviews.json`). That file is maintainer-only.
+- FormSubmit first-time activation is documented in the README, not as
+  the visitor-facing form blurb. Public copy still says reviews appear
+  only after manual approval and emails are never published.
+- `docs/review-thanks.html` stays honest about approval and email, and
+  does not tell every submitter they must activate FormSubmit.
+
 ## v0.7.8 — 2026-09-14
 
 ### Fixed — evidence page test count

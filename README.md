@@ -83,7 +83,9 @@ The public site footer lists one email: [1992.hsaxena@gmail.com](mailto:1992.hsa
 
 [docs/reviews.html](docs/reviews.html) posts to FormSubmit (`https://formsubmit.co/1992.hsaxena@gmail.com`) with subject `STIG site review submission`. Required fields: title, full name, email, review text. Organisation or role is optional. Email is for approval only and is never rendered.
 
-**Activate FormSubmit (first use).** Submit the form once from the live site. FormSubmit emails `1992.hsaxena@gmail.com` an activation link. Click it. Until then, later submissions stay queued and the thank-you page (`docs/review-thanks.html`) may not appear.
+The public reviews and thank-you pages do not name `docs/data/reviews.json` and do not ask visitors to activate FormSubmit. Visitors see that the form emails the maintainer, that reviews appear only after manual approval, and that emails are never published.
+
+**Activate FormSubmit (first use, maintainer inbox only).** This is a one-time setup of the site owner's inbox, not something submitters do. Submit the form once from the live site. FormSubmit emails `1992.hsaxena@gmail.com` an activation link. Click it. Until then, later submissions stay queued and the thank-you page (`docs/review-thanks.html`) may not appear.
 
 **Approve a review.** Do not paste the submitter’s email into the public file.
 
