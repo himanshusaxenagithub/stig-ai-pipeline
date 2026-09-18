@@ -1,5 +1,53 @@
 # Changelog
 
+## v0.7.10 — 2026-09-18
+
+### Fixed — honesty defects (modules, approval, WinRM note, rule counts)
+
+Outside review flagged copy that contradicted what the repository
+actually ships.
+
+- **All four modules ship.** README and the public site no longer
+  describe Module 1 as the only shipped work, or Modules 3/4 as
+  future-only. `stigprep`, `stigscan`, `stigassess` and `stigharden`
+  are working code. Assess drafts POA&M wording (a named person
+  approves and is the only one who can close). Harden drafts
+  remediation scripts; apply is a dry-run unless `--apply-for-real`
+  is passed with `--by` and `--i-have-reviewed`, and that flag is
+  refused in CI. The local page's Draft buttons only write files.
+- **Approval model.** Named approval is the normal scan. The hosted
+  site never scans. CLI `--include-unreviewed` (and the matching
+  local-page checkbox) can force an unreviewed run; that does not
+  approve the check, and those results are labeled untrusted — not
+  a normal approved scan or accreditation evidence. Copy no longer
+  implies the browser workflow is the whole model, and it does not
+  claim the override cannot exist.
+- **WN11-CC-000345.** The Windows 11 plain-English explanation had
+  invented an Authorizing Official exception that is not in the DISA
+  check block. That sentence is removed. The summary now only states
+  what DISA requires: the WinRM service must not accept Basic
+  authentication. No replacement exception was added.
+- **Two scoped rule counts.** Verified from files in this repository:
+  **1,440** explained rules across **seven** STIGs in `annotations/`;
+  **1,338** rules in **five** packaged check packs (`checkpacks/`).
+  SQL Server 2022 (79 instance + 23 database) is explained but has
+  no check pack (1,440 − 102 = 1,338). README, `docs/`, and this
+  changelog now state both numbers rather than one ambiguous total.
+  Five tests lock those counts, the WinRM wording, and the shipped-module
+  / untrusted-override copy. `python3 -m unittest discover -s tests`
+  is 306 tests.
+- Regenerating `docs/data/` for the WinRM fix also refreshed
+  `docs/packages/scanner-src.zip`. The previous committed payload was
+  stale: it omitted `stigassess/`, `stigharden/`, `run.py`, and
+  `stigscan/summary.py`, so a website download could not actually draft
+  POA&M entries or fix scripts. The zip now matches the source tree.
+
+### Out of scope (follow-up)
+
+- BitLocker / Credential Guard check-candidate rewrite and a new
+  Windows live scan are **not** in this release. They remain
+  follow-up work.
+
 ## v0.7.9 — 2026-09-15
 
 ### Changed — public reviews copy hides maintainer paths

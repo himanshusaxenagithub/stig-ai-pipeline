@@ -225,7 +225,7 @@
       "severity": "high",
       "cat": "CAT I",
       "title": "The Windows Remote Management (WinRM) service must not use Basic authentication.",
-      "summary": "Prevent the WinRM service from accepting Basic authentication, so remote management connections cannot send plain-text passwords to this machine. A temporary, documented exception is possible with Authorizing Official approval in specific administrative situations.",
+      "summary": "Prevent the WinRM service from accepting Basic authentication, so remote management connections cannot send plain-text passwords to this machine.",
       "triage": "config-profile",
       "automation": "automatable",
       "caution": "Any tool that manages this machine over WinRM with Basic authentication will lose access; check remote management workflows before rolling out.",

@@ -145,7 +145,7 @@
   </div>
 </header>
 <div class="banner">
-  This website does not scan your machine and never will. Scanning stays on the computer you download the program to. Checks stay unreviewed until a person types their name.
+  This website does not scan your machine and never will. Scanning stays on the computer you download the program to. A normal scan needs a named person's approval; an explicit override can run unreviewed checks but labels those results untrusted.
 </div>
 
 <main>
@@ -174,7 +174,7 @@
       <h2>Demo — try a simple first scan</h2>
       <p>The US Department of Defense publishes free <b>STIG</b> checklists — ranked settings that lock down a common system. Anyone may download them.</p>
       <p>This tool checks your Mac or Windows PC against the matching checklist and lists <b>configuration gaps</b> in plain English: settings that do not yet match the checklist.</p>
-      <p>Today the tool <b>finds</b> misses and writes a report (including a PDF). It does not walk you through guided <b>fixes</b> — that may come later.</p>
+      <p>Today the download <b>finds</b> misses and writes a report (including a PDF). After a scan, the local program can <b>draft</b> Plan of Action and Milestones entries and candidate <b>fix</b> scripts. Those stay drafts until a named person approves them; applying a script is a separate command-line step, dry-run by default, and refused in CI. This website does not change settings.</p>
       <p>For a first demo, use <b>CAT I only</b>. Those are the most serious items, and the list is short.</p>
       <p class="demo-hint">Pick the computer you will scan. The next page shows only CAT I rules. Nothing downloads until you ask.</p>
       <div class="picks">
@@ -301,6 +301,10 @@
         rule count. If that host is blocked, use
         <a href="https://public.cyber.mil/stigs/downloads/">public.cyber.mil/stigs/downloads</a>.
         Public site: <a href="https://stig.hsaxena.com">https://stig.hsaxena.com</a>.
+        Two scoped totals, not one ambiguous number: this project explains
+        <b>1,440</b> rules across seven STIGs, and ships check packs for five
+        of those guides totaling <b>1,338</b> rules (SQL Server is explained
+        but has no check pack).
       </div>
     </details>
   </section>

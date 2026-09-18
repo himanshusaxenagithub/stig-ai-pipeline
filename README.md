@@ -1,7 +1,7 @@
 # stig-ai-pipeline
 
 **Apply Department of Defense security checklists to your own systems without a compliance specialist.**
-An open-source, AI-enabled toolkit consisting of AI skills and scripts that turns any DISA STIG into a plain-English plan, explains every rule, and checks a machine against it — with a human approving every check before it runs. Free, MIT licence, no account, no API key.
+An open-source, AI-enabled toolkit consisting of AI skills and scripts that turns any DISA STIG into a plain-English plan, explains every rule, checks a machine against it, drafts a Plan of Action and Milestones, and drafts remediation scripts — with a human at every gate. Free, MIT licence, no account, no API key. All four modules (`stigprep`, `stigscan`, `stigassess`, `stigharden`) ship as working code in this repository.
 
 **New here?** Read the two-page overview with a worked example: [docs/overview.pdf](docs/overview.pdf).
 
@@ -26,18 +26,22 @@ This toolkit does the interpreting. Scanners like OpenSCAP can already tell you 
 ## What you get
 
 - **A week of specialist work in a few minutes.** `parse` turns a 300-page guide into a tracker: one row per rule, severity ranked, full check and fix text, as Excel, CSV, JSON or Markdown.
-- **Every rule explained.** What it makes you do and why, a rating (quick win / needs a policy pushed out / needs a decision / can break things), whether it can be scripted, and what could go wrong. Seven STIGs and 1,440 rules are explained already and shipped in this repository; the `stig-explain` skill produces more with the AI assistant you already have.
-- **A scan you can trust.** `stig-scan` checks a machine against its guide. Every check is unreviewed until a named person reads and approves it; approval freezes a fingerprint of the exact command; a safety gate refuses anything that could change the system; and the report says first how many rules were actually evaluated. AI may help write a check. It never runs one.
+- **Every rule explained.** What it makes you do and why, a rating (quick win / needs a policy pushed out / needs a decision / can break things), whether it can be scripted, and what could go wrong. Two scoped totals, not one ambiguous number: **1,440 rules explained** across seven STIGs in `annotations/`; **1,338 rules** in the five packaged check packs (the same five OS guides; SQL Server is explained but has no check pack). The `stig-explain` skill produces more with the AI assistant you already have.
+- **A scan you can trust.** `stig-scan` checks a machine against its guide. A normal scan runs only checks a named person has read and approved; approval freezes a fingerprint of the exact command; a safety gate refuses anything that could change the system; and the report says first how many rules were actually evaluated. The command line can force an unreviewed run with `--include-unreviewed` (the local page has a matching optional checkbox); those results are labeled **untrusted** and are not a normal approved scan or accreditation evidence. The program never approves a check on a person's behalf. AI may help write a check. It never runs one.
+- **A draft POA&M, not a closed finding.** `stig-assess` turns scan failures into Plan of Action and Milestones drafts. A named person approves the wording (that opens the item) and is the only one who can close it. A later passing scan does not close anything.
+- **A candidate fix script, not an applied change.** `stig-harden` drafts a remediation from a known check shape. Approval freezes the script a person read. `apply` is a dry-run unless `--apply-for-real` is passed with `--by` and `--i-have-reviewed`, and that flag is refused in CI. The local page's Draft buttons only write files.
 - **Nothing to buy and nothing to sign up for.** No dependencies, no API key, no vendor. Works with any AI assistant that supports skills, or with none.
 
 ## Roadmap
 
+All four modules ship as working code in this repository (covered by the unit tests). The table is current status, not a future plan.
+
 | Module | Status | What it does |
 |---|---|---|
-| **1. stig-prep** | ✅ this release | Parse any DISA STIG (XCCDF) into engineer-friendly checklists (Markdown / JSON / CSV) with optional AI triage & plain-English explanations |
-| **2. stig-scan** | ✅ v0.2 (macOS), v0.3 (Linux), v0.4 (Windows) | Run human-approved, content-frozen STIG checks against the local system and record pass/fail with an explicit evidence-coverage statement. Platform profiles: macOS, Linux, Windows |
-| **3. stig-assess** | ✅ this release | AI-assisted assessment: interpret scan results, draft POA&M entries (drafts only; a named person approves wording and is the only one who can close an item) |
-| **4. stig-harden** | ✅ this release | Generate remediation scripts for findings, with human-review gates (dry-run / show-script / approve-before-apply; refused in CI) |
+| **1. stig-prep** | ✅ shipped | Parse any DISA STIG (XCCDF) into engineer-friendly checklists (Markdown / JSON / CSV) with optional AI triage & plain-English explanations |
+| **2. stig-scan** | ✅ shipped (macOS, Linux, Windows) | Run STIG checks against the local system and record pass/fail with an explicit evidence-coverage statement. A normal scan runs only named-approved, content-frozen checks. `--include-unreviewed` can force an unreviewed run; those results are labeled untrusted |
+| **3. stig-assess** | ✅ shipped | Interpret scan results and draft POA&M entries (drafts only; a named person approves wording and is the only one who can close an item). Untrusted scan rows stay flagged and are not accreditation evidence |
+| **4. stig-harden** | ✅ shipped | Generate remediation scripts for findings, with human-review gates (dry-run / show-script / approve-before-apply). `--apply-for-real` is refused in CI. The local page only writes drafts; it never applies a script |
 
 Everything is STIG-agnostic: the tools parse standard XCCDF, so the same
 code works for Windows 11, Windows Server, RHEL, Ubuntu, macOS, SQL Server,
@@ -59,7 +63,7 @@ Keep the `.bat` / `.command` file inside the unzipped folder. Do not drag it to 
 
 The same steps are in `Double-click this.txt` next to those files.
 
-The page is served on your own computer (`127.0.0.1`). Nothing is uploaded. It never approves a check for you and never runs one you have not approved. After a scan it writes a PDF report next to the JSON and Markdown reports.
+The page is served on your own computer (`127.0.0.1`). Nothing is uploaded. It never approves a check for you. A normal scan runs only checks you have approved under your name. An explicit override (the local checkbox, or CLI `--include-unreviewed`) can run unreviewed checks; those results are labeled untrusted and are not a normal approved scan. After a scan it writes a PDF report next to the JSON and Markdown reports. After a scan the page can also draft POA&M entries and candidate fix scripts; those buttons only write files.
 
 ## Public website (GitHub Pages)
 
@@ -182,7 +186,10 @@ python3 -m stigprep parse U_MS_Windows_11_V2R9_STIG.zip --explain
 #  explanations: all 257 rules annotated from filed sets
 ```
 
-Currently shipped, 1,440 rules across seven STIGs: Microsoft Windows 11 V2R9 (257), Windows Server 2019 V3R8 (282), Red Hat Enterprise Linux 9 V2R9 (445), Ubuntu 24.04 LTS V1R6 (194), Apple macOS 26 V1R3 (160), SQL Server 2022 Instance V1R4 (79) and Database V1R3 (23).
+Two scoped totals, not one ambiguous number:
+
+- **Explained (seven STIGs): 1,440 rules** — Microsoft Windows 11 V2R9 (257), Windows Server 2019 V3R8 (282), Red Hat Enterprise Linux 9 V2R9 (445), Ubuntu 24.04 LTS V1R6 (194), Apple macOS 26 V1R3 (160), SQL Server 2022 Instance V1R4 (79) and Database V1R3 (23).
+- **Check packs (five packaged platforms): 1,338 rules** — the five OS guides above (257 + 282 + 445 + 194 + 160). SQL Server is explained but is not shipped as a check pack.
 
 **Produce them for any other STIG.** The `stig-explain` skill
 (`skills/stig-explain/`) lets the AI assistant you already have write the
@@ -316,7 +323,8 @@ and validates and files the answers. Results land in the checklist JSON and in
 `annotations/<stig>.ai-cache.json`, which `--explain` attaches — so
 annotations committed to this repository are available to every user, with or
 without an assistant. `annotations/` carries complete sets for seven STIGs
-(1,440 rules).
+(1,440 explained rules). Five of those guides ship as check packs (1,338
+scan candidates). SQL Server 2022 is explained only.
 
 ## AI skills: scanning
 

@@ -17,8 +17,10 @@ them:
 * it listens on the loopback address only, never on a network interface;
 * every request must carry the one-time token printed at startup, so no
   other page or process on the machine can drive it;
-* it never approves a check and never runs an unapproved one. Approval is
-  a person typing their name.
+* it never approves a check on a person's behalf. A normal scan runs only
+  named-approved checks. An explicit override (the page checkbox, or CLI
+  ``--include-unreviewed``) can run unreviewed checks; those results are
+  labeled untrusted and are not a normal approved scan.
 """
 
 from __future__ import annotations
