@@ -136,12 +136,12 @@
   "date": "2026-09-06"
  },
  "claude-cowork-2026-09:WN11-CC-000345": {
-  "summary": "Prevent the WinRM service from accepting Basic authentication, so remote management connections cannot send plain-text passwords to this machine. A temporary, documented exception is possible with Authorizing Official approval in specific administrative situations.",
+  "summary": "Prevent the WinRM service from accepting Basic authentication, so remote management connections cannot send plain-text passwords to this machine.",
   "triage": "config-profile",
   "automation": "automatable",
   "caution": "Any tool that manages this machine over WinRM with Basic authentication will lose access; check remote management workflows before rolling out.",
   "model": "claude-cowork-2026-09",
-  "date": "2026-09-06"
+  "date": "2026-09-18"
  },
  "claude-cowork-2026-09:WN11-SO-000140": {
   "summary": "Disable anonymous SID/Name translation so an unauthenticated user cannot look up account names from security identifiers or vice versa. This removes an easy way to gather account information for an attack. The check is done by reviewing the effective setting in the Local Group Policy Editor.",

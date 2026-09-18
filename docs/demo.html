@@ -64,12 +64,12 @@
 
     <h2>4 · Approve every check</h2>
     <p>Every shipped check is <b>unreviewed</b> until a named person reads the exact command and types their name. Approval freezes a fingerprint of the command, the comparison, and the expected value. If those bytes change later, the check is treated as drifted and will not run.</p>
-    <p>In this story Jordan Hale — a fictional name — reads <code>fdesetup status</code> for FileVault, sees that it is a read-only command, and approves it. They do the same for the other commands they accept. They leave two checks unapproved because those need a profile they have not built yet. Unapproved checks do not run. The report will say so.</p>
+    <p>In this story Jordan Hale — a fictional name — reads <code>fdesetup status</code> for FileVault, sees that it is a read-only command, and approves it. They do the same for the other commands they accept. They leave two checks unapproved because those need a profile they have not built yet. Unapproved checks do not run in a <b>normal</b> scan. The report will say so. The command line can force an unreviewed run with <code>--include-unreviewed</code> (the local page has a matching optional checkbox); those results are labeled <b>untrusted</b> and are not a normal approved scan or accreditation evidence. The program never approves a check on a person's behalf.</p>
     <figure class="diagram">
       <img src="img/demo-approve.svg" alt="Example approval screen with a read-only FileVault command and the fictional name Jordan Hale.">
-      <figcaption>Figure 4. Example approval. A person types their own name. The program never approves a check for you and never runs one you have not approved.</figcaption>
+      <figcaption>Figure 4. Example approval. A person types their own name. The program never approves a check for you. A normal scan runs only named-approved checks. An explicit override can run unreviewed checks; those results are labeled untrusted.</figcaption>
     </figure>
-    <p>A safety gate still refuses anything that looks like a change: writes, network clients, privilege escalation, destructive verbs. Approval is not a licence to mutate the system. This first module only looks.</p>
+    <p>A safety gate still refuses anything that looks like a change: writes, network clients, privilege escalation, destructive verbs. Approval is not a licence to mutate the system. The scan itself only looks. After a scan, <code>stig-assess</code> and <code>stig-harden</code> can draft a Plan of Action and candidate fix scripts; those stay drafts until a named person acts, and apply is dry-run by default.</p>
 
     <h2>5 · Read the results and the risk story</h2>
     <p>After the approved checks run, the local page writes JSON, Markdown and a PDF next to each other. Coverage is stated first. In this invented result set:</p>
@@ -118,14 +118,14 @@
         </tr>
       </tbody>
     </table>
-    <p>The next step in the real program is the same as in this story: start with the CAT I failures, then decide whether to approve more checks or stop. Planned later modules will help write an assessment and, only after another human gate, safe remediation. This release does not change settings for you.</p>
+    <p>The next step in the real program is the same as in this story: start with the CAT I failures, then decide whether to approve more checks or stop. Modules 3 and 4 already ship: <code>stig-assess</code> drafts Plan of Action and Milestones entries a named person must approve and is the only one who can close; <code>stig-harden</code> drafts remediation scripts, dry-run by default, with <code>--apply-for-real</code> refused in CI. This example does not change settings for you.</p>
 
     <h2>What this example is not</h2>
     <ul>
       <li>It is not a scan of your computer and not evidence about any real clinic.</li>
       <li>It is not an official Department of Defense product. DISA publishes the STIGs; this project is independent open source under an MIT licence.</li>
       <li>It is not a claim that twelve CAT I rules equal a complete baseline. A full macOS 26 guide in this repository has 160 rules.</li>
-      <li>It is not permission to skip approval. On a real machine you type your own name after you have read each command.</li>
+      <li>It is not permission to skip a named approval for a normal scan. On a real machine you type your own name after you have read each command. The command line can force an unreviewed run; those results are labeled untrusted and are not a normal approved scan.</li>
     </ul>
 
     <h2>Do the same steps for real</h2>

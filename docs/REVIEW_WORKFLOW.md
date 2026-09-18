@@ -20,7 +20,7 @@ a human gate between authoring and execution.
 
 | State | Meaning | Executes? |
 |---|---|---|
-| `unreviewed` | Authored but not read by a human | No |
+| `unreviewed` | Authored but not read by a human | No, in a normal scan. `--include-unreviewed` can force a run; those results are labeled untrusted |
 | `approved` | A named human read the command and accepted it | Yes |
 | `rejected` | A named human read it and refused it | No |
 | *drifted* | Approved, then edited | No — must be re-reviewed |
@@ -87,7 +87,10 @@ which is what makes the workflow sustainable across releases.
 
 ## What is deliberately not automated
 
-- **Approval.** There is no flag that approves everything.
+- **Approval.** There is no flag that approves everything. `--include-unreviewed`
+  (and the matching local-page checkbox) can *run* unreviewed checks without
+  approving them. Those results are labeled untrusted and are not a normal
+  approved scan or accreditation evidence.
 - **Remediation.** The scanner never changes configuration. Fixing findings
   is module 4's job, behind its own gates.
 - **Judgment about applicability.** A check that passes on a host where the

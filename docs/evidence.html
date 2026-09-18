@@ -28,7 +28,8 @@
   <article class="paper">
     <p class="kicker">Public record</p>
     <h1 class="page">Evidence &amp; transparency</h1>
-    <p class="byline">Himanshu Saxena · dated <time datetime="2026-09-13">13 September 2026</time> ·
+    <p class="byline">Himanshu Saxena · dated <time datetime="2026-09-13">13 September 2026</time>,
+      updated <time datetime="2026-09-18">18 September 2026</time> ·
       <a href="https://stig.hsaxena.com/evidence.html">stig.hsaxena.com/evidence.html</a></p>
 
     <p>Anyone can clone the repository, open this site, and check the statements below. Dates are the day this page was written. If a later commit changes a fact, the git history is the correction.</p>
@@ -51,12 +52,17 @@
         The downloaded scanner is this project’s Python. Neither asks for an account or an API key.
       </li>
       <li>
-        <time datetime="2026-09-13">2026-09-13</time>
-        <b>A person must approve every check</b>
+        <time datetime="2026-09-18">2026-09-18</time>
+        <b>Named approval is the normal scan; an override exists and is labeled</b>
         Shipped checks stay <b>unreviewed</b> until someone reads the exact command and types their name.
         Approval freezes a SHA-256 digest of the command, the comparison, and the expected value.
         If those bytes change later, the check is treated as drifted and will not run.
-        Unapproved checks do not run. The program never approves a check for you.
+        The hosted website never scans. On the local page, a normal scan runs only named-approved checks;
+        the program never approves a check for you.
+        The command line can force an unreviewed run with <code>--include-unreviewed</code>
+        (the local page has a matching optional checkbox). That does not approve the check.
+        Those results are labeled <b>untrusted</b> in JSON, Markdown and PDF, and are not a
+        normal approved scan or accreditation evidence.
       </li>
       <li>
         <time datetime="2026-09-13">2026-09-13</time>
@@ -66,6 +72,29 @@
         or a Windows 11 PC (V2R9, 257 rules). Linux and servers stay on the command line.
         Source:
         <a href="https://github.com/himanshusaxenagithub/stig-ai-pipeline">github.com/himanshusaxenagithub/stig-ai-pipeline</a>.
+      </li>
+      <li>
+        <time datetime="2026-09-18">2026-09-18</time>
+        <b>Two scoped rule counts, not one ambiguous total</b>
+        <b>1,440</b> rules are explained across seven STIGs in <code>annotations/</code>
+        (Windows 11 V2R9 257, Windows Server 2019 V3R8 282, RHEL 9 V2R9 445,
+        Ubuntu 24.04 LTS V1R6 194, macOS 26 V1R3 160, SQL Server 2022 Instance V1R4 79
+        and Database V1R3 23).
+        <b>1,338</b> rules ship as check packs for five packaged platforms
+        (the five OS guides: 257 + 282 + 445 + 194 + 160).
+        SQL Server is explained but has no check pack. Do not treat 1,440 and 1,338 as the same number.
+      </li>
+      <li>
+        <time datetime="2026-09-18">2026-09-18</time>
+        <b>All four modules ship as working code</b>
+        <code>stigprep</code>, <code>stigscan</code>, <code>stigassess</code> and
+        <code>stigharden</code> are in this repository with unit tests.
+        Assess drafts POA&amp;M wording; a named person approves and is the only one who can close.
+        Harden drafts remediation scripts; apply is a dry-run unless
+        <code>--apply-for-real</code> is passed with <code>--by</code> and
+        <code>--i-have-reviewed</code>, and that flag is refused in CI.
+        This page does not claim a BitLocker / Credential Guard check-candidate rewrite
+        or a new Windows live scan; those remain follow-up work.
       </li>
       <li>
         <time datetime="2026-09-14">2026-09-14</time>
@@ -91,9 +120,9 @@
         repository, so a reviewer can read exactly what runs.
       </li>
       <li>
-        <time datetime="2026-09-14">2026-09-14</time>
+        <time datetime="2026-09-18">2026-09-18</time>
         <b>Automated tests</b>
-        <code>python3 -m unittest discover -s tests</code> runs 301 tests on the date above
+        <code>python3 -m unittest discover -s tests</code> runs 306 tests on the date above
         (parsers, the approval digest, the safety gate, the Windows extractor, the site data
         export, the browser zip, the launchers, and the local page's HTTP routes). Separately,
         the double-click path — website download, unzip, launcher, page, approval, scan, PDF,

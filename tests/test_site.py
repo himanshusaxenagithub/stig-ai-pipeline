@@ -58,6 +58,15 @@ class TestSiteExport(unittest.TestCase):
         self.assertEqual(data["rules"], 257)
         self.assertGreater(data["annotated"], 200)
 
+    def test_winrm_service_explanation_does_not_invent_an_ao_exception(self):
+        data = json.loads((self.out / "data" / "guides" / "windows-11.json").read_text())
+        row = next(i for i in data["items"] if i["stig_id"] == "WN11-CC-000345")
+        summary = row["summary"]
+        self.assertIn("WinRM", summary)
+        self.assertIn("Basic", summary)
+        self.assertNotIn("Authorizing Official", summary)
+        self.assertNotIn("exception", summary.lower())
+
     def test_scanner_src_zip_is_stored_and_has_the_launchers(self):
         archive = self.out / "packages" / "scanner-src.zip"
         self.assertTrue(archive.is_file())
@@ -147,13 +156,15 @@ class TestWebsitePage(unittest.TestCase):
         demo = landing.split('id="demo"', 1)[1].split('id="os-pick"', 1)[0]
         self.assertIn("find", demo.lower())
         self.assertIn("PDF", demo)
-        self.assertIn("fixes", demo.lower())
+        self.assertIn("fix", demo.lower())
         self.assertNotIn("Pentagon", demo)
         self.assertNotIn("most people never", demo.lower())
         self.assertNotIn("vulnerabilit", demo.lower())
         self.assertNotIn("exploit", demo.lower())
         self.assertNotIn("dl.dod.cyber.mil", demo)
         self.assertNotIn("CORS", demo)
+        self.assertNotIn("may come later", html)
+        self.assertIn("draft", demo.lower())
         self.assertIn("Select CAT I for demo", html)
         self.assertIn('id="sel-cati-demo"', html)
         self.assertIn('id="demo-rules-banner"', html)
@@ -245,6 +256,13 @@ class TestDemoPage(unittest.TestCase):
             ET.parse(ROOT / "docs" / "img" / name)
         words = _visible_words(html)
         self.assertGreaterEqual(len(words), 400)
+        self.assertNotIn("Planned later modules", html)
+        self.assertNotIn("This first module only looks", html)
+        self.assertIn("stig-assess", html)
+        self.assertIn("stig-harden", html)
+        self.assertIn("untrusted", html)
+        self.assertIn("include-unreviewed", html)
+        self.assertIn("dry-run", html)
 
     def test_product_site_does_not_host_the_essay_library(self):
         articles = ROOT / "docs" / "articles"
@@ -299,7 +317,15 @@ class TestEvidenceAndTransparency(unittest.TestCase):
         self.assertIn("sample data", html.lower())
         self.assertIn("dry-run", html)
         self.assertIn("human-gated", html)
-        self.assertIn("runs 301 tests", html)
+        self.assertIn("runs 306 tests", html)
+        self.assertIn("1,440", html)
+        self.assertIn("1,338", html)
+        self.assertIn("include-unreviewed", html)
+        self.assertIn("untrusted", html.lower())
+        self.assertIn("stigprep", html)
+        self.assertIn("stigassess", html)
+        self.assertIn("stigharden", html)
+        self.assertNotIn("Unapproved checks do not run. The program never approves a check for you.", html)
         self.assertNotIn("chatbot", html.lower())
         self.assertNotIn("EB-2", html)
         self.assertNotIn("NIW", html)
@@ -545,6 +571,58 @@ blob.arrayBuffer().then(b => process.stdout.write(Buffer.from(b)));
             self.assertEqual((bat.external_attr >> 16) & 0o777, 0o644)
             self.assertEqual(zf.read(cmd).decode(), "#!/bin/bash\necho hi\n")
             self.assertIsNone(zf.testzip())
+
+
+class TestShippedScope(unittest.TestCase):
+    """Two scoped rule counts, four shipped modules, no invented WinRM exception."""
+
+    def test_annotations_total_1440_across_seven_stigs(self):
+        from stigprep.explain import _entries
+        files = sorted((ROOT / "annotations").glob("*.ai-cache.json"))
+        self.assertEqual(len(files), 7)
+        total = 0
+        for path in files:
+            n = len(_entries(json.loads(path.read_text(encoding="utf-8"))))
+            total += n
+        self.assertEqual(total, 1440)
+
+    def test_checkpacks_total_1338_across_five_platforms(self):
+        from stigscan.pack import CheckPack
+        files = sorted((ROOT / "checkpacks").glob("*.json"))
+        self.assertEqual(len(files), 5)
+        total = 0
+        for path in files:
+            total += len(CheckPack.load(path).checks)
+        self.assertEqual(total, 1338)
+
+    def test_readme_and_changelog_state_both_scoped_counts(self):
+        readme = (ROOT / "README.md").read_text(encoding="utf-8")
+        changelog = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
+        for text, name in ((readme, "README.md"), (changelog, "CHANGELOG.md")):
+            self.assertIn("1,440", text, name)
+            self.assertIn("1,338", text, name)
+        self.assertIn("All four modules ship", readme)
+        self.assertIn("stig-assess", readme)
+        self.assertIn("stig-harden", readme)
+        self.assertIn("--include-unreviewed", readme)
+        self.assertIn("untrusted", readme)
+        self.assertNotIn("Planned later modules", readme)
+        self.assertIn("WN11-CC-000345", changelog)
+        self.assertIn("BitLocker", changelog)
+
+    def test_filed_winrm_annotation_matches_disa_not_an_invented_exception(self):
+        from stigprep.explain import _entries
+        path = ROOT / "annotations" / "U_MS_Windows_11_STIG_V2R9_Manual-xccdf.ai-cache.json"
+        entries = _entries(json.loads(path.read_text(encoding="utf-8")))
+        summary = entries["WN11-CC-000345"]["summary"]
+        self.assertIn("WinRM", summary)
+        self.assertIn("Basic authentication", summary)
+        self.assertNotIn("Authorizing Official", summary)
+        self.assertNotIn("exception", summary.lower())
+        published = json.loads(
+            (ROOT / "docs" / "data" / "guides" / "windows-11.json").read_text(encoding="utf-8"))
+        row = next(i for i in published["items"] if i["stig_id"] == "WN11-CC-000345")
+        self.assertEqual(row["summary"], summary)
 
 
 if __name__ == "__main__":
